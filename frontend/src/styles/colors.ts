@@ -1,7 +1,7 @@
 const colors = {
-  primary: '#ffd6ff',
+  primary: '#c8b6ff',
+  pink: '#ffd6ff',
   lightViolet: '#e7c6ff',
-  violet: '#c8b6ff',
   black: '#222',
   gray100: '#888',
   gray200: '#BBB',
