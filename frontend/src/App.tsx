@@ -1,25 +1,17 @@
-import { useState } from 'react';
+import { Route, Router, Routes } from './lib/Router';
+import Chat from './pages/Chat';
+import Home from './pages/Home';
+import PostDetail from './pages/Post/PostDetail';
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <div className="App">
-      <div></div>
-
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vit e and React logos to learn more
-      </p>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/product/:id" element={<PostDetail />} />
+        <Route path="/chat" element={<Chat />} />
+      </Routes>
+    </Router>
   );
 }
 export default App;
