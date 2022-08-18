@@ -17,7 +17,7 @@ function HomeNavbar() {
         </h3>
         <div>
           <UserIcon />
-          <MenuIcon />
+          {false && <MenuIcon />}
         </div>
       </StyledNav>
     </header>

@@ -1,12 +1,28 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
-import { Link } from '../lib/Router';
+import ProductItem from '../components/Product/ProductItem';
+import { ProductPreviewType } from '../types/product';
 
 function Home() {
+  const [products, setProducts] = useState<ProductPreviewType[]>([]);
+
+  useEffect(() => {
+    (async function () {
+      const { data } = await axios.get('/api/product');
+
+      setProducts(data);
+    })();
+  }, []);
+
   return (
     <main>
       <HomeNavbar />
-      <h1>HOme</h1>
-      <Link to="/chat">챗으로가자~</Link>
+      <ul>
+        {products.map((product) => (
+          <ProductItem key={product.id} product={product} />
+        ))}
+      </ul>
     </main>
   );
 }
