@@ -7,12 +7,12 @@ import {
   throwError,
   transformPathVariables,
 } from '../utils';
+import location from '../location';
 
 function Routes({ children }: { children: React.ReactNode }) {
   const path = useContext(PathContext);
 
   let currentRoute = null;
-  let _currentParams = null;
 
   Children.forEach(children, (child: React.ReactNode) => {
     if (!isValidChild(child)) {
@@ -28,7 +28,10 @@ function Routes({ children }: { children: React.ReactNode }) {
 
     if (isMatchedRoute(parsedPath, path)) {
       currentRoute = routeElement;
-      _currentParams = params;
+      location.setLocation({
+        path: parsedPath,
+        params,
+      });
     }
   });
 
