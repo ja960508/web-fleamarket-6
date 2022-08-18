@@ -1,7 +1,25 @@
+import {
+  CategoryIcon,
+  MapPinIcon,
+  MenuIcon,
+  UserIcon,
+} from '../../assets/icons/icons';
+import { StyledNav } from './HomeNavbar.style';
+
 function HomeNavbar() {
   return (
     <header>
-      <nav>홈 네바</nav>
+      <StyledNav>
+        <CategoryIcon />
+        <h3>
+          <MapPinIcon />
+          <span>역삼동</span>
+        </h3>
+        <div>
+          <UserIcon />
+          <MenuIcon />
+        </div>
+      </StyledNav>
     </header>
   );
 }
