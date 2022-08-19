@@ -6,7 +6,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('oauth/github')
-  async getAccessToken(@Body('code') code: string) {
-    return await this.authService.getAccessToken(code);
+  async githubAuthentication(@Body('code') code: string) {
+    const token = await this.authService.getAccessToken(code);
+    const userInfo = await this.authService.getUserInfoFromGithub(token);
+
+    return { githubId: userInfo.id, nickname: userInfo.login };
   }
 }

@@ -1,13 +1,19 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { MySQLService } from 'src/config/mysql.service';
+import { Pool } from 'mysql2/promise';
 
 @Injectable()
 export class AuthService {
+  pool: Pool;
   constructor(
     private readonly httpService: HttpService,
     private configService: ConfigService,
-  ) {}
+    private mysqlService: MySQLService,
+  ) {
+    this.pool = this.mysqlService.pool;
+  }
 
   async getUserInfoFromGithub(accessToken) {
     try {
@@ -43,8 +49,6 @@ export class AuthService {
       },
     );
 
-    const userInfo = await this.getUserInfoFromGithub(data.access_token);
-
-    return userInfo;
+    return data.access_token;
   }
 }
