@@ -32,9 +32,7 @@ export function usePathParams() {
 export function useNavigate() {
   const pathDispatch = useContext(PathDispatch);
 
-  return (path: string) => {
-    pathDispatch(path);
-  };
+  return pathDispatch;
 }
 
 export function useSearchParams() {
@@ -44,4 +42,13 @@ export function useSearchParams() {
   return (query: string) => {
     return location.get(query);
   };
+}
+
+export function useHistoryState() {
+  const currentState = window.history.state;
+  if (!currentState) {
+    return null;
+  }
+
+  return currentState;
 }

@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 
-type PathDispatchType = (nextPath: string) => void;
+type PathDispatchType = (nextPath: string, state?: any) => void;
 
 export const PathContext = createContext('/');
 export const PathDispatch = createContext<PathDispatchType>(() => undefined);
@@ -8,14 +8,14 @@ export const PathDispatch = createContext<PathDispatchType>(() => undefined);
 function PathProvider({ children }: { children: React.ReactNode }) {
   const [path, setPath] = useState(location.pathname);
 
-  const handlePathChange = (nextPath: string) => {
+  const handlePathChange = (nextPath: string, state?: any) => {
     setPath(nextPath);
-    window.history.pushState(nextPath, '', nextPath);
+    window.history.pushState(state, '', nextPath);
   };
 
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      setPath(event.state || window.location.pathname);
+    const handlePopState = () => {
+      setPath(window.location.pathname);
     };
 
     window.addEventListener('popstate', handlePopState);
