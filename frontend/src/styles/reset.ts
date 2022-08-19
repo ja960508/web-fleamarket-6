@@ -32,6 +32,7 @@ const reset = css`
     padding: 0;
   }
   button {
+    color: inherit;
     font-family: 'Noto Sans KR';
     background-color: transparent;
     border: none;
