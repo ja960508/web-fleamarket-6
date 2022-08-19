@@ -1,12 +1,16 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
 import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
+import { UserInfoContext } from '../context/UserInfoContext';
 import { ProductPreviewType } from '../types/product';
 
 function Home() {
   const [products, setProducts] = useState<ProductPreviewType[]>([]);
+  const userInfo = useContext(UserInfoContext);
+
+  console.log(userInfo);
 
   useEffect(() => {
     (async function () {
