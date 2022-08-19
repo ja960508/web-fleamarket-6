@@ -10,8 +10,8 @@ interface LinkProps {
 function Link({ className, children, to }: LinkProps) {
   const navigate = useNavigate();
 
-  const handleClick = ({ preventDefault }: MouseEvent<HTMLAnchorElement>) => {
-    preventDefault();
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     navigate(to);
   };
 
