@@ -4,13 +4,14 @@ interface LinkButtonProps {
   className?: string;
   children: React.ReactNode;
   moveTo: string;
+  state?: any;
 }
 
-function LinkButton({ className, children, moveTo }: LinkButtonProps) {
+function LinkButton({ className, children, moveTo, state }: LinkButtonProps) {
   const navigate = useNavigate();
 
   const handleLinkButtonClick = () => {
-    navigate(moveTo);
+    navigate(moveTo, state);
   };
 
   return (
