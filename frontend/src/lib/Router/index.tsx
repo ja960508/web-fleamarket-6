@@ -3,6 +3,7 @@ import Router from './components/Router';
 import Routes from './components/Routes';
 import Link from './components/Link';
 import { useNavigate, usePathParams, useSearchParams } from './hooks';
+import LinkButton from './components/LinkButton';
 
 export {
   Route,
@@ -12,4 +13,5 @@ export {
   useNavigate,
   usePathParams,
   useSearchParams,
+  LinkButton,
 };

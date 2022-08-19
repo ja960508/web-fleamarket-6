@@ -21,7 +21,6 @@ export function usePathParams() {
 
   return match.reduce(
     (result, curr, idx) => {
-      console.log(curr);
       result[params[idx]] = curr;
 
       return result;
@@ -30,10 +29,12 @@ export function usePathParams() {
   );
 }
 
-export function useNavigate(path: string) {
+export function useNavigate() {
   const pathDispatch = useContext(PathDispatch);
 
-  pathDispatch(path);
+  return (path: string) => {
+    pathDispatch(path);
+  };
 }
 
 export function useSearchParams() {

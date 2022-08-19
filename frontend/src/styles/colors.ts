@@ -9,8 +9,6 @@ const colors = {
   offWhite: '#f6f6f6',
   white: '#fff',
   red: '#f45452',
-} as const;
-
-type COLOR_TYPE = typeof colors;
+};
 
 export default colors;

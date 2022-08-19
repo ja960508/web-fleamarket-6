@@ -15,7 +15,7 @@ function PathProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
-      setPath(event.state);
+      setPath(event.state || window.location.pathname);
     };
 
     window.addEventListener('popstate', handlePopState);

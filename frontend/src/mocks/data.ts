@@ -13,7 +13,7 @@ export function userGenerator() {
 
 // source.unsplash.com/random
 export function productGenerator(id?: number) {
-  const thumbnail = 'source.unsplash.com/random';
+  const thumbnail = 'http://source.unsplash.com/random';
   const result = [];
   const categories = [
     '디지털기기',
@@ -28,7 +28,7 @@ export function productGenerator(id?: number) {
       id: i,
       thumbnail,
       likeCount: Math.floor(Math.random() * 10),
-      createAt: new Date(),
+      createdAt: new Date(),
       isSold: Math.random() > 0.5,
       category: Math.floor(Math.random() * categories.length),
       author: '사용자' + i,

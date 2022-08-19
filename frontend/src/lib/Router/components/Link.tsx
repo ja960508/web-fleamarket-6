@@ -1,5 +1,5 @@
-import { MouseEvent, useContext } from 'react';
-import { PathDispatch } from './PathProvider';
+import { MouseEvent } from 'react';
+import { useNavigate } from '../hooks';
 
 interface LinkProps {
   className?: string;
@@ -8,11 +8,11 @@ interface LinkProps {
 }
 
 function Link({ className, children, to }: LinkProps) {
-  const pathDispatch = useContext(PathDispatch);
+  const navigate = useNavigate();
 
   const handleClick = ({ preventDefault }: MouseEvent<HTMLAnchorElement>) => {
     preventDefault();
-    pathDispatch(to);
+    navigate(to);
   };
 
   return (
