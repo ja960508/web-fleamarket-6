@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { MySQLService } from 'src/config/mysql.service';
 import { Pool } from 'mysql2/promise';
+import formatData from 'src/utils/format';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
           },
         },
       );
+
       return data;
     } catch (e) {
       throw new HttpException(
@@ -50,5 +52,25 @@ export class AuthService {
     );
 
     return data.access_token;
+  }
+
+  async findOAuthUser(githubUserId: string) {
+    const [result] = await this.pool.execute(
+      `SELECT * FROM USER WHERE githubUserId = ${githubUserId}`,
+    );
+
+    return result[0];
+  }
+
+  async signup(user: any) {
+    // const result = await this.pool.execute(
+    //   `INSERT INTO USER (${Object.keys(user).join()})
+    //   VALUES (${Object.values(user).map(formatData).join()})
+    //   `,
+    // );
+
+    console.log(user);
+
+    return user;
   }
 }

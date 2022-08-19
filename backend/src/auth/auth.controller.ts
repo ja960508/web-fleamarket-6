@@ -9,7 +9,20 @@ export class AuthController {
   async githubAuthentication(@Body('code') code: string) {
     const token = await this.authService.getAccessToken(code);
     const userInfo = await this.authService.getUserInfoFromGithub(token);
+    const { id: githubUserId, login: nickname } = userInfo;
+    const OAuthUser = await this.authService.findOAuthUser(githubUserId);
 
-    return { githubId: userInfo.id, nickname: userInfo.login };
+    if (OAuthUser) {
+      return { isExist: true, user: OAuthUser };
+    }
+
+    return { isExist: false, user: { githubUserId, nickname } };
+  }
+
+  @Post('signup')
+  async signup(@Body('user') user: any) {
+    const signupResult = await this.authService.signup(user);
+
+    return signupResult;
   }
 }
