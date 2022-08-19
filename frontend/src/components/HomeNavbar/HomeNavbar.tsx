@@ -18,7 +18,7 @@ function HomeNavbar() {
           </LinkButton>
         </h3>
         <div>
-          <LinkButton moveTo={false ? '/auth/sign-in' : '/my'}>
+          <LinkButton moveTo={true ? '/auth/sign-in' : '/my'}>
             <UserIcon />
           </LinkButton>
         </div>
