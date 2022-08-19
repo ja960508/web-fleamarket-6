@@ -30,10 +30,12 @@ export function usePathParams() {
   );
 }
 
-export function useNavigate(path: string) {
+export function useNavigate() {
   const pathDispatch = useContext(PathDispatch);
 
-  pathDispatch(path);
+  return (path: string) => {
+    pathDispatch(path);
+  };
 }
 
 export function useSearchParams() {
