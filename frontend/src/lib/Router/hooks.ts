@@ -21,7 +21,6 @@ export function usePathParams() {
 
   return match.reduce(
     (result, curr, idx) => {
-      console.log(curr);
       result[params[idx]] = curr;
 
       return result;
