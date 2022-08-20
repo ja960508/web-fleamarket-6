@@ -32,12 +32,7 @@ export class S3Service implements OnModuleInit {
         })
         .promise();
 
-      const url = this.s3.getSignedUrl('getObject', {
-        Bucket: this.configService.get('S3_BUCKET_NAME'),
-        Key,
-      });
-
-      return url;
+      return this.configService.get('S3_ADDRESS') + Key;
     } catch (e) {
       console.error(e);
       throw new HttpException('Failed to upload image to S3', 500);
