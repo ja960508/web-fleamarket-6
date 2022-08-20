@@ -10,8 +10,6 @@ function Home() {
   const [products, setProducts] = useState<ProductPreviewType[]>([]);
   const userInfo = useContext(UserInfoContext);
 
-  console.log(userInfo);
-
   useEffect(() => {
     (async function () {
       const { data } = await axios.get('/api/product');

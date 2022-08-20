@@ -4,6 +4,13 @@ import memoryCache from '../lib/MemoryCache';
 type QueryKey = string;
 type QueryFn<T> = () => Promise<T>;
 
+/**
+ * queryKey: 캐시 데이터의 unique key
+ * queryFn: 데이터 패칭용 함수 -> 추후에 refetchOnFocus 기능 구현 시 사용 예정
+ * refetchArgs: queryFn에 사용되는 파라미터가 변경되었을 때 refetch 하기 위한 도구.
+ * ex) useQuery('category', () => getCategory(categoryId), [categoryId])
+ */
+
 function useQuery<T>(
   queryKey: QueryKey,
   queryFn: QueryFn<T>,
@@ -13,7 +20,6 @@ function useQuery<T>(
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log('rerender!');
     async function fetchFromRemote() {
       try {
         setIsLoading(true);
