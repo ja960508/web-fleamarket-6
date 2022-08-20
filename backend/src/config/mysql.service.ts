@@ -29,9 +29,10 @@ export class MySQLService implements OnModuleInit {
     await this.pool.execute(`
     CREATE TABLE IF NOT EXISTS USER (
       id INT PRIMARY KEY AUTO_INCREMENT,
-      userId VARCHAR(20) NOT NULL,
+      githubUserId INT,
+      nickname VARCHAR(20),
       password VARCHAR(20),
-      regionId int,
+      regionId INT,
       FOREIGN KEY (regionId) REFERENCES REGION(id)
     )
     `);

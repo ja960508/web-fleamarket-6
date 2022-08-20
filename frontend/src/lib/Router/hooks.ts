@@ -36,8 +36,7 @@ export function useNavigate() {
 }
 
 export function useSearchParams() {
-  const currentPath = useContext(PathContext);
-  const location = new URLSearchParams(currentPath);
+  const location = new URLSearchParams(window.location.search);
 
   return (query: string) => {
     return location.get(query);
