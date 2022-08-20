@@ -15,7 +15,9 @@ export class S3Service implements OnModuleInit {
       },
     });
 
-    this.s3 = new AWS.S3();
+    this.s3 = new AWS.S3({
+      signatureVersion: 'v4',
+    });
   }
 
   async uploadFile(file: Express.Multer.File) {
@@ -26,12 +28,18 @@ export class S3Service implements OnModuleInit {
           Key,
           Body: file.buffer,
           Bucket: this.configService.get('S3_BUCKET_NAME'),
+          ContentType: file.mimetype,
         })
         .promise();
 
-      return this.configService.get('S3_ADDRESS') + Key;
+      const url = this.s3.getSignedUrl('getObject', {
+        Bucket: this.configService.get('S3_BUCKET_NAME'),
+        Key,
+      });
+
+      return url;
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new HttpException('Failed to upload image to S3', 500);
     }
   }

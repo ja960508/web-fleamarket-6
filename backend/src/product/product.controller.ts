@@ -12,7 +12,14 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post('upload')
-  @UseInterceptors(FilesInterceptor('thumbnails', 10))
+  @UseInterceptors(
+    FilesInterceptor('thumbnails', 10, {
+      limits: {
+        files: 10,
+        fileSize: 1024 * 1024 * 5,
+      },
+    }),
+  )
   uploadThumbnails(@UploadedFiles() files: Array<Express.Multer.File>) {
     return this.productService.uploadThumbnails(files);
   }
