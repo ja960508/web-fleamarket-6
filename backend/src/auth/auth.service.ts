@@ -59,7 +59,7 @@ export class AuthService {
 
       return data.access_token;
     } catch (e) {
-      throw new HttpException(`Failed to Fetch Token from provider.`, 400);
+      throw new HttpException(`Failed to Fetch Token from provider.`, 500);
     }
   }
 
