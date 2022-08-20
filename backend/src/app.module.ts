@@ -4,6 +4,7 @@ import { MySQLModule } from './config/mysql/mysql.module';
 import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
 import { S3Module } from './config/s3/s3.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { S3Module } from './config/s3/s3.module';
     AuthModule,
     ProductModule,
     S3Module,
+    CategoryModule,
   ],
 })
 export class AppModule {}
