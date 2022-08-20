@@ -3,7 +3,6 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { MySQLService } from 'src/config/mysql.service';
 import { Pool } from 'mysql2/promise';
-import formatData from 'src/utils/format';
 
 @Injectable()
 export class AuthService {
@@ -37,21 +36,31 @@ export class AuthService {
   }
 
   async getAccessToken(code: string) {
-    const { data } = await this.httpService.axiosRef.post(
-      'https://github.com/login/oauth/access_token',
-      {
-        client_id: this.configService.get('CLIENT_ID'),
-        client_secret: this.configService.get('CLIENT_SECRET'),
-        code,
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    );
+    const client_id = this.configService.get('CLIENT_ID');
+    const client_secret = this.configService.get('CLIENT_SECRET');
 
-    return data.access_token;
+    if (!client_id || !client_secret || !code)
+      throw new HttpException(`Required Data is not Provided.`, 400);
+
+    try {
+      const { data } = await this.httpService.axiosRef.post(
+        'https://github.com/login/oauth/access_token',
+        {
+          client_id,
+          client_secret,
+          code,
+        },
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      );
+
+      return data.access_token;
+    } catch (e) {
+      throw new HttpException(`Failed to Fetch Token from provider.`, 400);
+    }
   }
 
   async findOAuthUser(githubUserId: string) {
