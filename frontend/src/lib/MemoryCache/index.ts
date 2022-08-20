@@ -10,14 +10,24 @@ interface QueryCache {
   };
 }
 
+interface TimerMap {
+  [queryKey: QueryKey]: NodeJS.Timer;
+}
+
 class MemoryCache {
   private queryCache: QueryCache;
+  private timerMap: TimerMap;
   constructor() {
     this.queryCache = {};
+    this.timerMap = {};
   }
 
   private registerExpire(queryKey: QueryKey) {
-    setTimeout(() => {
+    if (this.timerMap[queryKey]) {
+      clearTimeout(this.timerMap[queryKey]);
+    }
+
+    this.timerMap[queryKey] = setTimeout(() => {
       this.removeCacheData(queryKey);
     }, CACHE_EXPIRE);
   }
