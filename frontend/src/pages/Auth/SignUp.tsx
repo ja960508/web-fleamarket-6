@@ -12,8 +12,6 @@ function SignUp() {
     const res = await axios.post('http://localhost:4000/auth/signup', {
       user: userInfo,
     });
-
-    console.log(res);
   };
 
   return (
