@@ -14,6 +14,6 @@ export class ProductController {
   @Post('upload')
   @UseInterceptors(FilesInterceptor('thumbnails', 10))
   uploadThumbnails(@UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log(files);
+    return this.productService.uploadThumbnails(files);
   }
 }

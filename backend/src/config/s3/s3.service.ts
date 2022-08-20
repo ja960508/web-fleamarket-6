@@ -1,5 +1,6 @@
 import { HttpException, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { generate as shortid } from 'shortid';
 import * as AWS from 'aws-sdk';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class S3Service implements OnModuleInit {
 
   async uploadFile(file: Express.Multer.File) {
     try {
-      const Key = `${Date.now()}_${file.originalname}`;
+      const Key = `${Date.now()}_${shortid()}`;
       await this.s3
         .putObject({
           Key,
@@ -28,8 +29,9 @@ export class S3Service implements OnModuleInit {
         })
         .promise();
 
-      return `${this.configService.get('S3_ADDRESS')}/${Key}}`;
+      return this.configService.get('S3_ADDRESS') + Key;
     } catch (e) {
+      console.log(e);
       throw new HttpException('Failed to upload image to S3', 500);
     }
   }
