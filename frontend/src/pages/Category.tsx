@@ -37,9 +37,9 @@ function Category() {
 const CategoryIconList = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem 1rem;
+  gap: 3rem 1rem;
 
-  padding: 1.5rem 0;
+  padding: 3rem 0;
 
   & > .icon-button {
     justify-self: center;
