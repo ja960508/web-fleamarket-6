@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MySQLModule } from './config/mysql.module';
+import { MySQLModule } from './config/mysql/mysql.module';
 import { AuthModule } from './auth/auth.module';
+import { ProductModule } from './product/product.module';
+import { S3Module } from './config/s3/s3.module';
 
 @Module({
   imports: [
@@ -11,6 +13,8 @@ import { AuthModule } from './auth/auth.module';
     }),
     MySQLModule,
     AuthModule,
+    ProductModule,
+    S3Module,
   ],
 })
 export class AppModule {}
