@@ -1,26 +1,23 @@
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
 import PageHeader from '../components/PageHeader/PageHeader';
 import { remote } from '../lib/api';
 import { CategoryType } from '../types/category';
 import colors from '../styles/colors';
 import { textXSmall } from '../styles/fonts';
 import { LinkButton } from '../lib/Router';
+import useQuery from '../hooks/useQuery';
 
 function Category() {
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-  useEffect(() => {
-    (async function () {
-      const result = await remote('/category');
-      setCategories(result.data);
-    })();
-  }, []);
+  const { data } = useQuery<CategoryType[]>('category', async () => {
+    const result = await remote('/category');
+    return result.data;
+  });
 
   return (
     <main>
       <PageHeader pageName="카테고리" />
       <CategoryIconList>
-        {categories.map(({ id, name, thumbnail }) => (
+        {data?.map(({ id, name, thumbnail }) => (
           <LinkButton
             moveTo={`/?category=${id}`}
             className="icon-button"
