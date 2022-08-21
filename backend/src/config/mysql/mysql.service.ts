@@ -40,7 +40,8 @@ export class MySQLService implements OnModuleInit {
     await this.pool.execute(`
     CREATE TABLE IF NOT EXISTS CATEGORY (
       id INT PRIMARY KEY AUTO_INCREMENT,
-      name VARCHAR(20) NOT NULL
+      name VARCHAR(20) NOT NULL,
+      thumbnail VARCHAR(255)
     )
     `);
 

@@ -2,7 +2,7 @@ import { useNavigate } from '../hooks';
 
 interface LinkButtonProps {
   className?: string;
-  children: React.ReactNode;
+  children: React.ReactNode | React.ReactNode[];
   moveTo: string;
   state?: any;
 }

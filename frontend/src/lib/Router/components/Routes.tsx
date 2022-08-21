@@ -26,7 +26,7 @@ function Routes({ children }: { children: React.ReactNode }) {
       removeQueryString(routePath),
     );
 
-    if (isMatchedRoute(parsedPath, path)) {
+    if (isMatchedRoute(parsedPath, removeQueryString(path))) {
       currentRoute = routeElement;
       location.setLocation({
         path: parsedPath,
