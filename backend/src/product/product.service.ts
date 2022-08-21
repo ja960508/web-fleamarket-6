@@ -36,7 +36,7 @@ export class ProductService {
       );
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT INNER JOIN REGION`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
