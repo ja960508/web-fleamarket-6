@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { Pool } from 'mysql2/promise';
+import formatData from 'src/utils/format';
 
 @Injectable()
 export class AuthService {
@@ -71,15 +72,25 @@ export class AuthService {
     return result[0];
   }
 
+  async findUserById(id: number) {
+    const [result] = await this.pool.execute(
+      `SELECT * FROM USER WHERE id = ${id}`,
+    );
+
+    return result[0];
+  }
+
   async signup(user: any) {
-    // const result = await this.pool.execute(
-    //   `INSERT INTO USER (${Object.keys(user).join()})
-    //   VALUES (${Object.values(user).map(formatData).join()})
-    //   `,
-    // );
+    await this.pool.execute(
+      `INSERT INTO USER (${Object.keys(user).join()})
+      VALUES (${Object.values(user).map(formatData).join()})
+      `,
+    );
 
-    console.log(user);
+    const [insertId] = await this.pool.execute(`
+      SELECT last_insert_id() as last_id;
+      `);
 
-    return user;
+    return insertId[0].last_id;
   }
 }

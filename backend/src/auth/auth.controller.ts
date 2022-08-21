@@ -21,8 +21,9 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body('user') user: any) {
-    const signupResult = await this.authService.signup(user);
+    const lastId = await this.authService.signup(user);
+    const insertedUser = await this.authService.findUserById(lastId);
 
-    return signupResult;
+    return insertedUser;
   }
 }

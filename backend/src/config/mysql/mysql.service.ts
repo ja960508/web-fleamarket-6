@@ -27,6 +27,11 @@ export class MySQLService implements OnModuleInit {
   `);
 
     await this.pool.execute(`
+    INSERT INTO REGION (name)
+    SELECT '잠실'
+    WHERE NOT EXISTS (SELECT * FROM REGION)`);
+
+    await this.pool.execute(`
     CREATE TABLE IF NOT EXISTS USER (
       id INT PRIMARY KEY AUTO_INCREMENT,
       githubUserId INT,
