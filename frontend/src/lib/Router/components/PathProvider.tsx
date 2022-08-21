@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 
-type PathDispatchType = (nextPath: string, state?: any) => void;
+export type NextPathType = string | -1;
+type PathDispatchType = (nextPath: NextPathType, state?: any) => void;
 
 export const PathContext = createContext('/');
 export const PathDispatch = createContext<PathDispatchType>(() => undefined);
@@ -8,7 +9,12 @@ export const PathDispatch = createContext<PathDispatchType>(() => undefined);
 function PathProvider({ children }: { children: React.ReactNode }) {
   const [path, setPath] = useState(location.pathname);
 
-  const handlePathChange = (nextPath: string, state?: any) => {
+  const handlePathChange = (nextPath: NextPathType, state?: any) => {
+    if (nextPath === -1) {
+      window.history.back();
+      return;
+    }
+
     setPath(nextPath);
     window.history.pushState(state, '', nextPath);
   };

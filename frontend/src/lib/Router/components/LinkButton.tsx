@@ -1,9 +1,10 @@
 import { useNavigate } from '../hooks';
+import { NextPathType } from './PathProvider';
 
 interface LinkButtonProps {
   className?: string;
   children: React.ReactNode | React.ReactNode[];
-  moveTo: string;
+  moveTo: NextPathType;
   state?: any;
 }
 
@@ -15,7 +16,11 @@ function LinkButton({ className, children, moveTo, state }: LinkButtonProps) {
   };
 
   return (
-    <button className={className} onClick={handleLinkButtonClick}>
+    <button
+      style={{ display: 'flex' }}
+      className={className}
+      onClick={handleLinkButtonClick}
+    >
       {children}
     </button>
   );
