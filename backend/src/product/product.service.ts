@@ -17,6 +17,9 @@ export class ProductService {
   async getProducts(options: ProductGetOptions) {
     const LIMIT = 10;
     const CALC_TOTAL_COUNT = `SQL_CALC_FOUND_ROWS`;
+    const REGION_SUBQUERY = /*sql*/ `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
+    const SELECT_WITH = `${CALC_TOTAL_COUNT} ${REGION_SUBQUERY},`;
+
     const { userId, filter, categoryId, page = 1 } = options;
 
     if ((userId || filter) && categoryId) {
@@ -33,23 +36,23 @@ export class ProductService {
       );
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${CALC_TOTAL_COUNT} * FROM PRODUCT`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT INNER JOIN REGION`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
-          select ${CALC_TOTAL_COUNT} P.* from PRODUCT as P inner join USER_LIKE_PRODUCT as ULP on ULP.productId = P.id where ULP.userId = ${userId}
+          SELECT ${SELECT_WITH} P.* FROM PRODUCT AS P INNER JOIN USER_LIKE_PRODUCT AS ULP ON ULP.productId = P.id WHERE ULP.userId = ${userId}
         `;
     }
 
     if (filter === 'sale') {
       beforePaginationQuery = /*sql*/ `
-          select ${CALC_TOTAL_COUNT} PRODUCT.* from PRODUCT where authorId = ${userId}
+          SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT WHERE authorId = ${userId}
         `;
     }
 
     if (categoryId) {
       beforePaginationQuery = /*sql*/ `
-        select ${CALC_TOTAL_COUNT} PRODUCT.* from PRODUCT where categoryId = ${categoryId}
+        SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT WHERE categoryId = ${categoryId}
       `;
     }
 
@@ -59,7 +62,7 @@ export class ProductService {
 
     const [result] = await this.pool.query(paginatedQuery);
     const [[{ totalCount }]] = (await this.pool.query(
-      /*sql*/ `SELECT FOUND_ROWS() as totalCount`,
+      `SELECT FOUND_ROWS() AS totalCount`,
     )) as any[][];
 
     return {
