@@ -3,12 +3,18 @@ import { CategoryIcon, MapPinIcon, UserIcon } from '../../assets/icons/icons';
 import { LinkButton } from '../../lib/Router';
 import colors from '../../styles/colors';
 
-function HomeNavbar() {
+function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
   return (
     <header>
       <StyledNav>
         <LinkButton moveTo="/category">
-          <CategoryIcon />
+          {currentCategoryIcon ? (
+            <SelectedCategory>
+              <img src={currentCategoryIcon} alt="selected-category" />
+            </SelectedCategory>
+          ) : (
+            <CategoryIcon />
+          )}
         </LinkButton>
 
         <h3>
@@ -52,4 +58,17 @@ const StyledNav = styled.nav`
   svg circle {
     stroke: ${colors.white};
   }
+`;
+
+const SelectedCategory = styled.div`
+  display: flex;
+  & > img {
+    width: 1rem;
+    height: 1rem;
+  }
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+
+  background-color: ${colors.white};
+  border-radius: 10px;
+  padding: 0.3rem;
 `;

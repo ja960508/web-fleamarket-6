@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
 import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
-import { UserInfoContext } from '../context/UserInfoContext';
+import { useHistoryState } from '../lib/Router/hooks';
 import { ProductPreviewType } from '../types/product';
 
 function Home() {
   const [products, setProducts] = useState<ProductPreviewType[]>([]);
-  const userInfo = useContext(UserInfoContext);
+  const categoryIconURL = useHistoryState();
 
   useEffect(() => {
     (async function () {
@@ -20,7 +20,7 @@ function Home() {
 
   return (
     <main>
-      <HomeNavbar />
+      <HomeNavbar currentCategoryIcon={categoryIconURL} />
       <ul>
         {products.map((product) => (
           <ProductItem key={product.id} product={product} />
