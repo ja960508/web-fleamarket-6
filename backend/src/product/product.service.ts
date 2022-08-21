@@ -15,44 +15,45 @@ export class ProductService {
   }
 
   async getProducts(options: ProductGetOptions) {
+    const { userId, filter, categoryId, page = 1 } = options;
+
     const LIMIT = 10;
     const CALC_TOTAL_COUNT = `SQL_CALC_FOUND_ROWS`;
     const REGION_SUBQUERY = /*sql*/ `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
+    const ISLIKED_SUBQUERY = /*sql*/ `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
+      userId ?? -1
+    } and productId = PRODUCT.id) as isLiked`;
+    const ISLIKED_TRUE = /*sql*/ `(SELECT 1) AS isLiked`;
     const SELECT_WITH = `${CALC_TOTAL_COUNT} ${REGION_SUBQUERY},`;
 
-    const { userId, filter, categoryId, page = 1 } = options;
-
-    if ((userId || filter) && categoryId) {
+    if (filter && categoryId) {
       throw new HttpException(
         'Filter cannot be provided with category option. Choose one.',
         400,
       );
     }
 
-    if (Boolean(userId) !== Boolean(filter)) {
-      throw new HttpException(
-        'userId and filter both should be provided.',
-        400,
-      );
+    if (!userId && filter) {
+      throw new HttpException('filter should be provided with userId.', 400);
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
-          SELECT ${SELECT_WITH} P.* FROM PRODUCT AS P INNER JOIN USER_LIKE_PRODUCT AS ULP ON ULP.productId = P.id WHERE ULP.userId = ${userId}
+          SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM PRODUCT AS P INNER JOIN USER_LIKE_PRODUCT AS ULP ON ULP.productId = P.id WHERE ULP.userId = ${userId}
         `;
     }
 
     if (filter === 'sale') {
       beforePaginationQuery = /*sql*/ `
-          SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT WHERE authorId = ${userId}
+          SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT WHERE authorId = ${userId}
         `;
     }
 
     if (categoryId) {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} PRODUCT.* FROM PRODUCT WHERE categoryId = ${categoryId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT WHERE categoryId = ${categoryId}
       `;
     }
 
