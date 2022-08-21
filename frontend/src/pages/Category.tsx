@@ -20,7 +20,7 @@ function Category() {
         {data?.map(({ id, name, thumbnail }) => (
           <LinkButton
             state={thumbnail}
-            moveTo={`/?category=${id}`}
+            moveTo={`/?categoryId=${id}`}
             className="icon-button"
             key={id}
           >

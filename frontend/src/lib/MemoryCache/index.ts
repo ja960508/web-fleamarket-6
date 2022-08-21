@@ -1,5 +1,4 @@
-type QueryKey = string;
-type QueryFn<T> = () => Promise<T>;
+import { QueryFn, QueryKey, RefetchArgs } from '../../hooks/useQuery';
 
 const CACHE_EXPIRE = 1000 * 30;
 
@@ -7,6 +6,7 @@ interface QueryCache {
   [queryKey: QueryKey]: {
     updateFn: () => Promise<any>;
     cacheData: any;
+    prevQueryOptions?: string;
   };
 }
 
@@ -32,14 +32,41 @@ class MemoryCache {
     }, CACHE_EXPIRE);
   }
 
-  getCacheData(queryKey: QueryKey) {
+  private isStaleCache(queryKey: QueryKey, refetchArgs?: RefetchArgs) {
+    if (!refetchArgs) return false;
+
+    const prevQueryOptions = this.queryCache[queryKey]?.prevQueryOptions;
+    if (!prevQueryOptions) return true;
+
+    return prevQueryOptions !== JSON.stringify(refetchArgs);
+  }
+
+  private parseQueryOption(refetchArgs?: RefetchArgs) {
+    return refetchArgs?.every((arg) => Boolean(arg))
+      ? JSON.stringify(refetchArgs)
+      : undefined;
+  }
+
+  getCacheData(queryKey: QueryKey, refetchArgs?: RefetchArgs) {
+    if (this.isStaleCache(queryKey, refetchArgs)) return null;
+
     return this.queryCache[queryKey]?.cacheData;
   }
 
-  setCacheData<T>(queryKey: QueryKey, queryFn: QueryFn<T>, fetchedData: T) {
+  setCacheData<T>(
+    queryKey: QueryKey,
+    queryFn: QueryFn<T>,
+    dataInfo: {
+      fetchedData: T;
+      queryOptions?: RefetchArgs;
+    },
+  ) {
+    const { fetchedData, queryOptions } = dataInfo;
+
     this.queryCache[queryKey] = {
       updateFn: queryFn,
       cacheData: fetchedData,
+      prevQueryOptions: this.parseQueryOption(queryOptions),
     };
 
     this.registerExpire(queryKey);

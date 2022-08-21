@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
 import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
@@ -16,7 +14,7 @@ function Home() {
   const { data: products } = useQuery<ProductPreviewType[]>(
     'products',
     async () => {
-      const queryString = categoryId ? `?category=${categoryId}` : '';
+      const queryString = categoryId ? `?categoryId=${categoryId}` : '';
       const { data } = await remote.get('/product' + queryString);
       return data.data;
     },
