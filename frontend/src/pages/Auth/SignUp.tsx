@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
-import { useHistoryState } from '../../lib/Router/hooks';
+import { UserInfoDispatch } from '../../context/UserInfoContext';
+import { useHistoryState, useNavigate } from '../../lib/Router/hooks';
 import colors from '../../styles/colors';
 
 interface regionType {
@@ -22,6 +23,8 @@ function SignUp() {
     name: '',
   });
   const githubUser = useHistoryState();
+  const dispatch = useContext(UserInfoDispatch);
+  const navigate = useNavigate();
 
   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,9 +32,20 @@ function SignUp() {
     if (githubUser) {
       const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-      const res = await axios.post('http://localhost:4000/auth/signup', {
+      const { data } = await axios.post('http://localhost:4000/auth/signup', {
         user: userInfo,
       });
+
+      dispatch({
+        type: 'USERINFO/SET_USER',
+        payload: {
+          userId: data.id,
+          name: data.nickname,
+          region: '잠실',
+          regionId: 1,
+        },
+      });
+      navigate('/');
 
       return;
     }
@@ -43,11 +57,20 @@ function SignUp() {
       regionId: selectedRegion.id,
     };
 
-    const res = await axios.post('http://localhost:4000/auth/signup', {
+    const { data } = await axios.post('http://localhost:4000/auth/signup', {
       user: userInfo,
     });
 
-    console.log(res);
+    dispatch({
+      type: 'USERINFO/SET_USER',
+      payload: {
+        userId: data.id,
+        name: data.nickname,
+        region: '잠실',
+        regionId: 1,
+      },
+    });
+    navigate('/');
   };
 
   const handleSelectRegion = (item: regionType) => {
