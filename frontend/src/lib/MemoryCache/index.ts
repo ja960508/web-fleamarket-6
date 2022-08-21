@@ -11,7 +11,7 @@ interface QueryCache {
 }
 
 interface TimerMap {
-  [queryKey: QueryKey]: NodeJS.Timer;
+  [queryKey: QueryKey]: number;
 }
 
 class MemoryCache {
@@ -75,6 +75,7 @@ class MemoryCache {
   removeCacheData(queryKey: QueryKey) {
     if (!this.queryCache[queryKey]) return;
     delete this.queryCache[queryKey];
+    delete this.timerMap[queryKey];
   }
 }
 
