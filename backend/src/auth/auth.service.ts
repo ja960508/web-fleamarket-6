@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { MySQLService } from 'src/config/mysql.service';
+import { MySQLService } from 'src/config/mysql/mysql.service';
 import { Pool } from 'mysql2/promise';
 import formatData from 'src/utils/format';
 
