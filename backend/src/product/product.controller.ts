@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Post,
   Query,
   UploadedFiles,
@@ -9,23 +10,24 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
-import { ProductGetOptions } from './types/product';
+import { ProductParam, ProductsGetOptions } from './types/product';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Get(':productId')
+  getProductById(
+    @Param()
+    { productId }: ProductParam,
+  ) {
+    return this.productService.getProductById(productId);
+  }
+
   @Get()
   getProducts(
-    @Query(
-      new ValidationPipe({
-        transform: true,
-        transformOptions: { enableImplicitConversion: true },
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    )
-    query: ProductGetOptions,
+    @Query()
+    query: ProductsGetOptions,
   ) {
     return this.productService.getProducts(query);
   }

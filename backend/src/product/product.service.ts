@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Pool } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
-import { ProductGetOptions } from './types/product';
+import { ProductsGetOptions } from './types/product';
 
 @Injectable()
 export class ProductService {
@@ -14,7 +14,11 @@ export class ProductService {
     this.pool = mysqlService.pool;
   }
 
-  async getProducts(options: ProductGetOptions) {
+  async getProductById(productId: number) {
+    return 1234;
+  }
+
+  async getProducts(options: ProductsGetOptions) {
     const { userId, filter, categoryId, page = 1 } = options;
 
     const LIMIT = 10;
