@@ -6,7 +6,6 @@ import {
   Query,
   UploadedFiles,
   UseInterceptors,
-  ValidationPipe,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';

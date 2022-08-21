@@ -1,9 +1,4 @@
-import {
-  IsOptional,
-  IsNumber,
-  IsString,
-  IsNumberString,
-} from 'class-validator';
+import { IsOptional, IsNumber, IsString } from 'class-validator';
 
 export type ProductFilterType = 'sale' | 'like';
 
