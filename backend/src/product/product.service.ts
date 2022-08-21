@@ -23,7 +23,8 @@ export class ProductService {
   }
 
   async getProductById(productId: number) {
-    if (this.isProductExist(productId)) {
+    const isExist = await this.isProductExist(productId);
+    if (!isExist) {
       throw new HttpException(`Cannot found Product.`, 404);
     }
 
