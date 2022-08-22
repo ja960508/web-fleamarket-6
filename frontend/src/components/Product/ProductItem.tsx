@@ -23,12 +23,16 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
         </div>
         <strong className="product-price">{price}</strong>
         <div className="product-count-group">
-          <span>
-            <MessageSquareIcon /> {chatCount}
-          </span>
-          <span>
-            <HeartIcon /> {likeCount}
-          </span>
+          {chatCount > 0 && (
+            <span>
+              <MessageSquareIcon /> {chatCount}
+            </span>
+          )}
+          {likeCount > 0 && (
+            <span>
+              <HeartIcon /> {likeCount}
+            </span>
+          )}
         </div>
       </div>
 
