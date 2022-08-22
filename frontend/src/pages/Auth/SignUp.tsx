@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
+import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
 import { useHistoryState, useNavigate } from '../../lib/Router/hooks';
 import colors from '../../styles/colors';
@@ -78,36 +79,39 @@ function SignUp() {
   };
 
   return (
-    <StyledSignupForm onSubmit={handleRegister}>
-      {!githubUser && (
-        <>
-          <CustomInput
-            name="nickname"
-            type="text"
-            placeholder="영문, 숫자 조합 10자 이하"
-          />
-          <CustomInput
-            name="password"
-            type="password"
-            placeholder="영문/특문/숫자 조합 16자 이하"
-          />
-        </>
-      )}
-      <CustomInput
-        type="text"
-        placeholder="시∙구 제외, 동만 입력."
-        value={selectedRegion.name}
-        readOnly={true}
-      />
-      <ul>
-        {region.map((item) => (
-          <li key={item.id} onClick={() => handleSelectRegion(item)}>
-            {item.name}
-          </li>
-        ))}
-      </ul>
-      <button type="submit">회원가입</button>
-    </StyledSignupForm>
+    <>
+      <PageHeader pageName="회원가입" />
+      <StyledSignupForm onSubmit={handleRegister}>
+        {!githubUser && (
+          <>
+            <CustomInput
+              name="nickname"
+              type="text"
+              placeholder="영문, 숫자 조합 10자 이하"
+            />
+            <CustomInput
+              name="password"
+              type="password"
+              placeholder="영문/특문/숫자 조합 16자 이하"
+            />
+          </>
+        )}
+        <CustomInput
+          type="text"
+          placeholder="시∙구 제외, 동만 입력."
+          value={selectedRegion.name}
+          readOnly={true}
+        />
+        <ul>
+          {region.map((item) => (
+            <li key={item.id} onClick={() => handleSelectRegion(item)}>
+              {item.name}
+            </li>
+          ))}
+        </ul>
+        <button type="submit">회원가입</button>
+      </StyledSignupForm>
+    </>
   );
 }
 

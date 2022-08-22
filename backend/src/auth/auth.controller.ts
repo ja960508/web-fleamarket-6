@@ -26,4 +26,11 @@ export class AuthController {
 
     return insertedUser;
   }
+
+  @Post('signin')
+  async signin(@Body() user: any) {
+    const userInfo = await this.authService.signin(user);
+
+    return userInfo;
+  }
 }
