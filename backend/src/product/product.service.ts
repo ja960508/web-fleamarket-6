@@ -2,9 +2,13 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Pool } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
-import { ProductsGetOptions } from './types/product';
+import {
+  ProductLikeRequestBody,
+  ProductParam,
+  ProductsGetOptions,
+  PostType,
+} from './types/product';
 import formatData from 'src/utils/format';
-import { PostType } from './product.type';
 
 @Injectable()
 export class ProductService {
@@ -50,9 +54,12 @@ export class ProductService {
     const REGION_SUBQUERY = /*sql*/ `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
     const ISLIKED_SUBQUERY = /*sql*/ `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
       userId ?? -1
-    } and productId = PRODUCT.id) as isLiked`;
+    } and productId = P.id) as isLiked`;
+    const LIKECOUNT_SUBQUERY = /*sql*/ `(SELECT COUNT(1) FROM USER_LIKE_PRODUCT as ULP WHERE ULP.productId = P.id) as likeCount`;
     const ISLIKED_TRUE = /*sql*/ `(SELECT 1) AS isLiked`;
-    const SELECT_WITH = `${CALC_TOTAL_COUNT} ${REGION_SUBQUERY},`;
+
+    const SELECT_WITH = `DISTINCT ${CALC_TOTAL_COUNT} ${REGION_SUBQUERY}, ${LIKECOUNT_SUBQUERY},`;
+    const BASE_TABLE = /*sql*/ `PRODUCT as P LEFT JOIN USER_LIKE_PRODUCT as ULP ON ULP.productId = P.id`;
 
     if (filter && categoryId) {
       throw new HttpException(
@@ -65,23 +72,23 @@ export class ProductService {
       throw new HttpException('filter should be provided with userId.', 400);
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE}`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
-          SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM PRODUCT AS P INNER JOIN USER_LIKE_PRODUCT AS ULP ON ULP.productId = P.id WHERE ULP.userId = ${userId}
-        `;
+        SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId}
+      `;
     }
 
     if (filter === 'sale') {
       beforePaginationQuery = /*sql*/ `
-          SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT WHERE authorId = ${userId}
-        `;
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
+      `;
     }
 
     if (categoryId) {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT WHERE categoryId = ${categoryId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId}
       `;
     }
 
@@ -97,6 +104,26 @@ export class ProductService {
     return {
       totalCount,
       data: result,
+    };
+  }
+
+  async likeOrDislikeProduct(options: ProductLikeRequestBody & ProductParam) {
+    const { userId, productId, isLiked: targetIsLiked } = options;
+
+    if (!targetIsLiked) {
+      await this.pool.query(/*sql*/ `
+        DELETE FROM USER_LIKE_PRODUCT WHERE userId = ${userId} and productId = ${productId};
+      `);
+    } else {
+      await this.pool.query(/*sql*/ `
+        INSERT INTO USER_LIKE_PRODUCT (userId, productId)
+        SELECT ${userId}, ${productId} FROM dual WHERE NOT EXISTS
+        (SELECT 1 FROM USER_LIKE_PRODUCT WHERE userId = ${userId} and productId = ${productId});
+      `);
+    }
+
+    return {
+      isLiked: targetIsLiked,
     };
   }
 

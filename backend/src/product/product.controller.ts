@@ -10,8 +10,12 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
-import { PostType } from './product.type';
-import { ProductParam, ProductsGetOptions } from './types/product';
+import {
+  ProductLikeRequestBody,
+  ProductParam,
+  ProductsGetOptions,
+  PostType,
+} from './types/product';
 
 @Controller('product')
 export class ProductController {
@@ -21,6 +25,19 @@ export class ProductController {
   async writePost(@Body() post: PostType) {
     return this.productService.writePost(post);
   }
+
+  @Post(':productId/like')
+  likeOrDislikeProduct(
+    @Body() { isLiked, userId }: ProductLikeRequestBody,
+    @Param() { productId }: ProductParam,
+  ) {
+    return this.productService.likeOrDislikeProduct({
+      userId,
+      productId,
+      isLiked,
+    });
+  }
+
   @Get(':productId')
   getProductById(
     @Param()
