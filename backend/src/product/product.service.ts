@@ -52,9 +52,12 @@ export class ProductService {
     const REGION_SUBQUERY = /*sql*/ `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
     const ISLIKED_SUBQUERY = /*sql*/ `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
       userId ?? -1
-    } and productId = PRODUCT.id) as isLiked`;
+    } and productId = P.id) as isLiked`;
+    const LIKECOUNT_SUBQUERY = /*sql*/ `(SELECT COUNT(1) FROM USER_LIKE_PRODUCT as ULP WHERE ULP.productId = P.id) as likeCount`;
     const ISLIKED_TRUE = /*sql*/ `(SELECT 1) AS isLiked`;
-    const SELECT_WITH = `${CALC_TOTAL_COUNT} ${REGION_SUBQUERY},`;
+
+    const SELECT_WITH = `DISTINCT ${CALC_TOTAL_COUNT} ${REGION_SUBQUERY}, ${LIKECOUNT_SUBQUERY},`;
+    const BASE_TABLE = /*sql*/ `PRODUCT as P LEFT JOIN USER_LIKE_PRODUCT as ULP ON ULP.productId = P.id`;
 
     if (filter && categoryId) {
       throw new HttpException(
@@ -67,23 +70,23 @@ export class ProductService {
       throw new HttpException('filter should be provided with userId.', 400);
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE}`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
-          SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM PRODUCT AS P INNER JOIN USER_LIKE_PRODUCT AS ULP ON ULP.productId = P.id WHERE ULP.userId = ${userId}
-        `;
+        SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId}
+      `;
     }
 
     if (filter === 'sale') {
       beforePaginationQuery = /*sql*/ `
-          SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT WHERE authorId = ${userId}
-        `;
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
+      `;
     }
 
     if (categoryId) {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, PRODUCT.* FROM PRODUCT WHERE categoryId = ${categoryId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId}
       `;
     }
 

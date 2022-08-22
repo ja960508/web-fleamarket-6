@@ -27,7 +27,7 @@ function OAuthRedirect() {
         dispatch({
           type: 'USERINFO/SET_USER',
           payload: {
-            userId: data.user.githubUserId,
+            userId: data.user.id,
             name: data.user.nickname,
             region: '잠실',
             regionId: 1,
