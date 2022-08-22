@@ -17,7 +17,27 @@ export class RegionService {
 
       return regions;
     } catch (e) {
+      console.error(e);
       throw new HttpException('Failed to GET REGION info', 500);
+    }
+  }
+
+  async changeUserRegion({
+    userId,
+    regionId,
+  }: {
+    userId: number;
+    regionId: number;
+  }) {
+    try {
+      const [res] = await this.pool.query(`
+      UPDATE USER SET regionId = ${regionId} WHERE id = ${userId};
+      `);
+
+      return res;
+    } catch (e) {
+      console.error(e);
+      throw new HttpException('Failed to UPDATE USER info', 500);
     }
   }
 }
