@@ -2,8 +2,11 @@ import axios from 'axios';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { CheckIcon, ImageIcon } from '../../assets/icons/icons';
+import withCheckLogin from '../../components/HOC/witCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { CategoryContext } from '../../context/CategoryContext';
+import { UserInfoContext } from '../../context/UserInfoContext';
+import { useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall, textMedium } from '../../styles/fonts';
 
@@ -14,9 +17,11 @@ function PostManager() {
     'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661139603973_kt0qFS0Lc',
   ]);
   const categories = useContext(CategoryContext);
+  const userInfo = useContext(UserInfoContext);
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number>(0);
   const [price, setPrice] = useState(0);
 
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,8 +49,29 @@ function PostManager() {
     setThumbnails((prev) => [...prev, res.data]);
   };
 
-  const handleWritePost = (event: React.FormEvent<HTMLFormElement>) => {
-    if (!(event.target instanceof HTMLFormElement)) return;
+  const handleWritePost = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.preventDefault();
+
+    if (!(title && description && selectedCategory)) {
+      alert('모든 필수 값이 입력되어야 합니다.');
+
+      return;
+    }
+
+    const post = {
+      name: title,
+      price,
+      description,
+      thumbnails,
+      categoryId: selectedCategory,
+      authorId: userInfo.userId,
+    };
+
+    const res = await axios.post('http://localhost:4000/product/write', post);
+
+    navigate('/');
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,27 +81,17 @@ function PostManager() {
     setPrice(Number(value));
   };
 
-  const handleSelectCategory = (categoryId: number) => {
-    if (selectedCategories.includes(categoryId)) {
-      setSelectedCategories((prev) =>
-        prev.filter((item) => item !== categoryId),
-      );
-    } else {
-      setSelectedCategories((prev) => [...prev, categoryId]);
-    }
-  };
-
   return (
     <>
       <PageHeader
         pageName="글쓰기"
         extraButton={
-          <button type="submit">
+          <button type="submit" onClick={handleWritePost}>
             <CheckIcon />
           </button>
         }
       />
-      <StyledPostForm onSubmit={handleWritePost}>
+      <StyledPostForm>
         <div className="image-section">
           <label htmlFor="post_image" className="image-upload">
             <ImageIcon />
@@ -111,10 +127,10 @@ function PostManager() {
               {categories.map((item) => (
                 <li
                   className={`category-item ${
-                    selectedCategories.includes(item.id) && 'selected'
+                    selectedCategory === item.id && 'selected'
                   }`}
                   key={item.id}
-                  onClick={() => handleSelectCategory(item.id)}
+                  onClick={() => setSelectedCategory(item.id)}
                 >
                   {item.name}
                 </li>
@@ -145,7 +161,7 @@ function PostManager() {
   );
 }
 
-export default PostManager;
+export default withCheckLogin(PostManager);
 
 const StyledPostForm = styled.form`
   display: flex;
