@@ -22,7 +22,6 @@ function OAuthRedirect() {
       });
 
       if (data.isExist) {
-        console.log(data);
         dispatch({
           type: 'USERINFO/SET_USER',
           payload: {
