@@ -93,4 +93,20 @@ export class AuthService {
 
     return insertId[0].last_id;
   }
+
+  async signin(user: any) {
+    try {
+      const [res] = await this.pool.execute(`
+      SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
+      INNER JOIN REGION as R ON R.id = U.regionId
+      WHERE nickname = ${formatData(user.nickname)} AND password = ${formatData(
+        user.password,
+      )}
+    `);
+
+      return res[0];
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }
