@@ -29,7 +29,7 @@ function useQuery<T>(
 
         memoryCache.setCacheData(queryKey, queryFn, {
           fetchedData: result,
-          queryOptions: refetchArgs,
+          refetchArgs,
         });
 
         setData(result);

@@ -8,6 +8,7 @@ import { remote } from '../../lib/api';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import debounce from '../../utils/debounce';
+import { Link as ProductDetailLink } from '../../lib/Router';
 
 function ProductItem({ product }: { product: ProductPreviewType }) {
   const {
@@ -68,36 +69,41 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
   }, [isLiked, likeCount]);
 
   return (
-    <StyledProductItem isLiked={optimisticLikeInfo.isLiked}>
-      <div>
-        <img src="http://source.unsplash.com/random" alt="product_thumbnail" />
-      </div>
-      <div className="product-meta">
-        <h4 className="product-name">{name}</h4>
-        <div className="product-time-region">
-          <span>{regionName}</span>
-          <span className="delimiter"></span>
-          <span>{parseDateFromNow(createdAt)}</span>
+    <ProductDetailLink to={`/post/${id}`}>
+      <StyledProductItem isLiked={optimisticLikeInfo.isLiked}>
+        <div>
+          <img
+            src="http://source.unsplash.com/random"
+            alt="product_thumbnail"
+          />
         </div>
-        <strong className="product-price">{price}</strong>
-        <div className="product-count-group">
-          {chatCount > 0 && (
-            <span>
-              <MessageSquareIcon /> {chatCount}
-            </span>
-          )}
-          {optimisticLikeInfo.likeCount > 0 && (
-            <span>
-              <HeartIcon /> {optimisticLikeInfo.likeCount}
-            </span>
-          )}
+        <div className="product-meta">
+          <h4 className="product-name">{name}</h4>
+          <div className="product-time-region">
+            <span>{regionName}</span>
+            <span className="delimiter"></span>
+            <span>{parseDateFromNow(createdAt)}</span>
+          </div>
+          <strong className="product-price">{price}</strong>
+          <div className="product-count-group">
+            {chatCount > 0 && (
+              <span>
+                <MessageSquareIcon /> {chatCount}
+              </span>
+            )}
+            {optimisticLikeInfo.likeCount > 0 && (
+              <span>
+                <HeartIcon /> {optimisticLikeInfo.likeCount}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
 
-      <button className="like-button" type="button" onClick={handleLikeInfo}>
-        <HeartIcon />
-      </button>
-    </StyledProductItem>
+        <button className="like-button" type="button" onClick={handleLikeInfo}>
+          <HeartIcon />
+        </button>
+      </StyledProductItem>
+    </ProductDetailLink>
   );
 }
 
