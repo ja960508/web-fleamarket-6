@@ -1,4 +1,3 @@
-import React from 'react';
 import PathProvider from './PathProvider';
 
 function Router({ children }: { children: React.ReactNode }) {

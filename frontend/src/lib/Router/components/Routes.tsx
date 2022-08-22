@@ -9,8 +9,15 @@ import {
 } from '../utils';
 import location from '../location';
 
-function Routes({ children }: { children: React.ReactNode }) {
+function Routes({
+  children,
+  pathnameProps,
+}: {
+  pathnameProps?: string;
+  children: React.ReactNode;
+}) {
   const path = useContext(PathContext);
+  const currentPath = pathnameProps || path;
 
   let currentRoute = null;
 
@@ -26,7 +33,7 @@ function Routes({ children }: { children: React.ReactNode }) {
       removeQueryString(routePath),
     );
 
-    if (isMatchedRoute(parsedPath, removeQueryString(path))) {
+    if (isMatchedRoute(parsedPath, removeQueryString(currentPath))) {
       currentRoute = routeElement;
       location.setLocation({
         path: parsedPath,
@@ -35,7 +42,7 @@ function Routes({ children }: { children: React.ReactNode }) {
     }
   });
 
-  return currentRoute;
+  return <>{currentRoute}</>;
 }
 
 export default Routes;
