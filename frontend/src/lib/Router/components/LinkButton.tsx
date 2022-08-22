@@ -1,18 +1,18 @@
 import { useNavigate } from '../hooks';
-import { NextPathType } from './PathProvider';
+import { NextPathType, PathDispatchOptions } from './PathProvider';
 
 interface LinkButtonProps {
   className?: string;
   children: React.ReactNode | React.ReactNode[];
   moveTo: NextPathType;
-  state?: any;
+  options?: PathDispatchOptions;
 }
 
-function LinkButton({ className, children, moveTo, state }: LinkButtonProps) {
+function LinkButton({ className, children, moveTo, options }: LinkButtonProps) {
   const navigate = useNavigate();
 
   const handleLinkButtonClick = () => {
-    navigate(moveTo, state);
+    navigate(moveTo, options);
   };
 
   return (

@@ -1,8 +1,7 @@
-import axios from 'axios';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { CheckIcon, ImageIcon } from '../../assets/icons/icons';
-import withCheckLogin from '../../components/HOC/witCheckLogin';
+import withCheckLogin from '../../components/HOC/withCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { CategoryContext } from '../../context/CategoryContext';
 import { UserInfoContext } from '../../context/UserInfoContext';

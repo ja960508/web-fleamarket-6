@@ -1,9 +1,13 @@
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { CategoryIcon, MapPinIcon, UserIcon } from '../../assets/icons/icons';
+import { UserInfoContext } from '../../context/UserInfoContext';
 import { LinkButton } from '../../lib/Router';
 import colors from '../../styles/colors';
 
 function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
+  const userInfo = useContext(UserInfoContext);
+
   return (
     <header>
       <StyledNav>
@@ -20,7 +24,7 @@ function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
         <h3>
           <LinkButton className="region-button" moveTo="/region">
             <MapPinIcon />
-            <span>역삼동</span>
+            <span>{userInfo.region}</span>
           </LinkButton>
         </h3>
         <div>

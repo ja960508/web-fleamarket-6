@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useContext, useEffect } from 'react';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
 import { remote } from '../../lib/api';
@@ -27,8 +26,8 @@ function OAuthRedirect() {
           payload: {
             userId: data.user.id,
             name: data.user.nickname,
-            region: '잠실',
-            regionId: 1,
+            region: data.user.regionName,
+            regionId: data.user.regionId,
           },
         });
         navigate('/');
