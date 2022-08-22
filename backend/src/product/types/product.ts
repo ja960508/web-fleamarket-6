@@ -2,7 +2,7 @@ import { IsOptional, IsNumber, IsString } from 'class-validator';
 
 export type ProductFilterType = 'sale' | 'like';
 
-export class ProductGetOptions {
+export class ProductsGetOptions {
   @IsNumber()
   @IsOptional()
   page?: number;
@@ -18,4 +18,9 @@ export class ProductGetOptions {
   @IsString()
   @IsOptional()
   filter?: ProductFilterType;
+}
+
+export class ProductParam {
+  @IsNumber()
+  productId: number;
 }

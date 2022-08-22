@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Pool } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
-import { ProductGetOptions } from './types/product';
+import { ProductsGetOptions } from './types/product';
 
 @Injectable()
 export class ProductService {
@@ -14,7 +14,33 @@ export class ProductService {
     this.pool = mysqlService.pool;
   }
 
-  async getProducts(options: ProductGetOptions) {
+  private async isProductExist(productId: number) {
+    const [result] = await this.pool.query(/*sql*/ `
+      SELECT 1 FROM PRODUCT WHERE PRODUCT.id = ${productId} LIMIT 1;
+    `);
+
+    return Boolean(result[0]);
+  }
+
+  async getProductById(productId: number) {
+    const isExist = await this.isProductExist(productId);
+    if (!isExist) {
+      throw new HttpException(`Cannot found Product.`, 404);
+    }
+
+    const [result] = await this.pool.query(/*sql*/ `
+      SELECT P.*, UR.nickname as authorName, COUNT(ULP.id) as likeCount, C.name as categoryName, regionName
+      FROM PRODUCT as P
+      INNER JOIN CATEGORY as C ON C.id = P.categoryId
+      INNER JOIN (SELECT U.nickname, U.id, R.name as regionName FROM USER as U INNER JOIN REGION as R) AS UR ON P.authorId = UR.id
+      LEFT JOIN USER_LIKE_PRODUCT as ULP ON ULP.productId = P.id
+      where P.id = ${productId};
+    `);
+
+    return result[0];
+  }
+
+  async getProducts(options: ProductsGetOptions) {
     const { userId, filter, categoryId, page = 1 } = options;
 
     const LIMIT = 10;
