@@ -10,4 +10,5 @@ export interface ProductPreviewType {
   regionName: string;
   price: number;
   chatCount: number;
+  isLiked: boolean;
 }
