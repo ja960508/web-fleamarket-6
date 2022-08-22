@@ -11,7 +11,7 @@ interface PageHeaderProps {
 function PageHeader({ pageName, extraButton }: PageHeaderProps) {
   return (
     <StyledHeader>
-      <LinkButton className="go-back-button" moveTo="/">
+      <LinkButton className="go-back-button" moveTo={-1}>
         <ChevronLeftIcon />
       </LinkButton>
       <h1>{pageName}</h1>

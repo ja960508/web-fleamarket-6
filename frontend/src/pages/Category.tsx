@@ -19,7 +19,8 @@ function Category() {
       <CategoryIconList>
         {data?.map(({ id, name, thumbnail }) => (
           <LinkButton
-            moveTo={`/?category=${id}`}
+            state={thumbnail}
+            moveTo={`/?categoryId=${id}`}
             className="icon-button"
             key={id}
           >

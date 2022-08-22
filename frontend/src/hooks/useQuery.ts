@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import memoryCache from '../lib/MemoryCache';
 
-type QueryKey = string;
-type QueryFn<T> = () => Promise<T>;
+export type QueryKey = string;
+export type QueryFn<T> = () => Promise<T>;
+export type RefetchArgs = any[];
 
 /**
  * queryKey: 캐시 데이터의 unique key
@@ -14,7 +15,7 @@ type QueryFn<T> = () => Promise<T>;
 function useQuery<T>(
   queryKey: QueryKey,
   queryFn: QueryFn<T>,
-  refetchArgs: any[] = [],
+  refetchArgs: RefetchArgs = [],
 ) {
   const [data, setData] = useState<T>();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,12 @@ function useQuery<T>(
         setIsLoading(true);
 
         const result = await queryFn();
-        memoryCache.setCacheData(queryKey, queryFn, result);
+
+        memoryCache.setCacheData(queryKey, queryFn, {
+          fetchedData: result,
+          queryOptions: refetchArgs,
+        });
+
         setData(result);
       } catch (e) {
         console.error(e);
@@ -34,7 +40,7 @@ function useQuery<T>(
       }
     }
 
-    const cacheData = memoryCache.getCacheData(queryKey);
+    const cacheData = memoryCache.getCacheData(queryKey, refetchArgs);
 
     if (!cacheData) {
       fetchFromRemote();

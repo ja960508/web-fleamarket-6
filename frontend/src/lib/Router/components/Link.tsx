@@ -1,10 +1,11 @@
 import { MouseEvent } from 'react';
 import { useNavigate } from '../hooks';
+import { NextPathType } from './PathProvider';
 
 interface LinkProps {
   className?: string;
   children: React.ReactNode;
-  to: string;
+  to: NextPathType;
   state?: any;
 }
 
@@ -17,7 +18,7 @@ function Link({ className, children, to, state }: LinkProps) {
   };
 
   return (
-    <a className={className} href={to} onClick={handleClick}>
+    <a className={className} onClick={handleClick}>
       {children}
     </a>
   );
