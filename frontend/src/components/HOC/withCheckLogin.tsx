@@ -1,15 +1,22 @@
-import React, { useContext } from 'react';
+import {
+  ComponentProps,
+  FunctionComponent,
+  useContext,
+  useEffect,
+} from 'react';
 import { UserInfoContext } from '../../context/UserInfoContext';
+import { useNavigate } from '../../lib/Router';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function withCheckLogin(Component: React.ComponentType<any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return function WithCheckLogin(props: any) {
+function withCheckLogin<T>(Component: FunctionComponent<T>) {
+  return function WithCheckLogin(props: ComponentProps<FunctionComponent<T>>) {
     const userInfo = useContext(UserInfoContext);
+    const navigate = useNavigate();
 
-    if (!userInfo.userId) {
-      window.history.back();
-    }
+    useEffect(() => {
+      if (!userInfo.userId) {
+        navigate('/auth/sign-in', { replace: true });
+      }
+    }, [userInfo]);
 
     return <Component {...props} />;
   };
