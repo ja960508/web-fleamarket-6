@@ -1,13 +1,17 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { PostType } from './product.type';
+import { ProductParam, ProductsGetOptions } from './types/product';
 
 @Controller('product')
 export class ProductController {
@@ -16,6 +20,21 @@ export class ProductController {
   @Post('write')
   async writePost(@Body() post: PostType) {
     return this.productService.writePost(post);
+  }
+  @Get(':productId')
+  getProductById(
+    @Param()
+    { productId }: ProductParam,
+  ) {
+    return this.productService.getProductById(productId);
+  }
+
+  @Get()
+  getProducts(
+    @Query()
+    query: ProductsGetOptions,
+  ) {
+    return this.productService.getProducts(query);
   }
 
   @Post('upload')
