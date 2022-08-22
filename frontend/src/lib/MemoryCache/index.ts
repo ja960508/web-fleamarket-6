@@ -22,23 +22,22 @@ class MemoryCache {
     this.timerMap = {};
   }
 
-  private registerExpire(queryKey: QueryKey) {
+  private registerExpire(queryKey: QueryKey, expireTime?: number) {
     if (this.timerMap[queryKey]) {
       clearTimeout(this.timerMap[queryKey]);
     }
 
     this.timerMap[queryKey] = setTimeout(() => {
       this.removeCacheData(queryKey);
-    }, CACHE_EXPIRE);
+    }, expireTime || CACHE_EXPIRE);
   }
 
   private isStaleCache(queryKey: QueryKey, refetchArgs?: RefetchArgs) {
     if (!refetchArgs) return false;
 
     const prevRefetchArgs = this.queryCache[queryKey]?.prevRefetchArgs;
-    if (!prevRefetchArgs) return true;
 
-    return prevRefetchArgs !== JSON.stringify(refetchArgs);
+    return prevRefetchArgs !== this.serializeRefetchArgs(refetchArgs);
   }
 
   private serializeRefetchArgs(refetchArgs?: RefetchArgs) {
@@ -59,9 +58,10 @@ class MemoryCache {
     dataInfo: {
       fetchedData: T;
       refetchArgs?: RefetchArgs;
+      expireTime?: number;
     },
   ) {
-    const { fetchedData, refetchArgs } = dataInfo;
+    const { fetchedData, refetchArgs, expireTime } = dataInfo;
 
     this.queryCache[queryKey] = {
       updateFn: queryFn,
@@ -69,7 +69,7 @@ class MemoryCache {
       prevRefetchArgs: this.serializeRefetchArgs(refetchArgs),
     };
 
-    this.registerExpire(queryKey);
+    this.registerExpire(queryKey, expireTime);
   }
 
   removeCacheData(queryKey: QueryKey) {

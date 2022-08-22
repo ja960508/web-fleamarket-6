@@ -12,13 +12,12 @@ function Home() {
   const categoryId = searchParams('categoryId');
 
   const { data: products } = useQuery<ProductPreviewType[]>(
-    'products',
+    ['products', categoryId],
     async () => {
       const queryString = categoryId ? `?categoryId=${categoryId}` : '';
       const { data } = await remote.get('/product' + queryString);
       return data.data;
     },
-    [categoryId],
   );
 
   return (

@@ -13,7 +13,7 @@ import { RegionType } from '../types/region';
 function RegionInfo() {
   const userInfo = useContext(UserInfoContext);
   const userInfoDispatch = useContext(UserInfoDispatch);
-  const { data } = useQuery('region', async () => {
+  const { data } = useQuery(['region'], async () => {
     const result = await remote('/region');
     return result.data;
   });

@@ -6,17 +6,18 @@ export type QueryFn<T> = () => Promise<T>;
 export type RefetchArgs = any[];
 
 /**
- * queryKey: 캐시 데이터의 unique key
+ * queryKeyWithArgs: 캐시 데이터의 unique key와 refetchArgs를 담고 있는 튜플.
+ * -> refetchArgs: queryFn에 사용되는 파라미터가 변경되었을 때 refetch 하기 위한 도구.
  * queryFn: 데이터 패칭용 함수 -> 추후에 refetchOnFocus 기능 구현 시 사용 예정
- * refetchArgs: queryFn에 사용되는 파라미터가 변경되었을 때 refetch 하기 위한 도구.
- * ex) useQuery('category', () => getCategory(categoryId), [categoryId])
+ * expireTime: 캐시의 만료기한을 명시적으로 지정하고 싶을 때 주는 옵션
  */
 
 function useQuery<T>(
-  queryKey: QueryKey,
+  queryKeyWithArgs: [QueryKey, ...RefetchArgs],
   queryFn: QueryFn<T>,
-  refetchArgs: RefetchArgs = [],
+  expireTime?: number,
 ) {
+  const [queryKey, ...refetchArgs] = queryKeyWithArgs;
   const [data, setData] = useState<T>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +30,8 @@ function useQuery<T>(
 
         memoryCache.setCacheData(queryKey, queryFn, {
           fetchedData: result,
-          queryOptions: refetchArgs,
+          refetchArgs,
+          expireTime,
         });
 
         setData(result);
@@ -41,7 +43,6 @@ function useQuery<T>(
     }
 
     const cacheData = memoryCache.getCacheData(queryKey, refetchArgs);
-
     if (!cacheData) {
       fetchFromRemote();
       return;
