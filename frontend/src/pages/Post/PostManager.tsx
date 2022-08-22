@@ -34,8 +34,6 @@ function PostManager() {
     const formData = new FormData();
     formData.append('thumbnails', files[0]);
 
-    console.log(files[0]);
-    console.log(formData);
     const res = await axios.post(
       'http://localhost:4000/product/upload',
       formData,
