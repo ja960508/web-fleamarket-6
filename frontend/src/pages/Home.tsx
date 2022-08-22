@@ -24,7 +24,7 @@ function Home() {
       );
       return data.data;
     },
-    [categoryId],
+    [categoryId, userId],
   );
 
   return (

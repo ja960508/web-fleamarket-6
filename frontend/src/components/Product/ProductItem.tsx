@@ -4,13 +4,62 @@ import { parseDateFromNow } from '../../utils';
 import styled, { css } from 'styled-components';
 import colors from '../../styles/colors';
 import { textMedium, textSmall } from '../../styles/fonts';
+import { remote } from '../../lib/api';
+import { useContext, useEffect, useState } from 'react';
+import { UserInfoContext } from '../../context/UserInfoContext';
 
 function ProductItem({ product }: { product: ProductPreviewType }) {
-  const { likeCount, createdAt, name, regionName, price, chatCount, isLiked } =
-    product;
+  const {
+    id,
+    likeCount,
+    createdAt,
+    name,
+    regionName,
+    price,
+    chatCount,
+    isLiked,
+  } = product;
+
+  const userInfo = useContext(UserInfoContext);
+  const [optimisticLikeInfo, setOptimisticLikeInfo] = useState({
+    likeCount,
+    isLiked,
+  });
+
+  const likeOrDislikeProduct = async () => {
+    if (!userInfo?.userId) {
+      alert('로그인이 필요해요.');
+      return;
+    }
+
+    try {
+      const { data } = await remote.post(`/product/${id}/like`, {
+        userId: userInfo.userId,
+        isLiked: !optimisticLikeInfo.isLiked,
+      });
+
+      const { isLiked: afterIsLiked } = data;
+      const likePayload = afterIsLiked ? 1 : -1;
+
+      setOptimisticLikeInfo((prevData) => ({
+        isLiked: afterIsLiked,
+        likeCount: prevData.likeCount + likePayload,
+      }));
+    } catch (e) {
+      alert('좋아요 누르기에 실패했어요.');
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    setOptimisticLikeInfo({
+      isLiked,
+      likeCount,
+    });
+  }, [isLiked, likeCount]);
 
   return (
-    <StyledProductItem isLiked={isLiked}>
+    <StyledProductItem isLiked={optimisticLikeInfo.isLiked}>
       <div>
         <img src="http://source.unsplash.com/random" alt="product_thumbnail" />
       </div>
@@ -28,15 +77,19 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
               <MessageSquareIcon /> {chatCount}
             </span>
           )}
-          {likeCount > 0 && (
+          {optimisticLikeInfo.likeCount > 0 && (
             <span>
-              <HeartIcon /> {likeCount}
+              <HeartIcon /> {optimisticLikeInfo.likeCount}
             </span>
           )}
         </div>
       </div>
 
-      <button className="like-button" type="button">
+      <button
+        className="like-button"
+        type="button"
+        onClick={likeOrDislikeProduct}
+      >
         <HeartIcon />
       </button>
     </StyledProductItem>
