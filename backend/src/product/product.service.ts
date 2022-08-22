@@ -2,7 +2,11 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Pool } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
-import { ProductsGetOptions } from './types/product';
+import {
+  ProductLikeRequestBody,
+  ProductParam,
+  ProductsGetOptions,
+} from './types/product';
 
 @Injectable()
 export class ProductService {
@@ -95,6 +99,26 @@ export class ProductService {
     return {
       totalCount,
       data: result,
+    };
+  }
+
+  async likeOrDislikeProduct(options: ProductLikeRequestBody & ProductParam) {
+    const { userId, productId, isLiked: targetIsLiked } = options;
+
+    if (!targetIsLiked) {
+      await this.pool.query(/*sql*/ `
+        DELETE FROM USER_LIKE_PRODUCT WHERE userId = ${userId} and productId = ${productId};
+      `);
+    } else {
+      await this.pool.query(/*sql*/ `
+        INSERT INTO USER_LIKE_PRODUCT (userId, productId)
+        SELECT ${userId}, ${productId} FROM dual WHERE NOT EXISTS
+        (SELECT 1 FROM USER_LIKE_PRODUCT WHERE userId = ${userId} and productId = ${productId});
+      `);
+    }
+
+    return {
+      isLiked: targetIsLiked,
     };
   }
 

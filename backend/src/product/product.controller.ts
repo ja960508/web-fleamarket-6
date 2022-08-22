@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -9,11 +10,27 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
-import { ProductParam, ProductsGetOptions } from './types/product';
+import {
+  ProductLikeRequestBody,
+  ProductParam,
+  ProductsGetOptions,
+} from './types/product';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @Post(':productId/like')
+  likeOrDislikeProduct(
+    @Body() { isLiked, userId }: ProductLikeRequestBody,
+    @Param() { productId }: ProductParam,
+  ) {
+    return this.productService.likeOrDislikeProduct({
+      userId,
+      productId,
+      isLiked,
+    });
+  }
 
   @Get(':productId')
   getProductById(
