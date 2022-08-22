@@ -1,3 +1,4 @@
+import CategoryProvider from './context/CategoryContext';
 import UserInfoProvider from './context/UserInfoContext';
 import { Route, Router, Routes } from './lib/Router';
 import OAuthRedirect from './pages/Auth/OAuthRedirect';
@@ -16,21 +17,23 @@ function App() {
   return (
     <>
       <UserInfoProvider>
-        <GlobalStyles />
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/my" element={<My />} />
-            <Route path="/region" element={<RegionInfo />} />
-            <Route path="/category" element={<Category />} />
-            <Route path="/auth/sign-in" element={<SignIn />} />
-            <Route path="/auth/sign-up" element={<SignUp />} />
-            <Route path="/auth/OAuth-redirect" element={<OAuthRedirect />} />
-            <Route path="/post/manage" element={<PostManager />} />
-            <Route path="/post/:id" element={<PostDetail />} />
-            <Route path="/chat" element={<Chat />} />
-          </Routes>
-        </Router>
+        <CategoryProvider>
+          <GlobalStyles />
+          <Router>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/my" element={<My />} />
+              <Route path="/region" element={<RegionInfo />} />
+              <Route path="/category" element={<Category />} />
+              <Route path="/auth/sign-in" element={<SignIn />} />
+              <Route path="/auth/sign-up" element={<SignUp />} />
+              <Route path="/auth/OAuth-redirect" element={<OAuthRedirect />} />
+              <Route path="/post/:id" element={<PostDetail />} />
+              <Route path="/post/manage" element={<PostManager />} />
+              <Route path="/chat" element={<Chat />} />
+            </Routes>
+          </Router>
+        </CategoryProvider>
       </UserInfoProvider>
     </>
   );
