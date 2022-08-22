@@ -66,7 +66,9 @@ export class AuthService {
 
   async findOAuthUser(githubUserId: string) {
     const [result] = await this.pool.execute(
-      `SELECT * FROM USER WHERE githubUserId = ${githubUserId}`,
+      `SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
+      INNER JOIN REGION as R ON R.id = U.regionId
+      WHERE U.githubUserId = ${githubUserId}`,
     );
 
     return result[0];

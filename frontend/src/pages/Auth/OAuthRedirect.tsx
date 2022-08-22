@@ -22,13 +22,14 @@ function OAuthRedirect() {
       });
 
       if (data.isExist) {
+        console.log(data);
         dispatch({
           type: 'USERINFO/SET_USER',
           payload: {
             userId: data.user.id,
             name: data.user.nickname,
-            region: '잠실',
-            regionId: 1,
+            region: data.user.regionName,
+            regionId: data.user.regionId,
           },
         });
         navigate('/');
