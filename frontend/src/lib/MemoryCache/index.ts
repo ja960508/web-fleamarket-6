@@ -6,12 +6,12 @@ interface QueryCache {
   [queryKey: QueryKey]: {
     updateFn: () => Promise<any>;
     cacheData: any;
-    prevQueryOptions?: string;
+    prevRefetchArgs?: string;
   };
 }
 
 interface TimerMap {
-  [queryKey: QueryKey]: number;
+  [queryKey: QueryKey]: NodeJS.Timeout;
 }
 
 class MemoryCache {
@@ -35,13 +35,13 @@ class MemoryCache {
   private isStaleCache(queryKey: QueryKey, refetchArgs?: RefetchArgs) {
     if (!refetchArgs) return false;
 
-    const prevQueryOptions = this.queryCache[queryKey]?.prevQueryOptions;
-    if (!prevQueryOptions) return true;
+    const prevRefetchArgs = this.queryCache[queryKey]?.prevRefetchArgs;
+    if (!prevRefetchArgs) return true;
 
-    return prevQueryOptions !== JSON.stringify(refetchArgs);
+    return prevRefetchArgs !== JSON.stringify(refetchArgs);
   }
 
-  private parseQueryOption(refetchArgs?: RefetchArgs) {
+  private serializeRefetchArgs(refetchArgs?: RefetchArgs) {
     return refetchArgs?.every((arg) => Boolean(arg))
       ? JSON.stringify(refetchArgs)
       : undefined;
@@ -58,15 +58,15 @@ class MemoryCache {
     queryFn: QueryFn<T>,
     dataInfo: {
       fetchedData: T;
-      queryOptions?: RefetchArgs;
+      refetchArgs?: RefetchArgs;
     },
   ) {
-    const { fetchedData, queryOptions } = dataInfo;
+    const { fetchedData, refetchArgs } = dataInfo;
 
     this.queryCache[queryKey] = {
       updateFn: queryFn,
       cacheData: fetchedData,
-      prevQueryOptions: this.parseQueryOption(queryOptions),
+      prevRefetchArgs: this.serializeRefetchArgs(refetchArgs),
     };
 
     this.registerExpire(queryKey);
