@@ -16,7 +16,11 @@ function SignIn() {
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const { data } = await remote.post('auth/signin', { nickname, password });
+    const { data } = await remote.post(
+      'auth/signin',
+      { nickname, password },
+      { withCredentials: true },
+    );
 
     if (!data) {
       alert('로그인에 실패했습니다.');
