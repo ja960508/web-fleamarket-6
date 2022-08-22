@@ -2,13 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import colors from '../styles/colors';
 
-interface InputProps {
-  name?: string;
-  id?: string;
-  placeholder?: string;
-  type?: string;
-  value?: string;
-  onChange?: () => void;
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   readOnly?: boolean;
 }
 
