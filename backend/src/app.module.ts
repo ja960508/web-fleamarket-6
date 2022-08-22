@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
 import { S3Module } from './config/s3/s3.module';
 import { CategoryModule } from './category/category.module';
+import { RegionModule } from './region/region.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CategoryModule } from './category/category.module';
     ProductModule,
     S3Module,
     CategoryModule,
+    RegionModule,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,5 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -20,10 +21,25 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signup(@Body('user') user: any) {
+  async signup(
+    @Body('user') user: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const lastId = await this.authService.signup(user);
     const insertedUser = await this.authService.findUserById(lastId);
 
+    response.cookie('user', insertedUser, { maxAge: 1000 * 60 * 60 * 24 * 15 });
     return insertedUser;
+  }
+
+  @Post('signin')
+  async signin(
+    @Body() user: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const userInfo = await this.authService.signin(user);
+
+    response.cookie('user', userInfo, { maxAge: 1000 * 60 * 60 * 24 * 15 });
+    return userInfo;
   }
 }

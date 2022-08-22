@@ -6,7 +6,7 @@ export { ReactComponent as ChevronLeftIcon } from './chevronLeftIcon.svg';
 export { ReactComponent as ChevronRightIcon } from './chevronRightIcon.svg';
 export { ReactComponent as CloseIcon } from './closeIcon.svg';
 export { ReactComponent as HeartIcon } from './heartIcon.svg';
-export { ReactComponent as UmageIcon } from './imageIcon.svg';
+export { ReactComponent as ImageIcon } from './imageIcon.svg';
 export { ReactComponent as LogoutIcon } from './logoutIcon.svg';
 export { ReactComponent as MapPinIcon } from './mapPinIcon.svg';
 export { ReactComponent as MenuIcon } from './menuIcon.svg';

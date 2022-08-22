@@ -6,7 +6,9 @@ import {
   ProductLikeRequestBody,
   ProductParam,
   ProductsGetOptions,
+  PostType,
 } from './types/product';
+import formatData from 'src/utils/format';
 
 @Injectable()
 export class ProductService {
@@ -136,6 +138,27 @@ export class ProductService {
     } catch (e) {
       console.error(e);
       throw new HttpException('Failed to upload Image.', 500);
+    }
+  }
+
+  async writePost(post: PostType) {
+    try {
+      const postData = {
+        ...post,
+        createdAt: new Date().toISOString(),
+        isSold: 0,
+        viewCount: 0,
+      };
+
+      const [res] = await this.mysqlService.pool.execute(`
+        INSERT INTO PRODUCT (${Object.keys(postData).join()})
+        VALUES (${Object.values(postData).map(formatData).join()})
+        `);
+
+      return res;
+    } catch (e) {
+      console.error(e);
+      throw new HttpException('Failed to upload Post.', 500);
     }
   }
 }

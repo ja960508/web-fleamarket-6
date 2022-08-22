@@ -14,11 +14,17 @@ import {
   ProductLikeRequestBody,
   ProductParam,
   ProductsGetOptions,
+  PostType,
 } from './types/product';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @Post('write')
+  async writePost(@Body() post: PostType) {
+    return this.productService.writePost(post);
+  }
 
   @Post(':productId/like')
   likeOrDislikeProduct(
