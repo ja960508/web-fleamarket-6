@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { CheckIcon, ImageIcon } from '../../assets/icons/icons';

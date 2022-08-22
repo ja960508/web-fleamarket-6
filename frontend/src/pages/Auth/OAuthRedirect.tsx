@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useContext, useEffect } from 'react';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
 import { remote } from '../../lib/api';
