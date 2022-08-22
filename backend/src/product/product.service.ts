@@ -118,7 +118,7 @@ export class ProductService {
     try {
       const postData = {
         ...post,
-        createdAt: Date.now(),
+        createdAt: new Date().toISOString(),
         isSold: 0,
         viewCount: 0,
       };
@@ -128,7 +128,7 @@ export class ProductService {
         VALUES (${Object.values(postData).map(formatData).join()})
         `);
 
-      return 'created';
+      return res;
     } catch (e) {
       console.error(e);
       throw new HttpException('Failed to upload Post.', 500);

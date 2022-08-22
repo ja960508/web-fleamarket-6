@@ -6,6 +6,7 @@ import withCheckLogin from '../../components/HOC/witCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { CategoryContext } from '../../context/CategoryContext';
 import { UserInfoContext } from '../../context/UserInfoContext';
+import { remote } from '../../lib/api';
 import { useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall, textMedium } from '../../styles/fonts';
@@ -34,15 +35,11 @@ function PostManager() {
     const formData = new FormData();
     formData.append('thumbnails', files[0]);
 
-    const res = await axios.post(
-      'http://localhost:4000/product/upload',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+    const res = await remote.post('product/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
       },
-    );
+    });
 
     setThumbnails((prev) => [...prev, res.data]);
   };
@@ -67,7 +64,7 @@ function PostManager() {
       authorId: userInfo.userId,
     };
 
-    const res = await axios.post('http://localhost:4000/product/write', post);
+    const res = await remote.post('product/write', post);
 
     navigate('/');
   };
