@@ -3,6 +3,8 @@ import { Pool } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
 import { ProductsGetOptions } from './types/product';
+import formatData from 'src/utils/format';
+import { PostType } from './product.type';
 
 @Injectable()
 export class ProductService {
@@ -109,6 +111,27 @@ export class ProductService {
     } catch (e) {
       console.error(e);
       throw new HttpException('Failed to upload Image.', 500);
+    }
+  }
+
+  async writePost(post: PostType) {
+    try {
+      const postData = {
+        ...post,
+        createdAt: Date.now(),
+        isSold: 0,
+        viewCount: 0,
+      };
+
+      const [res] = await this.mysqlService.pool.execute(`
+        INSERT INTO PRODUCT (${Object.keys(postData).join()})
+        VALUES (${Object.values(postData).map(formatData).join()})
+        `);
+
+      return 'created';
+    } catch (e) {
+      console.error(e);
+      throw new HttpException('Failed to upload Post.', 500);
     }
   }
 }
