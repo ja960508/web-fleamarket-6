@@ -38,6 +38,10 @@ const StyledHeader = styled.header`
     justify-self: center;
     ${textMedium};
   }
+
+  & > *:last-child {
+    justify-self: flex-end;
+  }
 `;
 
 export default PageHeader;

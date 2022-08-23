@@ -1,10 +1,11 @@
 import styled from 'styled-components';
-import { HeartIcon } from '../../assets/icons/icons';
+import { HeartIcon, MoreVerticalIcon } from '../../assets/icons/icons';
+import DropDown from '../../components/commons/Dropdown';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import ImageSlider from '../../components/Post/ImageSlider';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, usePathParams } from '../../lib/Router';
+import { Link, useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -12,10 +13,12 @@ import {
   textSmall,
   textXSmall,
 } from '../../styles/fonts';
+import mixin from '../../styles/mixin';
 import { ProductDetail } from '../../types/product';
 import { parseDateFromNow } from '../../utils/parse';
 
 function PostDetail() {
+  const navigate = useNavigate();
   const { id } = usePathParams();
   const { data: postDetail } = useQuery<ProductDetail>(
     'postDetail' + id,
@@ -25,6 +28,22 @@ function PostDetail() {
     },
     [id],
   );
+
+  const handleDelete = () => {
+    navigate('/');
+  };
+
+  const handleModify = () => {
+    navigate(`/post/manage?productId=${id}`);
+  };
+
+  const productManageOptions = [
+    {
+      text: '수정하기',
+      onClick: handleModify,
+    },
+    { text: '삭제하기', onClick: handleDelete },
+  ];
 
   if (!postDetail) {
     return <PageHeader pageName="상품 상세" />;
@@ -46,7 +65,15 @@ function PostDetail() {
 
   return (
     <>
-      <PageHeader pageName="상품 상세보기" />
+      <PageHeader
+        pageName="상품 상세보기"
+        extraButton={
+          <DropDown
+            initialDisplay={<MoreVerticalIcon />}
+            dropDownElements={productManageOptions}
+          />
+        }
+      />
       <ImageSlider />
       <StyledPostDetail>
         <div className="sale-status">{isSold ? '판매완료' : '판매중'}</div>
@@ -93,6 +120,7 @@ const StyledPostDetail = styled.main`
 
   & > h1 {
     ${textLarge};
+    ${mixin.textEllipsis(1)}
     margin: 1rem 0 0.5rem 0;
   }
   & > p {
