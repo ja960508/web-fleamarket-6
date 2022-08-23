@@ -4,11 +4,10 @@ import { parseDateFromNow } from '../../utils/parse';
 import styled, { css } from 'styled-components';
 import colors from '../../styles/colors';
 import { textMedium, textSmall } from '../../styles/fonts';
-import { remote } from '../../lib/api';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext } from 'react';
 import { UserInfoContext } from '../../context/UserInfoContext';
-import debounce from '../../utils/debounce';
 import { Link as ProductDetailLink } from '../../lib/Router';
+import useProductLike from '../../hooks/useProductLike';
 
 function ProductItem({ product }: { product: ProductPreviewType }) {
   const {
@@ -23,50 +22,11 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
   } = product;
 
   const userInfo = useContext(UserInfoContext);
-  const [optimisticLikeInfo, setOptimisticLikeInfo] = useState({
-    likeCount,
-    isLiked,
-  });
-
-  const debouncedLikeHandler = useRef(
-    debounce(async (currentIsLiked: boolean) => {
-      try {
-        await remote.post(`/product/${id}/like`, {
-          userId: userInfo.userId,
-          isLiked: !currentIsLiked,
-        });
-      } catch (e) {
-        alert('좋아요 누르기에 실패했어요.');
-        console.error(e);
-      }
-    }, 500),
+  const { optimisticLikeInfo, handleLikeProduct } = useProductLike(
+    { likeCount, isLiked },
+    id,
+    userInfo.userId,
   );
-
-  const togglLikeInfo = () => {
-    setOptimisticLikeInfo((prevData) => ({
-      isLiked: !prevData.isLiked,
-      likeCount: prevData.likeCount + (prevData.isLiked ? -1 : 1),
-    }));
-  };
-
-  const handleLikeInfo = () => {
-    if (!userInfo?.userId) {
-      alert('로그인이 필요해요.');
-      return;
-    }
-
-    const likeOrDislikeProduct = debouncedLikeHandler.current;
-
-    togglLikeInfo();
-    likeOrDislikeProduct(optimisticLikeInfo.isLiked);
-  };
-
-  useEffect(() => {
-    setOptimisticLikeInfo({
-      isLiked,
-      likeCount,
-    });
-  }, [isLiked, likeCount]);
 
   return (
     <ProductDetailLink to={`/post/${id}`}>
@@ -99,7 +59,11 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
           </div>
         </div>
 
-        <button className="like-button" type="button" onClick={handleLikeInfo}>
+        <button
+          className="like-button"
+          type="button"
+          onClick={handleLikeProduct}
+        >
           <HeartIcon />
         </button>
       </StyledProductItem>
