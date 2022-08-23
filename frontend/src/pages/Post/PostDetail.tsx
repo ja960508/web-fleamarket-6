@@ -6,6 +6,12 @@ import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
 import { Link, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
+import {
+  textLarge,
+  textMedium,
+  textSmall,
+  textXSmall,
+} from '../../styles/fonts';
 import { ProductDetail } from '../../types/product';
 import { parseDateFromNow } from '../../utils/parse';
 
@@ -41,54 +47,144 @@ function PostDetail() {
   return (
     <>
       <PageHeader pageName="상품 상세보기" />
+      <ImageSlider />
       <StyledPostDetail>
-        <ImageSlider />
         <div className="sale-status">{isSold ? '판매완료' : '판매중'}</div>
         <h1>{name}</h1>
-        <div>
+        <BoxWithDelimiter>
           <span>{categoryName}</span>
-          <span className="delimiter" />
+          <i className="delimiter" />
           <span>{parseDateFromNow(createdAt)}</span>
-        </div>
+        </BoxWithDelimiter>
         <p>{description}</p>
-        <div>
+        <BoxWithDelimiter>
           <span>관심 {likeCount}</span>
-          <span className="delimiter" />
+          <i className="delimiter" />
           <span>조회 {viewCount}</span>
-        </div>
-        <div>
+        </BoxWithDelimiter>
+        <SellerInfo>
           <span>판매자 정보</span>
 
-          <span>{authorName}</span>
-          <span>{regionName}</span>
-        </div>
-        <footer>
-          <HeartIcon />
-          <span>{price}</span>
-          <Link to="/chat" className="chat-link">
-            채팅 목록 보기 {chatCount && `(${chatCount})`}
-          </Link>
-        </footer>
+          <span className="product-author">{authorName}</span>
+          <span className="product-region">{regionName}</span>
+        </SellerInfo>
       </StyledPostDetail>
+      <PostFooter>
+        <div>
+          <button type="button">
+            <HeartIcon />
+          </button>
+          <span className="delimiter-vertical" />
+          <span className="product-price">{price.toLocaleString()}</span>
+        </div>
+        <Link to="/chat" className="chat-link">
+          채팅 목록 보기 {chatCount && `(${chatCount})`}
+        </Link>
+      </PostFooter>
     </>
   );
 }
 
 const StyledPostDetail = styled.main`
-  .delimiter {
+  display: flex;
+  flex-direction: column;
+
+  padding: 1.5rem 1rem;
+
+  & > h1 {
+    ${textLarge};
+    margin: 1rem 0 0.5rem 0;
+  }
+  & > p {
+    ${textMedium};
+    margin: 1rem 0 1.5rem 0;
+  }
+
+  .sale-status {
+    width: fit-content;
+    padding: 0.625rem 1rem;
+    border: 1px solid ${colors.gray300};
+    border-radius: 8px;
+    ${textSmall};
+  }
+`;
+
+const BoxWithDelimiter = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > span {
+    ${textXSmall};
+    color: ${colors.gray100};
+  }
+  & > .delimiter {
     background-color: ${colors.gray100};
     width: 0.2rem;
     height: 0.2rem;
     border-radius: 50%;
     margin: 0 0.25rem;
   }
+`;
 
-  .chat-link {
-    padding: 0.625rem 2.5rem;
+const SellerInfo = styled.div`
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  background-color: ${colors.offWhite};
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+
+  & > span:first-child {
+    margin-right: auto;
+  }
+
+  & > span {
+    ${textSmall};
+    font-weight: 500;
+  }
+
+  & > span.product-region {
+    ${textXSmall};
+    color: ${colors.gray100};
+  }
+`;
+
+const PostFooter = styled.footer`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 1rem;
+  border: 1px solid ${colors.gray200};
+
+  & > div {
+    display: flex;
+    align-items: center;
+
+    .delimiter-vertical {
+      width: 1px;
+      height: 2rem;
+      background-color: ${colors.gray200};
+      margin: 0 1rem;
+    }
+
+    .product-price {
+      ${textSmall};
+
+      &::after {
+        content: '원';
+      }
+    }
+  }
+
+  & .chat-link {
+    padding: 0.625rem 2rem;
     background-color: ${colors.primary};
     color: ${colors.white};
     border-radius: 8px;
-    margin-bottom: 1rem;
   }
 `;
 
