@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
-import { remote } from '../../lib/api';
+import { credentialRemote } from '../../lib/api';
 import { useNavigate, useSearchParams } from '../../lib/Router';
 
 function OAuthRedirect() {
@@ -16,13 +16,9 @@ function OAuthRedirect() {
     }
 
     (async function () {
-      const { data } = await remote.post(
-        'auth/oauth/github',
-        {
-          code,
-        },
-        { withCredentials: true },
-      );
+      const { data } = await credentialRemote.post('auth/oauth/github', {
+        code,
+      });
 
       if (data.isExist) {
         dispatch({
