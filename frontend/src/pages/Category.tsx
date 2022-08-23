@@ -7,11 +7,17 @@ import { textXSmall } from '../styles/fonts';
 import { LinkButton } from '../lib/Router';
 import useQuery from '../hooks/useQuery';
 
+const CATEGORY_EXPIRE_TIME = 1000 * 60 * 60 * 5;
+
 function Category() {
-  const { data } = useQuery<CategoryType[]>('category', async () => {
-    const result = await remote('/category');
-    return result.data;
-  });
+  const { data } = useQuery<CategoryType[]>(
+    ['category'],
+    async () => {
+      const result = await remote('/category');
+      return result.data;
+    },
+    CATEGORY_EXPIRE_TIME,
+  );
 
   return (
     <main>
@@ -19,7 +25,7 @@ function Category() {
       <CategoryIconList>
         {data?.map(({ id, name, thumbnail }) => (
           <LinkButton
-            state={thumbnail}
+            options={{ state: thumbnail }}
             moveTo={`/?categoryId=${id}`}
             className="icon-button"
             key={id}
