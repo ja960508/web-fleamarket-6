@@ -138,13 +138,21 @@ export class AuthService {
 
   async getUserInfo(token: string) {
     try {
-      const decoded = jwt.verify(
-        token,
-        this.configService.get('JWT_SECRET_KEY'),
-        (error) => {
-          JWT_ERROR_MAP[error.message]();
-        },
-      );
+      const decoded = await new Promise((resolve, reject) => {
+        jwt.verify(
+          token,
+          this.configService.get('JWT_SECRET_KEY'),
+          (error, decoded) => {
+            if (error) {
+              if (error.message in JWT_ERROR_MAP)
+                JWT_ERROR_MAP[error.message]();
+              else reject(error.message);
+            }
+
+            resolve(decoded);
+          },
+        );
+      });
 
       return decoded;
     } catch (e) {
