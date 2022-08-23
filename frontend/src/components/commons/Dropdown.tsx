@@ -1,11 +1,15 @@
-import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import type { CSSProperties } from 'styled-components';
 import colors from '../../styles/colors';
 import { textSmall } from '../../styles/fonts';
 import mixin from '../../styles/mixin';
 
 interface DropDownElementInfo {
-  text: string;
+  content: {
+    text: string;
+    style?: CSSProperties;
+  };
   onClick: () => void;
 }
 
@@ -44,8 +48,8 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
       {initialDisplay}
       {isDropDownOpen && (
         <DropDownList>
-          {dropDownElements.map(({ text, onClick }) => (
-            <DropDownElement key={text} onClick={onClick}>
+          {dropDownElements.map(({ content: { text, style }, onClick }) => (
+            <DropDownElement key={text} onClick={onClick} style={style}>
               {text}
             </DropDownElement>
           ))}
@@ -80,6 +84,10 @@ const DropDownElement = styled.li`
   ${textSmall};
   padding: 1rem;
   text-align: left;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${colors.gray300};
+  }
 `;
 
 export default DropDown;

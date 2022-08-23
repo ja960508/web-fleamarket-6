@@ -15,7 +15,7 @@ function Home() {
   const categoryId = searchParams('categoryId');
 
   const { data: products } = useQuery<ProductPreviewType[]>(
-    ['products', categoryId],
+    ['products', categoryId, userId],
     async () => {
       const userQueryString = userId ? `userId=${userId}&` : '';
       const categoryQueryString = categoryId ? `categoryId=${categoryId}&` : '';

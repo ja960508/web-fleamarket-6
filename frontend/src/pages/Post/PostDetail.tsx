@@ -21,12 +21,11 @@ function PostDetail() {
   const navigate = useNavigate();
   const { id } = usePathParams();
   const { data: postDetail } = useQuery<ProductDetail>(
-    'postDetail' + id,
+    ['postDetail' + id, id],
     async () => {
       const { data } = await remote(`/product/${id}`);
       return data;
     },
-    [id],
   );
 
   const handleDelete = () => {
@@ -39,10 +38,18 @@ function PostDetail() {
 
   const productManageOptions = [
     {
-      text: '수정하기',
+      content: {
+        text: '수정하기',
+      },
       onClick: handleModify,
     },
-    { text: '삭제하기', onClick: handleDelete },
+    {
+      content: {
+        text: '삭제하기',
+        style: { color: colors.red },
+      },
+      onClick: handleDelete,
+    },
   ];
 
   if (!postDetail) {

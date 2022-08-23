@@ -39,7 +39,7 @@ const StyledHeader = styled.header`
     ${textMedium};
   }
 
-  & > *:last-child {
+  & > *:last-child:not(h1) {
     justify-self: flex-end;
   }
 `;
