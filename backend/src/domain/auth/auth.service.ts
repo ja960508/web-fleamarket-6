@@ -2,9 +2,11 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { MySQLService } from 'src/config/mysql/mysql.service';
-import { Pool } from 'mysql2/promise';
+import { Pool, ResultSetHeader } from 'mysql2/promise';
 import formatData from 'src/utils/format';
 import * as jwt from 'jsonwebtoken';
+import { SigninInfo, SignupInfo, UserInfo } from './type/auth';
+import { JWT_ERROR_MAP } from 'src/constants/auth';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +19,7 @@ export class AuthService {
     this.pool = this.mysqlService.pool;
   }
 
-  async getUserInfoFromGithub(accessToken) {
+  async getUserInfoFromGithub(accessToken: string) {
     try {
       const { data } = await this.httpService.axiosRef.get(
         'https://api.github.com/user',
@@ -66,53 +68,72 @@ export class AuthService {
   }
 
   async findOAuthUser(githubUserId: string) {
-    const [result] = await this.pool.execute(
-      `SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
-      INNER JOIN REGION as R ON R.id = U.regionId
-      WHERE U.githubUserId = ${githubUserId}`,
-    );
+    try {
+      const [result] = await this.pool.execute(
+        `SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
+        INNER JOIN REGION as R ON R.id = U.regionId
+        WHERE U.githubUserId = ${githubUserId}`,
+      );
 
-    return result[0];
+      return result[0];
+    } catch (e) {
+      throw new HttpException(
+        `Failed Execute SQL Syntax Or Internal Server Error`,
+        500,
+      );
+    }
   }
 
   async findUserById(id: number) {
-    const [result] = await this.pool.execute(
-      `SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
-      INNER JOIN REGION as R ON R.id = U.regionId
-      WHERE U.id = ${id}`,
-    );
-
-    return result[0];
-  }
-
-  async signup(user: any) {
-    await this.pool.execute(
-      `INSERT INTO USER (${Object.keys(user).join()})
-      VALUES (${Object.values(user).map(formatData).join()})
-      `,
-    );
-
-    const [insertId] = await this.pool.execute(`
-      SELECT last_insert_id() as last_id;
-      `);
-
-    return insertId[0].last_id;
-  }
-
-  async signin(user: any) {
     try {
-      const [res] = await this.pool.execute(`
+      const [result] = await this.pool.execute(
+        `SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
+        INNER JOIN REGION as R ON R.id = U.regionId
+        WHERE U.id = ${id}`,
+      );
+
+      return result[0];
+    } catch (e) {
+      throw new HttpException(
+        `Failed Execute SQL Syntax Or Internal Server Error`,
+        500,
+      );
+    }
+  }
+
+  async signup(user: SignupInfo) {
+    const [res] = await this.pool.execute(
+      `INSERT INTO USER (${Object.keys(user).join()})
+          SELECT ${Object.values(user)
+            .map(formatData)
+            .join()} FROM dual WHERE NOT EXISTS (SELECT 1 from USER WHERE nickname=${formatData(
+        user.nickname,
+      )})`,
+    );
+
+    const result = res as ResultSetHeader;
+
+    if (!result.insertId) {
+      throw new HttpException('이미 존재하는 닉네임입니다.', 409);
+    }
+
+    return result.insertId;
+  }
+
+  async signin(user: SigninInfo) {
+    const [res] = await this.pool.execute(`
       SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
       INNER JOIN REGION as R ON R.id = U.regionId
       WHERE nickname = ${formatData(user.nickname)} AND password = ${formatData(
-        user.password,
-      )}
+      user.password,
+    )}
     `);
 
-      return res[0];
-    } catch (e) {
-      console.error(e);
+    if (!res[0]) {
+      throw new HttpException('로그인에 실패하였습니다.', 401);
     }
+
+    return res[0];
   }
 
   async getUserInfo(token: string) {
@@ -120,15 +141,22 @@ export class AuthService {
       const decoded = jwt.verify(
         token,
         this.configService.get('JWT_SECRET_KEY'),
+        (error) => {
+          JWT_ERROR_MAP[error.message]();
+        },
       );
 
       return decoded;
     } catch (e) {
-      console.error(e);
+      if (e instanceof Error) {
+        throw new HttpException(e.message, 401);
+      }
+
+      throw new HttpException(e, 401);
     }
   }
 
-  generateToken(userInfo) {
+  generateToken(userInfo: UserInfo) {
     const token = jwt.sign(
       { ...userInfo },
       this.configService.get('JWT_SECRET_KEY'),
