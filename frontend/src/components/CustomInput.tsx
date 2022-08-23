@@ -13,7 +13,7 @@ function CustomInput(props: InputProps) {
   const [isInValid, setIsInValid] = useState(false);
 
   useEffect(() => {
-    if (props.validation) {
+    if (props.validation && props.value) {
       setIsInValid(!props.validation.test(String(props.value)));
     }
   }, [props.value, props.validation]);
