@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import type { CSSProperties } from 'styled-components';
 import colors from '../../styles/colors';
 import { textSmall } from '../../styles/fonts';
@@ -59,6 +59,18 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
   );
 }
 
+const DropDownTransition = keyframes`
+  from {
+    transform: translateY(95%);
+    opacity: 0.1;
+  }
+
+  to {
+    transform: translateY(100%);
+    opacity: 1;
+  }
+`;
+
 const StyledDropDown = styled.button`
   position: relative;
 `;
@@ -78,6 +90,8 @@ const DropDownList = styled.ul`
   backdrop-filter: blur(4px);
   background-color: ${colors.offWhite};
   border-radius: 10px;
+
+  animation: ${DropDownTransition} ease-in-out 0.2s forwards;
 `;
 
 const DropDownElement = styled.li`
