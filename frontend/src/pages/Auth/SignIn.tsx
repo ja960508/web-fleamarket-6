@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
-import { remote } from '../../lib/api';
+import { credentialRemote } from '../../lib/api';
 import { Link, useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 
@@ -16,11 +16,10 @@ function SignIn() {
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const { data } = await remote.post(
-      'auth/signin',
-      { nickname, password },
-      { withCredentials: true },
-    );
+    const { data } = await credentialRemote.post('auth/signin', {
+      nickname,
+      password,
+    });
 
     if (!data) {
       alert('로그인에 실패했습니다.');

@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Pool } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
+import { ChangedUserInfo } from './types/region';
 
 @Injectable()
 export class RegionService {
@@ -22,13 +23,7 @@ export class RegionService {
     }
   }
 
-  async changeUserRegion({
-    userId,
-    regionId,
-  }: {
-    userId: number;
-    regionId: number;
-  }) {
+  async changeUserRegion({ userId, regionId }: ChangedUserInfo) {
     try {
       const [res] = await this.pool.query(`
       UPDATE USER SET regionId = ${regionId} WHERE id = ${userId};

@@ -3,20 +3,27 @@ import styled from 'styled-components';
 import { CheckIcon, ImageIcon } from '../../assets/icons/icons';
 import withCheckLogin from '../../components/HOC/withCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
-import { CategoryContext } from '../../context/CategoryContext';
 import { UserInfoContext } from '../../context/UserInfoContext';
+import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
 import { useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall, textMedium } from '../../styles/fonts';
+import { CategoryType } from '../../types/category';
 
 function PostManager() {
-  const [thumbnails, setThumbnails] = useState<string[]>([
+  const { data: categories } = useQuery<CategoryType[]>(
+    ['category'],
+    async () => {
+      const result = await remote('/category');
+      return result.data;
+    },
+  );
+  const [thumbnails, setThumbnails] = useState([
     'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661131387060_Sl_i5bb7y',
     'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661139595547_lEfMjTNql',
     'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661139603973_kt0qFS0Lc',
   ]);
-  const categories = useContext(CategoryContext);
   const userInfo = useContext(UserInfoContext);
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -63,7 +70,7 @@ function PostManager() {
       authorId: userInfo.userId,
     };
 
-    const res = await remote.post('product/write', post);
+    const _res = await remote.post('product/write', post);
 
     navigate('/');
   };
@@ -118,7 +125,7 @@ function PostManager() {
               (필수) 카테고리를 선택해주세요.
             </div>
             <ul className="categories">
-              {categories.map((item) => (
+              {categories?.map((item) => (
                 <li
                   className={`category-item ${
                     selectedCategory === item.id && 'selected'
@@ -132,7 +139,7 @@ function PostManager() {
             </ul>
           </div>
           <div className="post-price">
-            <span>{`₩ `}</span>
+            <span>₩</span>
             <input
               className="post-input"
               type="text"
