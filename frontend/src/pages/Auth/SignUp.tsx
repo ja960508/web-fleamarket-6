@@ -33,9 +33,13 @@ function SignUp() {
     if (githubUser) {
       const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-      const { data } = await axios.post('http://localhost:4000/auth/signup', {
-        user: userInfo,
-      });
+      const { data } = await axios.post(
+        'http://localhost:4000/auth/signup',
+        {
+          user: userInfo,
+        },
+        { withCredentials: true },
+      );
 
       dispatch({
         type: 'USERINFO/SET_USER',

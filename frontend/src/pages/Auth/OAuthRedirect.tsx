@@ -16,9 +16,13 @@ function OAuthRedirect() {
     }
 
     (async function () {
-      const { data } = await remote.post('auth/oauth/github', {
-        code,
-      });
+      const { data } = await remote.post(
+        'auth/oauth/github',
+        {
+          code,
+        },
+        { withCredentials: true },
+      );
 
       if (data.isExist) {
         dispatch({
