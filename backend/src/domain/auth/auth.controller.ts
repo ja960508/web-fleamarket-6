@@ -1,6 +1,8 @@
 import { Controller, Post, Body, Res, Get, Req } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { MAX_COOKIE_AGE, TOKEN_NAME } from 'src/constants/auth';
 import { AuthService } from './auth.service';
+import { Code, SigninInfo, SignupInfo } from './type/auth';
 
 @Controller('auth')
 export class AuthController {
@@ -8,7 +10,7 @@ export class AuthController {
 
   @Post('oauth/github')
   async githubAuthentication(
-    @Body('code') code: string,
+    @Body() { code }: Code,
     @Res({ passthrough: true }) response: Response,
   ) {
     const token = await this.authService.getAccessToken(code);
@@ -19,8 +21,8 @@ export class AuthController {
     if (OAuthUser) {
       const token = this.authService.generateToken(OAuthUser);
 
-      response.cookie('user', token, {
-        maxAge: 1000 * 60 * 60 * 24 * 7,
+      response.cookie(TOKEN_NAME, token, {
+        maxAge: MAX_COOKIE_AGE,
         httpOnly: true,
       });
 
@@ -32,15 +34,15 @@ export class AuthController {
 
   @Post('signup')
   async signup(
-    @Body('user') user: any,
+    @Body() user: SignupInfo,
     @Res({ passthrough: true }) response: Response,
   ) {
     const lastId = await this.authService.signup(user);
     const insertedUser = await this.authService.findUserById(lastId);
     const token = this.authService.generateToken(insertedUser);
 
-    response.cookie('user', token, {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+    response.cookie(TOKEN_NAME, token, {
+      maxAge: MAX_COOKIE_AGE,
       httpOnly: true,
     });
 
@@ -49,14 +51,14 @@ export class AuthController {
 
   @Post('signin')
   async signin(
-    @Body() user: any,
+    @Body() user: SigninInfo,
     @Res({ passthrough: true }) response: Response,
   ) {
     const userInfo = await this.authService.signin(user);
     const token = this.authService.generateToken(userInfo);
 
-    response.cookie('user', token, {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+    response.cookie(TOKEN_NAME, token, {
+      maxAge: MAX_COOKIE_AGE,
       httpOnly: true,
     });
 
@@ -66,13 +68,13 @@ export class AuthController {
   @Get()
   async getUserInfo(@Req() request: Request) {
     const cookies = request.cookies;
-    const token = cookies['user'];
+    const token = cookies[TOKEN_NAME];
 
     if (!token) {
       return;
     }
 
-    const userInfo = await this.authService.getUserInfo(cookies['user']);
+    const userInfo = await this.authService.getUserInfo(cookies[TOKEN_NAME]);
 
     return userInfo;
   }

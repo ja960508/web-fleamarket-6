@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Patch } from '@nestjs/common';
 import { RegionService } from './region.service';
+import { ChangedUserInfo } from './types/region';
 
 @Controller('region')
 export class RegionController {
@@ -11,7 +12,7 @@ export class RegionController {
   }
 
   @Patch()
-  async changeUserRegion(@Body() info) {
-    return this.regionService.changeUserRegion(info);
+  async changeUserRegion(@Body() chagnedUserInfo: ChangedUserInfo) {
+    return this.regionService.changeUserRegion(chagnedUserInfo);
   }
 }

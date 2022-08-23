@@ -4,6 +4,6 @@ import UserInfoProvider from './context/UserInfoContext';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <UserInfoProvider>
-    <App />,
+    <App />
   </UserInfoProvider>,
 );

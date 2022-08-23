@@ -59,9 +59,7 @@ function SignUp() {
       regionId: selectedRegion.id,
     };
 
-    const { data } = await credentialRemote.post('auth/signup', {
-      user: userInfo,
-    });
+    const { data } = await credentialRemote.post('auth/signup', userInfo);
 
     dispatch({
       type: 'USERINFO/SET_USER',
