@@ -1,4 +1,5 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import Loading from '../components/commons/Loading';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
 import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
@@ -13,18 +14,44 @@ function Home() {
   const categoryIconURL = useHistoryState();
   const searchParams = useSearchParams();
   const categoryId = searchParams('categoryId');
+  const [products, setProducts] = useState<ProductPreviewType[]>([]);
+  const [page, setPage] = useState(1);
+  const loader = useRef<HTMLDivElement>(null);
 
-  const { data: products } = useQuery<ProductPreviewType[]>(
-    ['products', categoryId],
+  const { data } = useQuery<ProductPreviewType[]>(
+    ['products', categoryId, page],
     async () => {
       const userQueryString = userId ? `userId=${userId}&` : '';
       const categoryQueryString = categoryId ? `categoryId=${categoryId}&` : '';
+      const pageQueryString = `page=${page}`;
       const { data } = await remote.get(
-        '/product?' + categoryQueryString + userQueryString,
+        '/product?' + categoryQueryString + userQueryString + pageQueryString,
       );
+
+      setProducts((prev) => [...prev, ...data.data]);
       return data.data;
     },
   );
+
+  useEffect(() => {
+    let observer: IntersectionObserver;
+
+    if (loader.current) {
+      observer = new IntersectionObserver(
+        () => {
+          setPage((prev) => prev + 1);
+        },
+        {
+          threshold: 1.0,
+        },
+      );
+      observer.observe(loader.current);
+    }
+
+    return () => {
+      observer && observer.disconnect();
+    };
+  }, [loader]);
 
   return (
     <main>
@@ -34,6 +61,7 @@ function Home() {
           <ProductItem key={product.id} product={product} />
         ))}
       </ul>
+      <Loading ref={loader} />
       <PostAddButton />
     </main>
   );
