@@ -1,8 +1,10 @@
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { HeartIcon, MoreVerticalIcon } from '../../assets/icons/icons';
 import DropDown from '../../components/commons/Dropdown';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import ImageSlider from '../../components/Post/ImageSlider';
+import { UserInfoContext } from '../../context/UserInfoContext';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
 import { Link, useNavigate, usePathParams } from '../../lib/Router';
@@ -18,6 +20,7 @@ import { ProductDetail } from '../../types/product';
 import { parseDateFromNow } from '../../utils/parse';
 
 function PostDetail() {
+  const { userId } = useContext(UserInfoContext);
   const navigate = useNavigate();
   const { id } = usePathParams();
   const { data: postDetail } = useQuery<ProductDetail>(
@@ -60,6 +63,7 @@ function PostDetail() {
     name,
     price,
     isSold,
+    authorId,
     authorName,
     description,
     createdAt,
@@ -70,17 +74,17 @@ function PostDetail() {
     regionName,
   } = postDetail;
 
+  const isAuthorOfProduct = userId === authorId;
+  const auhtorOnlyDropDown = isAuthorOfProduct && (
+    <DropDown
+      initialDisplay={<MoreVerticalIcon />}
+      dropDownElements={productManageOptions}
+    />
+  );
+
   return (
     <>
-      <PageHeader
-        pageName="상품 상세보기"
-        extraButton={
-          <DropDown
-            initialDisplay={<MoreVerticalIcon />}
-            dropDownElements={productManageOptions}
-          />
-        }
-      />
+      <PageHeader pageName="상품 상세보기" extraButton={auhtorOnlyDropDown} />
       <ImageSlider />
       <StyledPostDetail>
         <div className="sale-status">{isSold ? '판매완료' : '판매중'}</div>
