@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { Pool } from 'mysql2/promise';
 import formatData from 'src/utils/format';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +77,9 @@ export class AuthService {
 
   async findUserById(id: number) {
     const [result] = await this.pool.execute(
-      `SELECT * FROM USER WHERE id = ${id}`,
+      `SELECT U.id, U.nickname, U.regionId, R.name as regionName FROM USER as U 
+      INNER JOIN REGION as R ON R.id = U.regionId
+      WHERE U.id = ${id}`,
     );
 
     return result[0];
@@ -110,5 +113,30 @@ export class AuthService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async getUserInfo(token: string) {
+    try {
+      const decoded = jwt.verify(
+        token,
+        this.configService.get('JWT_SECRET_KEY'),
+      );
+
+      return decoded;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  generateToken(userInfo) {
+    const token = jwt.sign(
+      { ...userInfo },
+      this.configService.get('JWT_SECRET_KEY'),
+      {
+        expiresIn: '7d',
+      },
+    );
+
+    return token;
   }
 }

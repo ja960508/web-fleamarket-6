@@ -5,6 +5,7 @@ interface UserInfoContextType {
   name: string;
   region: string;
   regionId: number;
+  isLogin: boolean;
 }
 
 interface ActionType<T> {
@@ -45,6 +46,7 @@ const initialUserInfo: UserInfoContextType = {
   name: '',
   region: '',
   regionId: 0,
+  isLogin: false,
 };
 
 export const UserInfoContext =
@@ -57,7 +59,7 @@ export const UserInfoDispatch = createContext<
 function userInfoReducer<T>(state: UserInfoContextType, action: ActionType<T>) {
   switch (action.type) {
     case SET_USER:
-      return { ...state, ...action.payload };
+      return { ...state, ...action.payload, isLogin: true };
     case DELETE_USER:
       return { ...initialUserInfo };
     case CHANGE_REGION:

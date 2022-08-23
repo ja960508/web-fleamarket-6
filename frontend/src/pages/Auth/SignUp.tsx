@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
+import { credentialRemote } from '../../lib/api';
 import { useHistoryState, useNavigate } from '../../lib/Router/hooks';
 import colors from '../../styles/colors';
 
@@ -33,7 +34,7 @@ function SignUp() {
     if (githubUser) {
       const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-      const { data } = await axios.post('http://localhost:4000/auth/signup', {
+      const { data } = await credentialRemote.post('auth/signup', {
         user: userInfo,
       });
 
@@ -58,13 +59,9 @@ function SignUp() {
       regionId: selectedRegion.id,
     };
 
-    const { data } = await axios.post(
-      'http://localhost:4000/auth/signup',
-      {
-        user: userInfo,
-      },
-      { withCredentials: true },
-    );
+    const { data } = await credentialRemote.post('auth/signup', {
+      user: userInfo,
+    });
 
     dispatch({
       type: 'USERINFO/SET_USER',
