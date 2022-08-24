@@ -1,7 +1,10 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
+import ChatRoomList from '../components/My/ChatRoomList';
 import PageHeader from '../components/PageHeader/PageHeader';
+import ProductItem from '../components/Product/ProductItem';
 import { UserInfoDispatch } from '../context/UserInfoContext';
+import useMyPage from '../hooks/useMyPage';
 import { credentialRemote } from '../lib/api';
 import { useNavigate } from '../lib/Router';
 import colors from '../styles/colors';
@@ -9,9 +12,10 @@ import colors from '../styles/colors';
 const TABS = ['판매목록', '채팅', '관심목록'];
 
 function My() {
-  const [tab, selectedTab] = useState(TABS[0]);
   const dispatch = useContext(UserInfoDispatch);
   const navigate = useNavigate();
+  const { tab, selectedTab, products, chatRooms, isSelectChatRooms } =
+    useMyPage();
 
   const handleLogout = async () => {
     await credentialRemote.get('auth/logout');
@@ -37,6 +41,13 @@ function My() {
           </li>
         ))}
       </StyledMyPageTabs>
+      <ul>
+        {isSelectChatRooms ? (
+          <ChatRoomList chatRooms={chatRooms} />
+        ) : (
+          products.map((item) => <ProductItem key={item.id} product={item} />)
+        )}
+      </ul>
     </>
   );
 }
