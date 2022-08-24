@@ -1,6 +1,6 @@
 import UserInfoProvider from './context/UserInfoContext';
 import { Route, Router, Routes } from './lib/Router';
-import Animating from './lib/Router/components/Animating';
+import Transition from './lib/Router/components/Transition';
 import OAuthRedirect from './pages/Auth/OAuthRedirect';
 import SignIn from './pages/Auth/SignIn';
 import SignUp from './pages/Auth/SignUp';
@@ -19,7 +19,7 @@ function App() {
       <UserInfoProvider>
         <GlobalStyles />
         <Router>
-          <Animating>
+          <Transition>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/my" element={<My />} />
@@ -32,7 +32,7 @@ function App() {
               <Route path="/post/:id" element={<PostDetail />} />
               <Route path="/chat" element={<Chat />} />
             </Routes>
-          </Animating>
+          </Transition>
         </Router>
       </UserInfoProvider>
     </>

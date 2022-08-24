@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
   ReactNode,
   useState,
@@ -21,7 +21,7 @@ interface RouteInfo {
   pathnameProps?: string;
 }
 
-function Animating({ children }: PropsWithChildren): JSX.Element {
+function Transition({ children }: PropsWithChildren): JSX.Element {
   const path = useContext(PathContext);
   const mountRef = useRef(false);
   const [currentRoute, setCurrentRoute] = useState<RouteInfo>({
@@ -31,13 +31,12 @@ function Animating({ children }: PropsWithChildren): JSX.Element {
   const [nextRoute, setNextRoute] = useState<RouteInfo>({});
   const [isAnimationReady, setIsAnimationReady] = useState(false);
 
-  const isMount = mountRef.current !== false;
-
   const handleAnimationEnd = () => {
     setIsAnimationReady(false);
   };
 
   useEffect(() => {
+    const isMount = mountRef.current !== false;
     if (!isMount) {
       return;
     }
@@ -51,6 +50,7 @@ function Animating({ children }: PropsWithChildren): JSX.Element {
   }, [children, path]);
 
   useEffect(() => {
+    const isMount = mountRef.current !== false;
     if (isMount && !isAnimationReady) {
       const { element, pathnameProps } = nextRoute;
       setCurrentRoute({
@@ -58,7 +58,7 @@ function Animating({ children }: PropsWithChildren): JSX.Element {
         pathnameProps: nextRoute.pathnameProps,
       });
     }
-  }, [isAnimationReady]);
+  }, [isAnimationReady, nextRoute]);
 
   useEffect(() => {
     mountRef.current = true;
@@ -82,17 +82,27 @@ const Wrapper = styled.div`
   height: 100%;
 `;
 
-const StyledAnimatingBox = styled.div`
-  display: flex;
-  @keyframes moveToLeft {
+const routeKeyframes = {
+  right: keyframes`
     0% {
       transform: translateX(0);
     }
     100% {
       transform: translateX(-100%);
     }
-  }
-  animation: moveToLeft ease-in-out 0.7s forwards;
+  `,
+  left: keyframes`
+  0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }`,
+};
+
+const StyledAnimatingBox = styled.div`
+  display: flex;
+  animation: ${routeKeyframes.right} ease-in-out 0.7s forwards;
 `;
 
-export default Animating;
+export default Transition;
