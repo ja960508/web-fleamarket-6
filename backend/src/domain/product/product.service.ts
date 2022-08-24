@@ -92,6 +92,12 @@ export class ProductService {
       `;
     }
 
+    if (userId) {
+      beforePaginationQuery = /*sql*/ `
+      SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
+    `;
+    }
+
     const paginatedQuery = /*sql*/ `${beforePaginationQuery} LIMIT ${
       (page - 1) * LIMIT
     }, ${LIMIT}`;
