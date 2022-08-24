@@ -1,6 +1,7 @@
 import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export type ProductFilterType = 'sale' | 'like';
+export type ProductLocationType = 'home' | 'my';
 
 export class ProductsGetOptions {
   @IsNumber()
@@ -18,6 +19,10 @@ export class ProductsGetOptions {
   @IsString()
   @IsOptional()
   filter?: ProductFilterType;
+
+  @IsString()
+  @IsOptional()
+  location?: ProductLocationType;
 }
 
 export class ProductParam {

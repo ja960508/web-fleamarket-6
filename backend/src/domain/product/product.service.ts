@@ -47,7 +47,7 @@ export class ProductService {
   }
 
   async getProducts(options: ProductsGetOptions) {
-    const { userId, filter, categoryId, page = 1 } = options;
+    const { userId, filter, categoryId, page = 1, location } = options;
 
     const LIMIT = 10;
     const CALC_TOTAL_COUNT = `SQL_CALC_FOUND_ROWS`;
@@ -74,6 +74,12 @@ export class ProductService {
 
     let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE}`;
 
+    if (userId && location === 'my') {
+      beforePaginationQuery = /*sql*/ `
+          SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
+        `;
+    }
+
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
         SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId}
@@ -90,12 +96,6 @@ export class ProductService {
       beforePaginationQuery = /*sql*/ `
         SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId}
       `;
-    }
-
-    if (userId) {
-      beforePaginationQuery = /*sql*/ `
-      SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
-    `;
     }
 
     const paginatedQuery = /*sql*/ `${beforePaginationQuery} LIMIT ${
