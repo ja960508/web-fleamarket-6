@@ -2,8 +2,7 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
-import { NICKNAME_MESSAGE, PASSWORD_MESSAGE } from '../../constants/input';
-import { NICKNAME_REGEX, PASSWORD_REGEX } from '../../constants/regex';
+import { NICKNAME, PASSWORD } from '../../constants/validation';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
 import useTextInputs from '../../hooks/useTextInputs';
 import { credentialRemote } from '../../lib/api';
@@ -61,8 +60,8 @@ function SignIn() {
           value={inputs.nickname}
           onChange={handleChange('nickname')}
           autoComplete="off"
-          validation={NICKNAME_REGEX}
-          error={NICKNAME_MESSAGE}
+          validation={NICKNAME.REGEX}
+          error={NICKNAME.ERROR_MESSAGE}
         />
         <CustomInput
           type="password"
@@ -70,8 +69,8 @@ function SignIn() {
           placeholder="비밀번호를 입력하세요"
           value={inputs.password}
           onChange={handleChange('password')}
-          validation={PASSWORD_REGEX}
-          error={PASSWORD_MESSAGE}
+          validation={PASSWORD.REGEX}
+          error={PASSWORD.ERROR_MESSAGE}
         />
         <button type="submit">로그인</button>
         <StyledGithubOAuthLink

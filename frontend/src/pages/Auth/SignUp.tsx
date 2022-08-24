@@ -2,8 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
-import { NICKNAME_MESSAGE, PASSWORD_MESSAGE } from '../../constants/input';
-import { NICKNAME_REGEX, PASSWORD_REGEX } from '../../constants/regex';
+import { NICKNAME, PASSWORD } from '../../constants/validation';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
 import useTextInputs from '../../hooks/useTextInputs';
 import { credentialRemote, remote } from '../../lib/api';
@@ -102,8 +101,8 @@ function SignUp() {
               value={inputs.nickname}
               onChange={handleChange('nickname')}
               placeholder="영문, 숫자 조합 10자 이하"
-              validation={NICKNAME_REGEX}
-              error={NICKNAME_MESSAGE}
+              validation={NICKNAME.REGEX}
+              error={NICKNAME.ERROR_MESSAGE}
               autoComplete="off"
             />
             <CustomInput
@@ -112,8 +111,8 @@ function SignUp() {
               value={inputs.password}
               onChange={handleChange('password')}
               placeholder="영문/특문/숫자 조합 16자 이하"
-              validation={PASSWORD_REGEX}
-              error={PASSWORD_MESSAGE}
+              validation={PASSWORD.REGEX}
+              error={PASSWORD.ERROR_MESSAGE}
             />
           </>
         )}
