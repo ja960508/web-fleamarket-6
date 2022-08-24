@@ -1,40 +1,16 @@
-import { useContext, useEffect, useState } from 'react';
-import { UserInfoContext } from '../context/UserInfoContext';
-import { remote } from '../lib/api';
-import { useSearchParams } from '../lib/Router';
-import { ProductPreviewType } from '../types/product';
+import { useEffect, useState } from 'react';
+import useGetProducts from './useGetProducts';
 
 function useProductInfiniteScroll(loader: React.RefObject<HTMLDivElement>) {
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [products, setProducts] = useState<ProductPreviewType[]>([]);
-  const [isLastPage, setIsLastPage] = useState(false);
-  const { userId } = useContext(UserInfoContext);
-  const searchParams = useSearchParams();
-  const categoryId = searchParams('categoryId');
+  const { products, isLastPage, getProducts } = useGetProducts();
 
   useEffect(() => {
     const onIntersect = async ([entry]: IntersectionObserverEntry[]) => {
       if (entry.isIntersecting && !isLoading) {
         setIsLoading(true);
-        setPage((prev) => prev + 1);
-        const userQueryString = userId ? `userId=${userId}&` : '';
-        const categoryQueryString = categoryId
-          ? `categoryId=${categoryId}&`
-          : '';
-        const pageQueryString = `page=${page}`;
-        const { data } = await remote.get(
-          '/product?' + categoryQueryString + userQueryString + pageQueryString,
-        );
-        const lastPage = Math.ceil(data.totalCount / 10);
-        console.log(
-          lastPage,
-          data.totalCount,
-          `/product?${categoryQueryString}${userQueryString}${pageQueryString}`,
-        );
-        setProducts((prev) => [...prev, ...data.data]);
+        await getProducts();
         setIsLoading(false);
-        setIsLastPage(lastPage === page);
       }
     };
 
@@ -50,7 +26,7 @@ function useProductInfiniteScroll(loader: React.RefObject<HTMLDivElement>) {
     return () => {
       observer && observer.disconnect();
     };
-  }, [loader, categoryId, isLoading, page, userId]);
+  }, [loader, getProducts, isLoading]);
 
   return { products, isLastPage };
 }
