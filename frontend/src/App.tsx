@@ -27,7 +27,7 @@ function App() {
           <Route path="/auth/sign-in" element={<SignIn />} />
           <Route path="/auth/sign-up" element={<SignUp />} />
           <Route path="/auth/OAuth-redirect" element={<OAuthRedirect />} />
-          <Route path="/post/:id" element={<PostDetail />} />
+          <Route path="/post/:productId" element={<PostDetail />} />
           <Route path="/post/manage" element={<PostManager />} />
           <Route path="/chat" element={<Chat />} />
         </Routes>
