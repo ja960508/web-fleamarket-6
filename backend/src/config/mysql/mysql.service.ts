@@ -14,6 +14,7 @@ export class MySQLService implements OnModuleInit {
         user: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_DATABASE'),
+        decimalNumbers: true,
       })
       .promise();
   }
