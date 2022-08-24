@@ -2,9 +2,10 @@ import styled from 'styled-components';
 import { MoreVerticalIcon } from '../assets/icons/icons';
 import DropDown from '../components/commons/Dropdown';
 import Modal from '../components/commons/Modal/Modal';
+import { remote } from '../lib/api';
 import { useNavigate } from '../lib/Router';
 import colors from '../styles/colors';
-import { textLarge, textMedium } from '../styles/fonts';
+import { textMedium } from '../styles/fonts';
 import { useModal } from './useModal';
 
 interface useManageDropdownProps {
@@ -15,7 +16,12 @@ function useManageDropdown({ productId }: useManageDropdownProps) {
   const navigate = useNavigate();
   const { isModalOpen, closeModal, openModal } = useModal();
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    try {
+      await remote.delete(`/product/${productId}`);
+    } catch (error) {
+      console.error(error);
+    }
     navigate('/');
   };
 
