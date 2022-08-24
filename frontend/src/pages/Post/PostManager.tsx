@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { CheckIcon, ImageIcon, MapPinIcon } from '../../assets/icons/icons';
 import withCheckLogin from '../../components/HOC/withCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
+import ImagePreviewList from '../../components/Post/ImagePreviewList';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
@@ -19,11 +20,7 @@ function PostManager() {
       return result.data;
     },
   );
-  const [thumbnails, setThumbnails] = useState([
-    'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661131387060_Sl_i5bb7y',
-    'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661139595547_lEfMjTNql',
-    'https://web-flea-6.s3.ap-northeast-2.amazonaws.com/1661139603973_kt0qFS0Lc',
-  ]);
+  const [thumbnails, setThumbnails] = useState<string[]>([]);
   const userInfo = useContext(UserInfoContext);
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -39,7 +36,7 @@ function PostManager() {
     }
 
     const formData = new FormData();
-    formData.append('thumbnails', files[0]);
+    [...files].forEach((file) => formData.append('thumbnails', file));
 
     const res = await remote.post('product/upload', formData, {
       headers: {
@@ -47,7 +44,7 @@ function PostManager() {
       },
     });
 
-    setThumbnails((prev) => [...prev, res.data]);
+    setThumbnails((prev) => [...prev, ...res.data]);
   };
 
   const handleWritePost = async (
@@ -103,14 +100,12 @@ function PostManager() {
             type="file"
             onChange={onFileUpload}
             accept="image/*"
+            multiple
           />
-          <ul className="image-list">
-            {thumbnails.map((url) => (
-              <li key={url}>
-                <img className="post-image" src={url} alt="post_images" />
-              </li>
-            ))}
-          </ul>
+          <ImagePreviewList
+            thumbnails={thumbnails}
+            setThumbnails={setThumbnails}
+          />
         </div>
         <div className="content-section">
           <div className="post-meta">
@@ -189,7 +184,7 @@ const StyledPostForm = styled.form`
   flex: 1 1 100%;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 1rem;
+  padding: 0 1rem 1.5rem 1rem;
 
   input[type='file'] {
     display: none;
@@ -197,13 +192,9 @@ const StyledPostForm = styled.form`
 
   .image-section {
     width: 100%;
-    padding-bottom: 1.5rem;
+    padding: 1.5rem 0;
     overflow-y: scroll;
     display: flex;
-
-    .image-list {
-      display: flex;
-    }
 
     .image-upload {
       flex-shrink: 0;
