@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { CheckIcon, ImageIcon, MapPinIcon } from '../../assets/icons/icons';
 import withCheckLogin from '../../components/HOC/withCheckLogin';
@@ -7,10 +7,12 @@ import ImagePreviewList from '../../components/Post/ImagePreviewList';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { useNavigate } from '../../lib/Router';
+import memoryCache from '../../lib/MemoryCache';
+import { useNavigate, useSearchParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall, textMedium } from '../../styles/fonts';
 import { CategoryType } from '../../types/category';
+import { ProductDetail } from '../../types/product';
 import { parseLocaleStringToNumber } from '../../utils/parse';
 
 interface ProductInputsType {
@@ -24,6 +26,11 @@ interface ProductInputsType {
 const MAX_PRICE = 1000000000;
 
 function PostManager() {
+  const userInfo = useContext(UserInfoContext);
+  const searchParams = useSearchParams();
+  const productId = searchParams('productId');
+  const navigate = useNavigate();
+
   const { data: categories } = useQuery<CategoryType[]>(
     ['category'],
     async () => {
@@ -31,8 +38,16 @@ function PostManager() {
       return result.data;
     },
   );
-  const userInfo = useContext(UserInfoContext);
-  const navigate = useNavigate();
+
+  const { data: prevProductDetail } = useQuery<ProductDetail>(
+    ['postDetail' + productId, productId],
+    async () => {
+      const { data } = await remote(`/product/${productId}`);
+      return data;
+    },
+    { skip: productId === null },
+  );
+
   const [productInputs, setProductInputs] = useState<ProductInputsType>({
     title: '',
     description: '',
@@ -50,6 +65,8 @@ function PostManager() {
     selectedCategory > 0 &&
     price > 0 &&
     price < MAX_PRICE;
+
+  const isEditMode = prevProductDetail !== undefined;
 
   const handleChange = <T extends keyof ProductInputsType>(
     inputName: T,
@@ -80,7 +97,7 @@ function PostManager() {
     handleChange('thumbnails', [...thumbnails, ...res.data]);
   };
 
-  const handleWritePost = async (
+  const handleSubmitPost = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.preventDefault();
@@ -99,7 +116,13 @@ function PostManager() {
       authorId: userInfo.userId,
     };
 
-    const { data } = await remote.post('product/write', post);
+    const submitMethod = isEditMode ? remote.patch : remote.post;
+    const submitUrl = isEditMode
+      ? `/product/${prevProductDetail.id}`
+      : '/product/write';
+
+    const { data } = await submitMethod(submitUrl, post);
+    memoryCache.removeCacheData('postDetail' + data.productId);
     navigate(`/post/${data.productId}`, { replace: true });
   };
 
@@ -110,14 +133,34 @@ function PostManager() {
     }));
   };
 
+  useEffect(() => {
+    if (prevProductDetail) {
+      const { name, description, categoryId, thumbnail, price } =
+        prevProductDetail;
+
+      const thumbnails =
+        typeof thumbnail !== 'string'
+          ? ['http://source.unsplash.com/random']
+          : [thumbnail];
+
+      setProductInputs({
+        title: name,
+        description,
+        selectedCategory: categoryId,
+        thumbnails,
+        price,
+      });
+    }
+  }, [prevProductDetail]);
+
   return (
     <StyledWrapper>
       <PageHeader
-        pageName="글쓰기"
+        pageName={isEditMode ? '수정하기' : '글쓰기'}
         extraButton={
           <SubmitButton
             type="submit"
-            onClick={handleWritePost}
+            onClick={handleSubmitPost}
             isSubmitable={isFormSubmitable}
           >
             <CheckIcon />
