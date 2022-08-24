@@ -30,7 +30,6 @@ function PostManager() {
 
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    console.log(files);
 
     if (!files) {
       return;
