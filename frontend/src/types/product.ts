@@ -3,6 +3,7 @@ export interface ProductPreviewType {
   thumbnail: string;
   likeCount: number;
   createdAt: string;
+  deletedAt: string;
   isSold: boolean;
   authorId: number;
   name: string;
