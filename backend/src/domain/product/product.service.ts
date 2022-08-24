@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Pool } from 'mysql2/promise';
+import { Pool, ResultSetHeader } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
 import {
@@ -155,7 +155,10 @@ export class ProductService {
         VALUES (${Object.values(postData).map(formatData).join()})
         `);
 
-      return res;
+      const { insertId } = res as ResultSetHeader;
+      return {
+        productId: insertId,
+      };
     } catch (e) {
       console.error(e);
       throw new HttpException('Failed to upload Post.', 500);
