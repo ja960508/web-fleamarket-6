@@ -13,10 +13,10 @@ function withCheckLogin<T>(Component: FunctionComponent<T>) {
     const navigate = useNavigate();
 
     useEffect(() => {
-      if (!userInfo.userId) {
+      if (!userInfo.userId && !userInfo.isAuthorizing) {
         navigate('/auth/sign-in', { replace: true });
       }
-    }, [userInfo]);
+    }, [userInfo, navigate]);
 
     return <Component {...props} />;
   };

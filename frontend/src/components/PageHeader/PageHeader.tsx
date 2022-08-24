@@ -23,7 +23,7 @@ function PageHeader({ pageName, extraButton }: PageHeaderProps) {
 const StyledHeader = styled.header`
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
 
   padding: 1rem;
