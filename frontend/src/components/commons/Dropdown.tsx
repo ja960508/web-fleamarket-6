@@ -32,7 +32,8 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
     const handleClickOutsideDropdown = ({ target }: Event) => {
       if (!(target instanceof HTMLElement) || !dropDownRef.current) return;
 
-      if (dropDownRef.current.contains(target)) return;
+      if (dropDownRef.current.contains(target) || target.closest('#modal'))
+        return;
 
       toggleDropDown(false);
     };
@@ -49,7 +50,15 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
       {isDropDownOpen && (
         <DropDownList>
           {dropDownElements.map(({ content: { text, style }, onClick }) => (
-            <DropDownElement key={text} onClick={onClick} style={style}>
+            <DropDownElement
+              key={text}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+                toggleDropDown(false);
+              }}
+              style={style}
+            >
               {text}
             </DropDownElement>
           ))}
