@@ -122,8 +122,13 @@ function PostManager() {
       : '/product/write';
 
     const { data } = await submitMethod(submitUrl, post);
+    const productId = prevProductDetail?.id || data?.productId;
+    const returnUrl = productId ? `/post/${productId}` : '/';
+
     memoryCache.removeCacheData('postDetail' + data.productId);
-    navigate(`/post/${data.productId}`, { replace: true });
+    navigate(returnUrl, {
+      replace: true,
+    });
   };
 
   const handleDeleteThumbnail = (url: string) => {
