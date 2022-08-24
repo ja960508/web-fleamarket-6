@@ -18,14 +18,9 @@ function useGetProducts() {
     const categoryQueryString = categoryId ? `categoryId=${categoryId}&` : '';
     const pageQueryString = `page=${page}`;
     const { data } = await remote.get(
-      '/product?' + categoryQueryString + pageQueryString,
+      '/product?' + categoryQueryString + userQueryString + pageQueryString,
     );
     const lastPage = Math.ceil(data.totalCount / 10);
-    console.log(
-      lastPage,
-      data.totalCount,
-      `/product?${categoryQueryString}${userQueryString}${pageQueryString}`,
-    );
     setProducts((prev) => [...prev, ...data.data]);
     setIsLastPage(lastPage === page);
   }, [categoryId, page, userId]);
