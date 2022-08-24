@@ -82,7 +82,7 @@ export class AuthController {
   @Get('logout')
   logout(@Res({ passthrough: true }) response: Response) {
     response.cookie(TOKEN_NAME, '', {
-      maxAge: Date.now(),
+      maxAge: 0,
       httpOnly: true,
     });
 
