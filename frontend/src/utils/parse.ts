@@ -27,3 +27,11 @@ export const parseDateFromNow = (date: string) => {
 
   return `${Math.floor(betweenTimeDay / 365)}년전`;
 };
+
+export const parseLocaleStringToNumber = (
+  localeString: string,
+  maxPrice: number,
+) => {
+  const parsedNumber = Number(localeString.replace(/[^0-9]/g, ''));
+  return parsedNumber >= maxPrice ? maxPrice - 1 : parsedNumber;
+};
