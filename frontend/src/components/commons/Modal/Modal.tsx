@@ -10,7 +10,7 @@ interface ModalPropsType {
 
 function Modal({ isModalOpen, children, closeModal }: ModalPropsType) {
   if (!isModalOpen) {
-    return <></>;
+    return null;
   }
 
   return (

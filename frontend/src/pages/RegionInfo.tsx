@@ -134,10 +134,14 @@ const StyledForm = styled.form`
   button[type='submit'] {
     margin-top: 1.25rem;
     padding: 0.625rem;
-    background: #c8b6ff;
-    opacity: 0.5;
+    background: ${colors.primary};
+    opacity: 1;
     border-radius: 8px;
     color: ${colors.white};
+  }
+
+  button[type='submit']:disabled {
+    opacity: 0.5;
   }
 
   .region-item {
