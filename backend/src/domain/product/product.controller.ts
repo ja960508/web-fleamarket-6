@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UploadedFiles,
@@ -11,10 +12,11 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import {
+  CreateProductDTO,
+  ModifyProductDTO,
   ProductLikeRequestBody,
   ProductParam,
   ProductsGetOptions,
-  PostType,
 } from './types/product';
 
 @Controller('product')
@@ -22,7 +24,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post('write')
-  async writePost(@Body() post: PostType) {
+  async writePost(@Body() post: CreateProductDTO) {
     return this.productService.writePost(post);
   }
 
@@ -36,6 +38,16 @@ export class ProductController {
       productId,
       isLiked,
     });
+  }
+
+  @Patch(':productId')
+  modifyProductById(
+    @Param()
+    { productId }: ProductParam,
+    @Body()
+    modifyProductDto: Partial<ModifyProductDTO>,
+  ) {
+    return this.productService.modifyPostById(productId, modifyProductDto);
   }
 
   @Get(':productId')

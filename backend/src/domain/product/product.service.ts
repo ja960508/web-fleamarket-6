@@ -6,7 +6,8 @@ import {
   ProductLikeRequestBody,
   ProductParam,
   ProductsGetOptions,
-  PostType,
+  CreateProductDTO,
+  ModifyProductDTO,
 } from './types/product';
 import formatData from 'src/utils/format';
 
@@ -141,7 +142,7 @@ export class ProductService {
     }
   }
 
-  async writePost(post: PostType) {
+  async writePost(post: CreateProductDTO) {
     try {
       const postData = {
         ...post,
@@ -163,5 +164,27 @@ export class ProductService {
       console.error(e);
       throw new HttpException('Failed to upload Post.', 500);
     }
+  }
+
+  async modifyPostById(productId: number, post: Partial<ModifyProductDTO>) {
+    const isExist = await this.isProductExist(productId);
+    if (!isExist) {
+      throw new HttpException(`Cannot found Product.`, 404);
+    }
+
+    const modifyTemplate = Object.entries(post)
+      .map(([key, val]) => `${key}= ${formatData(val)}`)
+      .join(', ');
+
+    const [res] = await this.pool.query(/*sql*/ `
+      UPDATE PRODUCT SET ${modifyTemplate} WHERE id = ${productId};
+    `);
+
+    const modifedResult = res as ResultSetHeader;
+    if (!modifedResult?.changedRows) {
+      throw new HttpException('Something wrong when delete Product', 422);
+    }
+
+    return post;
   }
 }
