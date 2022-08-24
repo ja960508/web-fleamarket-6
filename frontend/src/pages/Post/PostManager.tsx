@@ -11,6 +11,17 @@ import { useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall, textMedium } from '../../styles/fonts';
 import { CategoryType } from '../../types/category';
+import { parseLocaleStringToNumber } from '../../utils/parse';
+
+interface ProductInputsType {
+  title: string;
+  description: string;
+  selectedCategory: number;
+  price: number;
+  thumbnails: string[];
+}
+
+const MAX_PRICE = 1000000000;
 
 function PostManager() {
   const { data: categories } = useQuery<CategoryType[]>(
@@ -20,13 +31,35 @@ function PostManager() {
       return result.data;
     },
   );
-  const [thumbnails, setThumbnails] = useState<string[]>([]);
   const userInfo = useContext(UserInfoContext);
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<number>(0);
-  const [price, setPrice] = useState(0);
+  const [productInputs, setProductInputs] = useState<ProductInputsType>({
+    title: '',
+    description: '',
+    selectedCategory: 0,
+    price: 0,
+    thumbnails: [],
+  });
+
+  const { title, price, description, selectedCategory, thumbnails } =
+    productInputs;
+
+  const isFormSubmitable =
+    title.trim() !== '' &&
+    description.trim() !== '' &&
+    selectedCategory > 0 &&
+    price > 0 &&
+    price < MAX_PRICE;
+
+  const handleChange = <T extends keyof ProductInputsType>(
+    inputName: T,
+    value: ProductInputsType[T],
+  ) => {
+    setProductInputs((prev) => ({
+      ...prev,
+      [inputName]: value,
+    }));
+  };
 
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -44,7 +77,7 @@ function PostManager() {
       },
     });
 
-    setThumbnails((prev) => [...prev, ...res.data]);
+    handleChange('thumbnails', [...thumbnails, ...res.data]);
   };
 
   const handleWritePost = async (
@@ -52,9 +85,8 @@ function PostManager() {
   ) => {
     event.preventDefault();
 
-    if (!(title && description && selectedCategory)) {
+    if (!isFormSubmitable) {
       alert('모든 필수 값이 입력되어야 합니다.');
-
       return;
     }
 
@@ -67,16 +99,15 @@ function PostManager() {
       authorId: userInfo.userId,
     };
 
-    await remote.post('product/write', post);
-
-    navigate('/');
+    const { data } = await remote.post('product/write', post);
+    navigate(`/post/${data.productId}`, { replace: true });
   };
 
-  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let { value } = event.target;
-    value = value.replace(/[^0-9]/g, '');
-
-    setPrice(Number(value));
+  const handleDeleteThumbnail = (url: string) => {
+    setProductInputs((prev) => ({
+      ...prev,
+      thumbnails: prev.thumbnails.filter((thumbnail) => thumbnail !== url),
+    }));
   };
 
   return (
@@ -84,9 +115,13 @@ function PostManager() {
       <PageHeader
         pageName="글쓰기"
         extraButton={
-          <button type="submit" onClick={handleWritePost}>
+          <SubmitButton
+            type="submit"
+            onClick={handleWritePost}
+            isSubmitable={isFormSubmitable}
+          >
             <CheckIcon />
-          </button>
+          </SubmitButton>
         }
       />
       <StyledPostForm>
@@ -104,7 +139,7 @@ function PostManager() {
           />
           <ImagePreviewList
             thumbnails={thumbnails}
-            setThumbnails={setThumbnails}
+            handleDeleteThumbnail={handleDeleteThumbnail}
           />
         </div>
         <div className="content-section">
@@ -114,21 +149,21 @@ function PostManager() {
               type="text"
               placeholder="글 제목"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={({ target: { value } }) => handleChange('title', value)}
             />
             <div className="category-guide">
               (필수) 카테고리를 선택해주세요.
             </div>
             <ul className="categories">
-              {categories?.map((item) => (
+              {categories?.map(({ id, name }) => (
                 <li
                   className={`category-item ${
-                    selectedCategory === item.id && 'selected'
+                    selectedCategory === id && 'selected'
                   }`}
-                  key={item.id}
-                  onClick={() => setSelectedCategory(item.id)}
+                  key={id}
+                  onClick={() => handleChange('selectedCategory', id)}
                 >
-                  {item.name}
+                  {name}
                 </li>
               ))}
             </ul>
@@ -140,7 +175,12 @@ function PostManager() {
               type="text"
               placeholder="가격(선택사항)"
               value={price.toLocaleString()}
-              onChange={handlePriceChange}
+              onChange={({ target: { value } }) =>
+                handleChange(
+                  'price',
+                  parseLocaleStringToNumber(value, MAX_PRICE),
+                )
+              }
             />
           </div>
           <textarea
@@ -149,7 +189,9 @@ function PostManager() {
             className="description"
             placeholder="게시글 내용을 작성해주세요"
             value={description}
-            onChange={(event) => setDescription(event.target.value)}
+            onChange={({ target: { value } }) =>
+              handleChange('description', value)
+            }
           />
         </div>
       </StyledPostForm>
@@ -282,5 +324,11 @@ const StyledPostForm = styled.form`
       ${textMedium}
       width: 100%;
     }
+  }
+`;
+
+const SubmitButton = styled.button<{ isSubmitable: boolean }>`
+  & > svg > path {
+    stroke: ${({ isSubmitable }) => isSubmitable && colors.mint};
   }
 `;
