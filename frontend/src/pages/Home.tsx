@@ -1,30 +1,15 @@
-import { useContext } from 'react';
+import { useRef } from 'react';
+import Loading from '../components/commons/Loading';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
 import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
-import { UserInfoContext } from '../context/UserInfoContext';
-import useQuery from '../hooks/useQuery';
-import { remote } from '../lib/api';
-import { useHistoryState, useSearchParams } from '../lib/Router/hooks';
-import { ProductPreviewType } from '../types/product';
+import useProductInfiniteScroll from '../hooks/useProductInfiniteScroll';
+import { useHistoryState } from '../lib/Router/hooks';
 
 function Home() {
-  const { userId } = useContext(UserInfoContext);
+  const loader = useRef<HTMLDivElement>(null);
+  const { isLastPage, products } = useProductInfiniteScroll(loader);
   const categoryIconURL = useHistoryState();
-  const searchParams = useSearchParams();
-  const categoryId = searchParams('categoryId');
-
-  const { data: products } = useQuery<ProductPreviewType[]>(
-    ['products', categoryId, userId],
-    async () => {
-      const userQueryString = userId ? `userId=${userId}&` : '';
-      const categoryQueryString = categoryId ? `categoryId=${categoryId}&` : '';
-      const { data } = await remote.get(
-        '/product?' + categoryQueryString + userQueryString,
-      );
-      return data.data;
-    },
-  );
 
   return (
     <main>
@@ -34,6 +19,7 @@ function Home() {
           <ProductItem key={product.id} product={product} />
         ))}
       </ul>
+      {!isLastPage && <Loading ref={loader} />}
       <PostAddButton />
     </main>
   );
