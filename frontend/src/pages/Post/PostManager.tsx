@@ -140,6 +140,11 @@ function PostManager() {
 
   useEffect(() => {
     if (prevProductDetail) {
+      if (prevProductDetail.authorId !== userInfo.userId) {
+        navigate(`/post/${prevProductDetail.id}`, { replace: true });
+        return;
+      }
+
       const { name, description, categoryId, thumbnail, price } =
         prevProductDetail;
 
@@ -156,7 +161,7 @@ function PostManager() {
         price,
       });
     }
-  }, [prevProductDetail]);
+  }, [prevProductDetail, userInfo, navigate]);
 
   return (
     <StyledWrapper>
