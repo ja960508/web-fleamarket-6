@@ -7,7 +7,19 @@ function useToken() {
 
   useEffect(() => {
     (async function () {
+      dispatch({
+        type: 'USERINFO/SET_AUTHORIZING',
+        payload: {
+          isAuthorizing: true,
+        },
+      });
       const { data } = await credentialRemote('auth');
+      dispatch({
+        type: 'USERINFO/SET_AUTHORIZING',
+        payload: {
+          isAuthorizing: false,
+        },
+      });
 
       if (!data) {
         return;
