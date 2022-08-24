@@ -1,14 +1,14 @@
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { HeartIcon, MoreVerticalIcon } from '../../assets/icons/icons';
-import DropDown from '../../components/commons/Dropdown';
+import { HeartIcon } from '../../assets/icons/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import ImageSlider from '../../components/Post/ImageSlider';
 import { UserInfoContext } from '../../context/UserInfoContext';
+import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, useNavigate, usePathParams } from '../../lib/Router';
+import { Link, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -22,44 +22,22 @@ import { parseDateFromNow } from '../../utils/parse';
 
 function PostDetail() {
   const { userId } = useContext(UserInfoContext);
-  const navigate = useNavigate();
-  const { id } = usePathParams();
+  const { productId } = usePathParams();
+  const { authorOnlyDropDown } = useManageDropdown({
+    productId: Number(productId),
+  });
   const { data: postDetail } = useQuery<ProductDetail>(
-    ['postDetail' + id, id],
+    ['postDetail' + productId, productId],
     async () => {
-      const { data } = await remote(`/product/${id}`);
+      const { data } = await remote(`/product/${productId}`);
       return data;
     },
   );
   const { optimisticLikeInfo, handleLikeProduct } = useProductLike(
     { isLiked: Boolean(postDetail?.isLiked), likeCount: 0 },
-    +id,
+    +productId,
     userId,
   );
-
-  const handleDelete = () => {
-    navigate('/');
-  };
-
-  const handleModify = () => {
-    navigate(`/post/manage?productId=${id}`);
-  };
-
-  const productManageOptions = [
-    {
-      content: {
-        text: '수정하기',
-      },
-      onClick: handleModify,
-    },
-    {
-      content: {
-        text: '삭제하기',
-        style: { color: colors.red },
-      },
-      onClick: handleDelete,
-    },
-  ];
 
   if (!postDetail) {
     return <PageHeader pageName="상품 상세" />;
@@ -84,16 +62,13 @@ function PostDetail() {
   const chatLinkText = isAuthorOfProduct
     ? `채팅 목록 보기 ${chatCount > 0 ? `(${chatCount})` : ''}`
     : '문의하기';
-  const authorOnlyDropDown = isAuthorOfProduct && (
-    <DropDown
-      initialDisplay={<MoreVerticalIcon />}
-      dropDownElements={productManageOptions}
-    />
-  );
 
   return (
     <>
-      <PageHeader pageName="상품 상세보기" extraButton={authorOnlyDropDown} />
+      <PageHeader
+        pageName="상품 상세보기"
+        extraButton={isAuthorOfProduct && authorOnlyDropDown}
+      />
       <ImageSlider />
       <StyledPostDetail>
         <div className="sale-status">{isSold ? '판매완료' : '판매중'}</div>
