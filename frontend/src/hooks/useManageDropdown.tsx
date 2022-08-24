@@ -3,6 +3,7 @@ import { MoreVerticalIcon } from '../assets/icons/icons';
 import DropDown from '../components/commons/Dropdown';
 import Modal from '../components/commons/Modal/Modal';
 import { remote } from '../lib/api';
+import memoryCache from '../lib/MemoryCache';
 import { useNavigate } from '../lib/Router';
 import colors from '../styles/colors';
 import { textMedium } from '../styles/fonts';
@@ -19,6 +20,7 @@ function useManageDropdown({ productId }: useManageDropdownProps) {
   const handleDelete = async () => {
     try {
       await remote.delete(`/product/${productId}`);
+      memoryCache.removeCacheData('products');
     } catch (error) {
       console.error(error);
     }
