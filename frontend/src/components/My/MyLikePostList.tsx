@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyledGuideMessage } from '../../pages/My';
 import { ProductPreviewType } from '../../types/product';
 import ProductItem from '../Product/ProductItem';
 
@@ -12,7 +13,7 @@ function MyLikePostList({ products }: { products: ProductPreviewType[] }) {
       ))}
     </ul>
   ) : (
-    <div>등록된 상품이 없습니다.</div>
+    <StyledGuideMessage>등록된 상품이 없습니다.</StyledGuideMessage>
   );
 }
 

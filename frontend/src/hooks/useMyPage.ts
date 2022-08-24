@@ -8,6 +8,7 @@ function useMyPage() {
   const [chatRooms, setChatRooms] = useState<string[]>([]);
   const { products, getProductsByUserId, getProductsByUserLike } =
     useGetProducts();
+  const isSelectPostLike = tab === TABS[2];
   const isSelectChatRooms = tab === TABS[1];
 
   useEffect(() => {
@@ -27,7 +28,14 @@ function useMyPage() {
     }
   }, [getProductsByUserId, getProductsByUserLike, tab]);
 
-  return { tab, selectedTab, products, chatRooms, isSelectChatRooms };
+  return {
+    tab,
+    selectedTab,
+    products,
+    chatRooms,
+    isSelectChatRooms,
+    isSelectPostLike,
+  };
 }
 
 export default useMyPage;

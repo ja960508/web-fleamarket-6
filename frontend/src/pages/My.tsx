@@ -1,21 +1,29 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
 import ChatRoomList from '../components/My/ChatRoomList';
+import MyLikePostList from '../components/My/MyLikePostList';
+import MyPostList from '../components/My/MyPostList';
 import PageHeader from '../components/PageHeader/PageHeader';
-import ProductItem from '../components/Product/ProductItem';
 import { UserInfoDispatch } from '../context/UserInfoContext';
 import useMyPage from '../hooks/useMyPage';
 import { credentialRemote } from '../lib/api';
 import { useNavigate } from '../lib/Router';
 import colors from '../styles/colors';
+import { textSmall } from '../styles/fonts';
 
 const TABS = ['판매목록', '채팅', '관심목록'];
 
 function My() {
   const dispatch = useContext(UserInfoDispatch);
   const navigate = useNavigate();
-  const { tab, selectedTab, products, chatRooms, isSelectChatRooms } =
-    useMyPage();
+  const {
+    tab,
+    selectedTab,
+    products,
+    chatRooms,
+    isSelectChatRooms,
+    isSelectPostLike,
+  } = useMyPage();
 
   const handleLogout = async () => {
     await credentialRemote.get('auth/logout');
@@ -44,8 +52,10 @@ function My() {
       <ul>
         {isSelectChatRooms ? (
           <ChatRoomList chatRooms={chatRooms} />
+        ) : isSelectPostLike ? (
+          <MyLikePostList products={products} />
         ) : (
-          products.map((item) => <ProductItem key={item.id} product={item} />)
+          <MyPostList products={products} />
         )}
       </ul>
     </>
@@ -68,4 +78,12 @@ const StyledMyPageTabs = styled.ul`
     color: ${colors.primary};
     border-bottom: 2px solid ${colors.primary};
   }
+`;
+
+export const StyledGuideMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  ${textSmall};
+  color: ${colors.gray200};
 `;
