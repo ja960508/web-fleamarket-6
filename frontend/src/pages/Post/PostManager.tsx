@@ -123,9 +123,9 @@ function PostManager() {
 
     const { data } = await submitMethod(submitUrl, post);
     const productId = prevProductDetail?.id || data?.productId;
-    const returnUrl = productId ? `/post/${productId}` : '/';
+    const returnUrl = isEditMode ? -1 : `/post/${productId}`;
 
-    memoryCache.removeCacheData('postDetail' + data.productId);
+    memoryCache.removeCacheData('postDetail' + productId);
     navigate(returnUrl, {
       replace: true,
     });

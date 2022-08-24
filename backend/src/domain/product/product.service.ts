@@ -182,7 +182,7 @@ export class ProductService {
 
     const modifedResult = res as ResultSetHeader;
     if (!modifedResult?.changedRows) {
-      throw new HttpException('Something wrong when delete Product', 422);
+      throw new HttpException('Nothing changed.', 422);
     }
 
     return post;
