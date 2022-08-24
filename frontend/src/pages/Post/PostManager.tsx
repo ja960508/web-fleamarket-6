@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { CheckIcon, ImageIcon } from '../../assets/icons/icons';
+import { CheckIcon, ImageIcon, MapPinIcon } from '../../assets/icons/icons';
 import withCheckLogin from '../../components/HOC/withCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoContext } from '../../context/UserInfoContext';
@@ -70,7 +70,7 @@ function PostManager() {
       authorId: userInfo.userId,
     };
 
-    const _res = await remote.post('product/write', post);
+    await remote.post('product/write', post);
 
     navigate('/');
   };
@@ -83,7 +83,7 @@ function PostManager() {
   };
 
   return (
-    <>
+    <StyledWrapper>
       <PageHeader
         pageName="글쓰기"
         extraButton={
@@ -158,13 +158,35 @@ function PostManager() {
           />
         </div>
       </StyledPostForm>
-    </>
+      <footer>
+        <MapPinIcon />
+        <span className="region-name">{userInfo.region}</span>
+      </footer>
+    </StyledWrapper>
   );
 }
 
 export default withCheckLogin(PostManager);
 
+const StyledWrapper = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  footer {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid ${colors.gray300};
+    padding: 0.5rem 1rem;
+
+    .region-name {
+      margin-left: 0.25rem;
+    }
+  }
+`;
+
 const StyledPostForm = styled.form`
+  flex: 1 1 100%;
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1rem;
@@ -207,11 +229,18 @@ const StyledPostForm = styled.form`
   }
 
   .content-section {
+    flex: 1 1 100%;
     display: flex;
     flex-direction: column;
 
     & > input {
       padding: 1.5rem 0;
+    }
+
+    .description {
+      all: unset;
+      padding: 1.5rem 0;
+      flex: 1 1 100%;
     }
   }
 
@@ -257,14 +286,10 @@ const StyledPostForm = styled.form`
     align-items: center;
     border-bottom: 1px solid ${colors.gray300};
 
-    input {
+    .post-input {
+      margin-left: 0.25rem;
       ${textMedium}
       width: 100%;
     }
-  }
-
-  .description {
-    all: unset;
-    padding: 1.5rem 0;
   }
 `;

@@ -4,11 +4,18 @@ export interface ProductPreviewType {
   likeCount: number;
   createdAt: string;
   isSold: boolean;
-  category: number;
-  author: number;
+  authorId: number;
   name: string;
   regionName: string;
   price: number;
   chatCount: number;
   isLiked: boolean;
+}
+
+export interface ProductDetail extends ProductPreviewType {
+  categoryId: number;
+  categoryName: string;
+  authorName: string;
+  description: string;
+  viewCount: number;
 }

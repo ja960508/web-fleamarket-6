@@ -1,24 +1,33 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
+import { NICKNAME, PASSWORD } from '../../constants/validation';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
+import useTextInputs from '../../hooks/useTextInputs';
 import { credentialRemote } from '../../lib/api';
 import { Link, useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 
 function SignIn() {
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
   const dispatch = useContext(UserInfoDispatch);
   const navigate = useNavigate();
+  const { inputs, handleChange } = useTextInputs<{
+    nickname: string;
+    password: string;
+  }>({
+    initialValue: {
+      nickname: '',
+      password: '',
+    },
+  });
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const { data } = await credentialRemote.post('auth/signin', {
-      nickname,
-      password,
+      nickname: inputs.nickname,
+      password: inputs.password,
     });
 
     if (!data) {
@@ -48,15 +57,20 @@ function SignIn() {
           type="text"
           name="nickname"
           placeholder="닉네임을 입력하세요"
-          value={nickname}
-          onChange={(event) => setNickname(event.target.value)}
+          value={inputs.nickname}
+          onChange={handleChange('nickname')}
+          autoComplete="off"
+          validation={NICKNAME.REGEX}
+          error={NICKNAME.ERROR_MESSAGE}
         />
         <CustomInput
           type="password"
           name="password"
           placeholder="비밀번호를 입력하세요"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          value={inputs.password}
+          onChange={handleChange('password')}
+          validation={PASSWORD.REGEX}
+          error={PASSWORD.ERROR_MESSAGE}
         />
         <button type="submit">로그인</button>
         <StyledGithubOAuthLink
