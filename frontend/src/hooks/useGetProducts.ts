@@ -4,6 +4,11 @@ import { remote } from '../lib/api';
 import { useSearchParams } from '../lib/Router';
 import { ProductPreviewType } from '../types/product';
 
+interface dataType {
+  totalCount: number;
+  data: ProductPreviewType[];
+}
+
 function useGetProducts() {
   const [products, setProducts] = useState<ProductPreviewType[]>([]);
   const [isLastPage, setIsLastPage] = useState(false);
@@ -12,18 +17,26 @@ function useGetProducts() {
   const searchParams = useSearchParams();
   const categoryId = searchParams('categoryId');
 
+  const incrementPage = useCallback(
+    (data: dataType) => {
+      const lastPage = Math.ceil(data.totalCount / 10);
+      setPage((prev) => prev + 1);
+      setIsLastPage(lastPage === page);
+    },
+    [page],
+  );
+
   const getProducts = useCallback(async () => {
-    setPage((prev) => prev + 1);
     const userQueryString = userId ? `userId=${userId}&` : '';
     const categoryQueryString = categoryId ? `categoryId=${categoryId}&` : '';
     const pageQueryString = `page=${page}`;
     const { data } = await remote.get(
       '/product?' + categoryQueryString + userQueryString + pageQueryString,
     );
-    const lastPage = Math.ceil(data.totalCount / 10);
+
     setProducts((prev) => [...prev, ...data.data]);
-    setIsLastPage(lastPage === page);
-  }, [categoryId, page, userId]);
+    incrementPage(data);
+  }, [categoryId, incrementPage, page, userId]);
 
   const getProductsByUserId = useCallback(async () => {
     const userQueryString = userId ? `userId=${userId}&` : '';
@@ -38,23 +51,24 @@ function useGetProducts() {
     );
 
     setProducts(data.data);
-  }, [userId]);
+    incrementPage(data);
+  }, [userId, incrementPage]);
 
   const getProductsByUserLike = useCallback(async () => {
     const userQueryString = userId ? `userId=${userId}&` : '';
     const filterQueryString = `filter=like&`;
-    const locationQueryString = `location=my&`;
 
     if (!userId) {
       return;
     }
 
     const { data } = await remote.get(
-      '/product?' + userQueryString + filterQueryString + locationQueryString,
+      '/product?' + userQueryString + filterQueryString,
     );
 
     setProducts(data.data);
-  }, [userId]);
+    incrementPage(data);
+  }, [userId, incrementPage]);
 
   return {
     products,

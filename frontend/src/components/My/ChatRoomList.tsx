@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyledGuideMessage } from '../../pages/My';
 
-function ChatRoomList({ chatRooms }: { chatRooms: string[] }) {
+function ChatRoomList() {
+  const [chatRooms, setChatRooms] = useState<string[]>([]);
   const isNotEmpty = chatRooms.length;
 
   return isNotEmpty ? (
