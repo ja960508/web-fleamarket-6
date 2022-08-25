@@ -16,21 +16,26 @@ import { ChatRoomInfo } from '../../types/chat';
 function Chat() {
   const [message, setMessage] = useState('');
   const { chatId } = usePathParams();
-  const { data } = useQuery<ChatRoomInfo>(['chat', chatId], async () => {
-    const result = await remote(`/chat/${chatId}`);
-    return result.data;
-  });
+  const { data: chatRoomInfo } = useQuery<ChatRoomInfo>(
+    ['chat', chatId],
+    async () => {
+      const result = await remote(`/chat/${chatId}`);
 
-  const { isLoading, sendMessage, receivedData } = useSocket(data?.roomInfo);
+      console.log(result);
+      return result.data;
+    },
+  );
+
+  const { isLoading, sendMessage, receivedData } = useSocket(chatRoomInfo);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    if (!data?.roomInfo.buyerId) return;
+    if (!chatRoomInfo?.roomInfo.buyerId) return;
 
     sendMessage({
       message,
-      senderId: data.roomInfo.buyerId,
+      senderId: chatRoomInfo.roomInfo.buyerId,
     });
 
     setMessage('');
@@ -46,24 +51,28 @@ function Chat() {
           <StyledProductInfo>
             <img
               className="post-image"
-              src={data?.roomInfo.thumbnails[0]}
+              src={chatRoomInfo?.roomInfo.thumbnails[0]}
               alt="post_images"
             />
             <div className="product-info">
-              <div>{data?.roomInfo.name}</div>
-              <div className="product-price">{data?.roomInfo.price}원</div>
+              <div>{chatRoomInfo?.roomInfo.name}</div>
+              <div className="product-price">
+                {chatRoomInfo?.roomInfo.price}원
+              </div>
             </div>
             <div>
               {
                 <div className="sale-status">
-                  {data?.roomInfo.isSold ? '판매완료' : '판매중'}
+                  {chatRoomInfo?.roomInfo.isSold ? '판매완료' : '판매중'}
                 </div>
               }
             </div>
           </StyledProductInfo>
           <ChatList>
-            {receivedData.map((data) => (
-              <li key={data.message + data.timestamp}>{data.message}</li>
+            {receivedData.map((chatRoomInfo) => (
+              <li key={chatRoomInfo.message + chatRoomInfo.createdAt}>
+                {chatRoomInfo.message}
+              </li>
             ))}
           </ChatList>
           <StyledChatForm onSubmit={handleSubmit}>

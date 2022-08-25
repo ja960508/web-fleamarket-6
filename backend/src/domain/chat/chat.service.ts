@@ -1,7 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Pool, ResultSetHeader } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
-import { CreateChatDto } from './dto/create-chat.dto';
+import formatData from 'src/utils/format';
+import { CreateChatDto, createMessageDto } from './dto/create-chat.dto';
 
 @Injectable()
 export class ChatService {
@@ -74,9 +75,10 @@ export class ChatService {
 
   async getChatRoomMetaInfoByRoomId(roomId: number) {
     const [res] = await this.pool.query(`
-    SELECT * FROM CHATROOM
-    INNER JOIN PRODUCT ON PRODUCT.id = CHATROOM.productId
-    WHERE CHATROOM.id = ${roomId}
+    SELECT C.id, C.buyerId, C.sellerId, C.productId, P.isSold, P.thumbnails, 
+    C.updatedAt, P.price, P.name FROM CHATROOM as C
+    INNER JOIN PRODUCT as P ON P.id = C.productId
+    WHERE C.id = ${roomId}
   `);
 
     return res[0];
@@ -84,11 +86,38 @@ export class ChatService {
 
   async getChatMessageByRoomId(roomId: number) {
     const [res] = await this.pool.query(`
-      SELECT * FROM CHATROOM
-      INNER JOIN CHAT_MESSAGE ON CHATROOM.id = CHAT_MESSAGE.roomId
-      WHERE CHATROOM.id = ${roomId}
+      SELECT * FROM CHAT_MESSAGE
+      WHERE roomId = ${roomId}
     `);
 
+    console.log(res);
     return res;
+  }
+
+  async createChatMessage(message: createMessageDto) {
+    try {
+      const createdMessage = { ...message, isRead: 0 };
+
+      const [res] = await this.mysqlService.pool.query(`
+      INSERT INTO CHAT_MESSAGE (${Object.keys(createdMessage).join()})
+      VALUES (${Object.values(createdMessage).map(formatData).join()})
+      `);
+
+      const { insertId } = res as ResultSetHeader;
+
+      return insertId;
+    } catch (e) {
+      console.error(e);
+      throw new HttpException('Failed to send Message.', 500);
+    }
+  }
+
+  async getChatMessageById(id: number) {
+    const [res] = await this.pool.query(`
+    SELECT * FROM CHAT_MESSAGE
+    WHERE id = ${id}
+    `);
+
+    return res[0];
   }
 }

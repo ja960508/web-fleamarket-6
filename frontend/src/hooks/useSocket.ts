@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import * as io from 'socket.io-client';
 import socketEvent from '../constants/socketEvent';
-import { ChatRoomInfo } from '../types/chat';
+import { ChatRoomInfo, MessageType } from '../types/chat';
 
-interface ReceivedData {
-  senderId: number;
-  message: string;
-  timestamp: string;
-}
-
-function useSocket(roomInfo?: ChatRoomInfo['roomInfo']) {
+function useSocket(chatRoomInfo: ChatRoomInfo | undefined) {
   const [isLoading, setIsLoading] = useState(true);
-  const [receivedData, setReceivedData] = useState<ReceivedData[]>([]);
+  const [receivedData, setReceivedData] = useState<MessageType[]>([]);
   const socket = useRef<io.Socket>();
 
   const sendMessage = ({
@@ -21,13 +15,18 @@ function useSocket(roomInfo?: ChatRoomInfo['roomInfo']) {
     message: string;
     senderId: number;
   }) => {
-    if (!socket.current) return;
+    if (!socket.current || !chatRoomInfo) return;
 
-    socket.current?.emit(socketEvent.SEND, { message, senderId });
+    socket.current?.emit(socketEvent.SEND, {
+      message,
+      senderId,
+      roomId: chatRoomInfo.roomInfo.id,
+    });
   };
 
   const receiveMessage = (socket: io.Socket) => {
-    socket.on(socketEvent.RECEIVE, (info: ReceivedData) => {
+    socket.on(socketEvent.RECEIVE, (info: MessageType) => {
+      console.log(info);
       setReceivedData((prev) => [...prev, info]);
     });
   };
@@ -37,18 +36,20 @@ function useSocket(roomInfo?: ChatRoomInfo['roomInfo']) {
   }, []);
 
   useEffect(() => {
-    if (!socket?.current || !roomInfo) return;
+    if (!socket?.current || !chatRoomInfo) return;
 
-    const { authorId: sellerId, buyerId, id: roomId } = roomInfo;
+    const { sellerId, buyerId, id: roomId } = chatRoomInfo.roomInfo;
+
     socket.current.emit(socketEvent.ENTER, {
       sellerId,
       buyerId,
       roomId,
     });
     setIsLoading(false);
+    setReceivedData(chatRoomInfo.messages);
 
     receiveMessage(socket.current);
-  }, [roomInfo]);
+  }, [chatRoomInfo]);
 
   return { isLoading, sendMessage, receivedData };
 }

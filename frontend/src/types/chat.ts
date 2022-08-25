@@ -1,7 +1,7 @@
 export interface ChatRoomInfo {
-  messages: ChatUserInfo[];
+  messages: MessageType[];
   roomInfo: {
-    authorId: number;
+    sellerId: number;
     buyerId: number;
     isSold: boolean;
     thumbnails: string[];
@@ -13,7 +13,11 @@ export interface ChatRoomInfo {
   };
 }
 
-export interface ChatUserInfo {
-  message: string;
+export interface MessageType {
+  id: number;
   senderId: number;
+  roomId: number;
+  message: string;
+  createdAt: string;
+  isRead: boolean;
 }
