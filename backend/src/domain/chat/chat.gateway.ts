@@ -18,6 +18,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  // 소켓에는 들어왔지만 chatRoom에는 안 들어 온 상태입니다.
   public handleConnection(client: Socket) {
     console.log('웹소켓이 연결되었음...');
     console.log(client.id + '가 접속했어요.');

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 
@@ -19,9 +27,19 @@ export class ChatController {
     return '어떤 채팅방 목록';
   }
 
+  @Get('/check')
+  checkIsRoomExist(@Query() query: any) {
+    return this.chatService.checkIsRoomExist(query);
+  }
+
   @Get(':roomId')
-  getChatMessageByRoomId() {
-    return '특정 방에 대한 채팅내역';
+  async getChatMessageByRoomId(@Param('roomId') roomId: number) {
+    const [messages, roomInfo] = await Promise.all([
+      this.chatService.getChatMessageByRoomId(roomId),
+      this.chatService.getChatRoomMetaInfoByRoomId(roomId),
+    ]);
+
+    return { messages, roomInfo };
   }
 
   // 메시지 전송하기

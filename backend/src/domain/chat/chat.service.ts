@@ -60,4 +60,35 @@ export class ChatService {
       roomId,
     };
   }
+
+  async checkIsRoomExist(query: any) {
+    const { userId, productId } = query;
+
+    const [res] = await this.pool.query(`
+      SELECT id as roomId FROM CHATROOM
+      WHERE buyerId = ${userId} AND productId = ${productId} AND deletedAt IS NULL LIMIT 1;
+    `);
+
+    return res[0];
+  }
+
+  async getChatRoomMetaInfoByRoomId(roomId: number) {
+    const [res] = await this.pool.query(`
+    SELECT * FROM CHATROOM
+    INNER JOIN PRODUCT ON PRODUCT.id = CHATROOM.productId
+    WHERE CHATROOM.id = ${roomId}
+  `);
+
+    return res[0];
+  }
+
+  async getChatMessageByRoomId(roomId: number) {
+    const [res] = await this.pool.query(`
+      SELECT * FROM CHATROOM
+      INNER JOIN CHAT_MESSAGE ON CHATROOM.id = CHAT_MESSAGE.roomId
+      WHERE CHATROOM.id = ${roomId}
+    `);
+
+    return res;
+  }
 }
