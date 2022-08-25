@@ -1,4 +1,6 @@
+import socketEvent from 'src/constants/socketEvent';
 import {
+  SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketGateway,
@@ -7,6 +9,12 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
+export interface ChatRoomInfo {
+  roomId: string;
+  seller: string;
+  buyer: string;
+}
+
 @WebSocketGateway(8080, {
   cors: {
     origin: '*',
@@ -14,7 +22,10 @@ import { ChatService } from './chat.service';
   },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly chatService: ChatService) {}
+  private chatRooms: Record<string, ChatRoomInfo>;
+  constructor(private readonly chatService: ChatService) {
+    this.chatRooms = {};
+  }
   @WebSocketServer()
   server: Server;
 
@@ -31,5 +42,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     console.log('-----------------------------------');
     client.leave(client.data.roomId);
+  }
+
+  @SubscribeMessage(socketEvent.ENTER)
+  enterChatRoom(client: Socket, roomInfo: ChatRoomInfo) {
+    const { roomId } = roomInfo;
+    this.chatRooms[roomId] = {
+      ...roomInfo,
+    };
+
+    client.data.roomId = roomId;
+    client.join(roomId);
+  }
+
+  @SubscribeMessage(socketEvent.SEND)
+  sendMessage(
+    client: Socket,
+    { message, senderId }: { message: string; senderId: number },
+  ) {
+    // 디비에 저장.
+
+    const roomId = client.data.roomId;
+    client.to(roomId).emit('getMessage', {
+      senderId,
+      message,
+      timestamp: new Date().toLocaleDateString(),
+    });
   }
 }

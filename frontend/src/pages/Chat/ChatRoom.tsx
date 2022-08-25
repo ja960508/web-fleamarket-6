@@ -1,9 +1,11 @@
+import { FormEvent } from 'react';
 import styled from 'styled-components';
 import { SendIcon } from '../../assets/icons/icons';
 import ChatList from '../../components/Chat/ChatList';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import useQuery from '../../hooks/useQuery';
+import useSocket from '../../hooks/useSocket';
 import { remote } from '../../lib/api';
 import { usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
@@ -16,7 +18,14 @@ function Chat() {
     return result.data;
   });
 
-  console.log(data);
+  const { sendMessage } = useSocket(chatId);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    sendMessage('야이자식아!');
+  };
+
   return (
     <StyledWrapper>
       <PageHeader pageName="상대유저" />
@@ -39,7 +48,7 @@ function Chat() {
         </div>
       </StyledProductInfo>
       <ChatList></ChatList>
-      <StyledChatForm>
+      <StyledChatForm onSubmit={handleSubmit}>
         <CustomInput type="text" placeholder="메시지를 입력하세요." />
         <button type="submit">
           <SendIcon />
@@ -66,6 +75,7 @@ const StyledProductInfo = styled.div`
 
   .post-image {
     display: block;
+    width: 100px;
   }
 
   .product-info {
