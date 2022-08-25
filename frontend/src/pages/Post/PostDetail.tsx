@@ -8,7 +8,7 @@ import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, usePathParams } from '../../lib/Router';
+import { Link, useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -21,6 +21,7 @@ import { ProductDetail } from '../../types/product';
 import { parseDateFromNow } from '../../utils/parse';
 
 function PostDetail() {
+  const navigate = useNavigate();
   const { userId } = useContext(UserInfoContext);
   const { productId } = usePathParams();
   const { authorOnlyDropDown } = useManageDropdown({
@@ -63,6 +64,28 @@ function PostDetail() {
     ? `채팅 목록 보기 ${chatCount > 0 ? `(${chatCount})` : ''}`
     : '문의하기';
 
+  const handleRequestChat = async () => {
+    const { data: existRoom } = await remote(
+      `chat/check?userId=${userId}&productId=${productId}`,
+    );
+
+    if (existRoom) {
+      navigate(`/chat/${existRoom.roomId}`);
+
+      return;
+    }
+
+    const {
+      data: { roomId },
+    } = await remote.post(`chat`, {
+      buyerId: userId,
+      sellerId: authorId,
+      productId,
+    });
+
+    navigate(`/chat/${roomId}`);
+  };
+
   return (
     <>
       <PageHeader
@@ -99,9 +122,12 @@ function PostDetail() {
           <span className="delimiter-vertical" />
           <span className="product-price">{price.toLocaleString()}</span>
         </div>
-        <Link to="/chat" className="chat-link">
+        <button type="button" onClick={handleRequestChat}>
           {chatLinkText}
-        </Link>
+        </button>
+        {/* <Link to="/chat" className="chat-link">
+          {chatLinkText}
+        </Link> */}
       </PostFooter>
     </>
   );
