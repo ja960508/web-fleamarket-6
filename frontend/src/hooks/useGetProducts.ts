@@ -41,34 +41,36 @@ function useGetProducts() {
   const getProductsByUserId = useCallback(async () => {
     const userQueryString = userId ? `userId=${userId}&` : '';
     const filterQueryString = `filter=sale&`;
+    const pageQueryString = `page=${page}`;
 
     if (!userId) {
       return;
     }
 
     const { data } = await remote.get(
-      '/product?' + userQueryString + filterQueryString,
+      '/product?' + userQueryString + filterQueryString + pageQueryString,
     );
 
-    setProducts(data.data);
+    setProducts((prev) => [...prev, ...data.data]);
     incrementPage(data);
-  }, [userId, incrementPage]);
+  }, [userId, incrementPage, page]);
 
   const getProductsByUserLike = useCallback(async () => {
     const userQueryString = userId ? `userId=${userId}&` : '';
     const filterQueryString = `filter=like&`;
+    const pageQueryString = `page=${page}`;
 
     if (!userId) {
       return;
     }
 
     const { data } = await remote.get(
-      '/product?' + userQueryString + filterQueryString,
+      '/product?' + userQueryString + filterQueryString + pageQueryString,
     );
 
-    setProducts(data.data);
+    setProducts((prev) => [...prev, ...data.data]);
     incrementPage(data);
-  }, [userId, incrementPage]);
+  }, [userId, incrementPage, page]);
 
   return {
     products,
