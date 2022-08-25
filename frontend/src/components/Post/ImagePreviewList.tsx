@@ -4,17 +4,13 @@ import colors from '../../styles/colors';
 
 interface ImagePreviewListProps {
   thumbnails: string[];
-  setThumbnails: React.Dispatch<React.SetStateAction<string[]>>;
+  handleDeleteThumbnail: (url: string) => void;
 }
 
 function ImagePreviewList({
   thumbnails,
-  setThumbnails,
+  handleDeleteThumbnail,
 }: ImagePreviewListProps) {
-  const handleDeleteThumbnail = (url: string) => {
-    setThumbnails((prev) => prev.filter((item) => item !== url));
-  };
-
   return (
     <StyledImagePreviewList>
       {thumbnails.map((url) => (

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { CheckIcon, ImageIcon, MapPinIcon } from '../../assets/icons/icons';
 import withCheckLogin from '../../components/HOC/withCheckLogin';
@@ -7,12 +7,30 @@ import ImagePreviewList from '../../components/Post/ImagePreviewList';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { useNavigate } from '../../lib/Router';
+import memoryCache from '../../lib/MemoryCache';
+import { useNavigate, useSearchParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall, textMedium } from '../../styles/fonts';
 import { CategoryType } from '../../types/category';
+import { ProductDetail } from '../../types/product';
+import { parseLocaleStringToNumber } from '../../utils/parse';
+
+interface ProductInputsType {
+  title: string;
+  description: string;
+  selectedCategory: number;
+  price: number;
+  thumbnails: string[];
+}
+
+const MAX_PRICE = 1000000000;
 
 function PostManager() {
+  const userInfo = useContext(UserInfoContext);
+  const searchParams = useSearchParams();
+  const productId = searchParams('productId');
+  const navigate = useNavigate();
+
   const { data: categories } = useQuery<CategoryType[]>(
     ['category'],
     async () => {
@@ -20,13 +38,45 @@ function PostManager() {
       return result.data;
     },
   );
-  const [thumbnails, setThumbnails] = useState<string[]>([]);
-  const userInfo = useContext(UserInfoContext);
-  const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<number>(0);
-  const [price, setPrice] = useState(0);
+
+  const { data: prevProductDetail } = useQuery<ProductDetail>(
+    ['postDetail' + productId, productId],
+    async () => {
+      const { data } = await remote(`/product/${productId}`);
+      return data;
+    },
+    { skip: productId === null },
+  );
+
+  const [productInputs, setProductInputs] = useState<ProductInputsType>({
+    title: '',
+    description: '',
+    selectedCategory: 0,
+    price: 0,
+    thumbnails: [],
+  });
+
+  const { title, price, description, selectedCategory, thumbnails } =
+    productInputs;
+
+  const isFormSubmitable =
+    title.trim() !== '' &&
+    description.trim() !== '' &&
+    selectedCategory > 0 &&
+    price > 0 &&
+    price < MAX_PRICE;
+
+  const isEditMode = prevProductDetail !== undefined;
+
+  const handleChange = <T extends keyof ProductInputsType>(
+    inputName: T,
+    value: ProductInputsType[T],
+  ) => {
+    setProductInputs((prev) => ({
+      ...prev,
+      [inputName]: value,
+    }));
+  };
 
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -44,17 +94,16 @@ function PostManager() {
       },
     });
 
-    setThumbnails((prev) => [...prev, ...res.data]);
+    handleChange('thumbnails', [...thumbnails, ...res.data]);
   };
 
-  const handleWritePost = async (
+  const handleSubmitPost = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.preventDefault();
 
-    if (!(title && description && selectedCategory)) {
+    if (!isFormSubmitable) {
       alert('모든 필수 값이 입력되어야 합니다.');
-
       return;
     }
 
@@ -67,26 +116,65 @@ function PostManager() {
       authorId: userInfo.userId,
     };
 
-    await remote.post('product/write', post);
+    const submitMethod = isEditMode ? remote.patch : remote.post;
+    const submitUrl = isEditMode
+      ? `/product/${prevProductDetail.id}`
+      : '/product/write';
 
-    navigate('/');
+    const { data } = await submitMethod(submitUrl, post);
+    const productId = prevProductDetail?.id || data?.productId;
+    const returnUrl = isEditMode ? -1 : `/post/${productId}`;
+
+    memoryCache.removeCacheData('postDetail' + productId);
+    navigate(returnUrl, {
+      replace: true,
+    });
   };
 
-  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let { value } = event.target;
-    value = value.replace(/[^0-9]/g, '');
-
-    setPrice(Number(value));
+  const handleDeleteThumbnail = (url: string) => {
+    setProductInputs((prev) => ({
+      ...prev,
+      thumbnails: prev.thumbnails.filter((thumbnail) => thumbnail !== url),
+    }));
   };
+
+  useEffect(() => {
+    if (prevProductDetail) {
+      if (prevProductDetail.authorId !== userInfo.userId) {
+        navigate(`/post/${prevProductDetail.id}`, { replace: true });
+        return;
+      }
+
+      const { name, description, categoryId, thumbnail, price } =
+        prevProductDetail;
+
+      const thumbnails =
+        typeof thumbnail !== 'string'
+          ? ['http://source.unsplash.com/random']
+          : [thumbnail];
+
+      setProductInputs({
+        title: name,
+        description,
+        selectedCategory: categoryId,
+        thumbnails,
+        price,
+      });
+    }
+  }, [prevProductDetail, userInfo, navigate]);
 
   return (
     <StyledWrapper>
       <PageHeader
-        pageName="글쓰기"
+        pageName={isEditMode ? '수정하기' : '글쓰기'}
         extraButton={
-          <button type="submit" onClick={handleWritePost}>
+          <SubmitButton
+            type="submit"
+            onClick={handleSubmitPost}
+            isSubmitable={isFormSubmitable}
+          >
             <CheckIcon />
-          </button>
+          </SubmitButton>
         }
       />
       <StyledPostForm>
@@ -104,7 +192,7 @@ function PostManager() {
           />
           <ImagePreviewList
             thumbnails={thumbnails}
-            setThumbnails={setThumbnails}
+            handleDeleteThumbnail={handleDeleteThumbnail}
           />
         </div>
         <div className="content-section">
@@ -114,21 +202,21 @@ function PostManager() {
               type="text"
               placeholder="글 제목"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={({ target: { value } }) => handleChange('title', value)}
             />
             <div className="category-guide">
               (필수) 카테고리를 선택해주세요.
             </div>
             <ul className="categories">
-              {categories?.map((item) => (
+              {categories?.map(({ id, name }) => (
                 <li
                   className={`category-item ${
-                    selectedCategory === item.id && 'selected'
+                    selectedCategory === id && 'selected'
                   }`}
-                  key={item.id}
-                  onClick={() => setSelectedCategory(item.id)}
+                  key={id}
+                  onClick={() => handleChange('selectedCategory', id)}
                 >
-                  {item.name}
+                  {name}
                 </li>
               ))}
             </ul>
@@ -140,7 +228,12 @@ function PostManager() {
               type="text"
               placeholder="가격(선택사항)"
               value={price.toLocaleString()}
-              onChange={handlePriceChange}
+              onChange={({ target: { value } }) =>
+                handleChange(
+                  'price',
+                  parseLocaleStringToNumber(value, MAX_PRICE),
+                )
+              }
             />
           </div>
           <textarea
@@ -149,7 +242,9 @@ function PostManager() {
             className="description"
             placeholder="게시글 내용을 작성해주세요"
             value={description}
-            onChange={(event) => setDescription(event.target.value)}
+            onChange={({ target: { value } }) =>
+              handleChange('description', value)
+            }
           />
         </div>
       </StyledPostForm>
@@ -282,5 +377,11 @@ const StyledPostForm = styled.form`
       ${textMedium}
       width: 100%;
     }
+  }
+`;
+
+const SubmitButton = styled.button<{ isSubmitable: boolean }>`
+  & > svg > path {
+    stroke: ${({ isSubmitable }) => isSubmitable && colors.mint};
   }
 `;

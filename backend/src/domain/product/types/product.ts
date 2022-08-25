@@ -1,4 +1,11 @@
-import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
+import { OmitType } from '@nestjs/mapped-types';
+import {
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsBoolean,
+  IsJSON,
+} from 'class-validator';
 
 export type ProductFilterType = 'sale' | 'like';
 
@@ -33,11 +40,26 @@ export class ProductLikeRequestBody {
   userId: number;
 }
 
-export interface PostType {
+export class CreateProductDTO {
+  @IsString()
   name: string;
+
+  @IsNumber()
   price: number;
+
+  @IsString()
   description: string;
+
+  @IsJSON()
   thumbnails: string[];
+
+  @IsNumber()
   categoryId: number;
+
+  @IsNumber()
   authorId: number;
+}
+
+export class ModifyProductDTO extends OmitType(CreateProductDTO, ['authorId']) {
+  isSold: boolean;
 }

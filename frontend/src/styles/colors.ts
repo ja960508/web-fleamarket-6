@@ -9,6 +9,7 @@ const colors = {
   offWhite: '#f6f6f6',
   white: '#fff',
   red: '#f45452',
+  mint: '#2ac1bc',
 };
 
 export default colors;

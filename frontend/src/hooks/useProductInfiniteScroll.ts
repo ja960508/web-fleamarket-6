@@ -27,11 +27,7 @@ function useProductInfiniteScroll(loader: React.RefObject<HTMLDivElement>) {
           '/product?' + categoryQueryString + userQueryString + pageQueryString,
         );
         const lastPage = Math.ceil(data.totalCount / 10);
-        console.log(
-          lastPage,
-          data.totalCount,
-          `/product?${categoryQueryString}${userQueryString}${pageQueryString}`,
-        );
+
         setProducts((prev) => [...prev, ...data.data]);
         setIsLoading(false);
         setIsLastPage(lastPage === page);
