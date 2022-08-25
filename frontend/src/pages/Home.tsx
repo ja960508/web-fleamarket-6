@@ -3,12 +3,14 @@ import Loading from '../components/commons/Loading';
 import HomeNavbar from '../components/HomeNavbar/HomeNavbar';
 import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
-import useProductInfiniteScroll from '../hooks/useProductInfiniteScroll';
+import useGetProducts from '../hooks/useGetProducts';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import { useHistoryState } from '../lib/Router/hooks';
 
 function Home() {
   const loader = useRef<HTMLDivElement>(null);
-  const { isLastPage, products } = useProductInfiniteScroll(loader);
+  const { products, isLastPage, getProducts } = useGetProducts();
+  useInfiniteScroll({ loader, asyncCallback: getProducts });
   const categoryIconURL = useHistoryState();
 
   return (

@@ -1,17 +1,20 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserInfoContext } from '../context/UserInfoContext';
-import useGetProducts from './useGetProducts';
 
-function useProductInfiniteScroll(loader: React.RefObject<HTMLDivElement>) {
+interface useInfiniteScrollProps {
+  loader: React.RefObject<HTMLDivElement>;
+  asyncCallback: () => Promise<void>;
+}
+
+function useInfiniteScroll({ loader, asyncCallback }: useInfiniteScrollProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { products, isLastPage, getProducts } = useGetProducts();
   const { isAuthorizing } = useContext(UserInfoContext);
 
   useEffect(() => {
     const onIntersect = async ([entry]: IntersectionObserverEntry[]) => {
       if (entry.isIntersecting && !isLoading && !isAuthorizing) {
         setIsLoading(true);
-        await getProducts();
+        await asyncCallback();
         setIsLoading(false);
       }
     };
@@ -28,9 +31,9 @@ function useProductInfiniteScroll(loader: React.RefObject<HTMLDivElement>) {
     return () => {
       observer && observer.disconnect();
     };
-  }, [loader, getProducts, isLoading, isAuthorizing]);
+  }, [loader, isLoading, isAuthorizing, asyncCallback]);
 
-  return { products, isLastPage };
+  return { isLoading };
 }
 
-export default useProductInfiniteScroll;
+export default useInfiniteScroll;
