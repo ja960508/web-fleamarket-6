@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -48,6 +49,13 @@ export class ProductController {
     modifyProductDto: Partial<ModifyProductDTO>,
   ) {
     return this.productService.modifyPostById(productId, modifyProductDto);
+
+  @Delete(':productId')
+  deleteProductById(
+    @Param()
+    { productId }: ProductParam,
+  ) {
+    return this.productService.deletePostById(productId);
   }
 
   @Get(':productId')

@@ -23,7 +23,7 @@ export class ProductService {
 
   private async isProductExist(productId: number) {
     const [result] = await this.pool.query(/*sql*/ `
-      SELECT 1 FROM PRODUCT WHERE PRODUCT.id = ${productId} LIMIT 1;
+      SELECT 1 FROM PRODUCT WHERE PRODUCT.id = ${productId} AND PRODUCT.deletedAt IS NULL LIMIT 1;
     `);
 
     return Boolean(result[0]);
@@ -52,12 +52,13 @@ export class ProductService {
 
     const LIMIT = 10;
     const CALC_TOTAL_COUNT = `SQL_CALC_FOUND_ROWS`;
-    const REGION_SUBQUERY = /*sql*/ `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
-    const ISLIKED_SUBQUERY = /*sql*/ `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
+    const REGION_SUBQUERY = `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
+    const ISLIKED_SUBQUERY = `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
       userId ?? -1
     } and productId = P.id) as isLiked`;
-    const LIKECOUNT_SUBQUERY = /*sql*/ `(SELECT COUNT(1) FROM USER_LIKE_PRODUCT as ULP WHERE ULP.productId = P.id) as likeCount`;
-    const ISLIKED_TRUE = /*sql*/ `(SELECT 1) AS isLiked`;
+    const LIKECOUNT_SUBQUERY = `(SELECT COUNT(1) FROM USER_LIKE_PRODUCT as ULP WHERE ULP.productId = P.id) as likeCount`;
+    const ISLIKED_TRUE = `(SELECT 1) AS isLiked`;
+    const CHECK_IS_DELETED = `P.deletedAt IS NULL`;
 
     const SELECT_WITH = `DISTINCT ${CALC_TOTAL_COUNT} ${REGION_SUBQUERY}, ${LIKECOUNT_SUBQUERY},`;
     const BASE_TABLE = /*sql*/ `PRODUCT as P LEFT JOIN USER_LIKE_PRODUCT as ULP ON ULP.productId = P.id`;
@@ -73,23 +74,23 @@ export class ProductService {
       throw new HttpException('filter should be provided with userId.', 400);
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE}`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE ${CHECK_IS_DELETED}`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId}
+        SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId} AND ${CHECK_IS_DELETED}
       `;
     }
 
     if (filter === 'sale') {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId} AND ${CHECK_IS_DELETED}
       `;
     }
 
     if (categoryId) {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId} AND ${CHECK_IS_DELETED}
       `;
     }
 
@@ -186,5 +187,23 @@ export class ProductService {
     }
 
     return post;
+  }
+
+  async deletePostById(productId: number) {
+    const deletedAt = new Date().toISOString();
+
+    const [result] = await this.pool.query(/* sql */ `
+      UPDATE PRODUCT SET deletedAt =  "${deletedAt}" WHERE id = ${productId};
+    `);
+
+    const modifedResult = result as ResultSetHeader;
+    if (!modifedResult?.changedRows) {
+      throw new HttpException('Something wrong when delete Product', 422);
+    }
+
+    return {
+      productId,
+      deletedAt,
+    };
   }
 }
