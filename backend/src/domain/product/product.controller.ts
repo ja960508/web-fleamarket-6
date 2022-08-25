@@ -49,6 +49,7 @@ export class ProductController {
     modifyProductDto: Partial<ModifyProductDTO>,
   ) {
     return this.productService.modifyPostById(productId, modifyProductDto);
+  }
 
   @Delete(':productId')
   deleteProductById(
