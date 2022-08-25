@@ -1,6 +1,6 @@
 const colors = {
   primary: '#c8b6ff',
-  pink: '#ffd6ff',
+  pink: '#ff79a8',
   lightViolet: '#e7c6ff',
   black: '#222',
   gray100: '#888',

@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 
 export type ProductFilterType = 'sale' | 'like';
+export type ProductLocationType = 'home' | 'my';
 
 export class ProductsGetOptions {
   @IsNumber()
@@ -25,6 +26,10 @@ export class ProductsGetOptions {
   @IsString()
   @IsOptional()
   filter?: ProductFilterType;
+
+  @IsString()
+  @IsOptional()
+  location?: ProductLocationType;
 }
 
 export class ProductParam {
@@ -51,7 +56,7 @@ export class CreateProductDTO {
   description: string;
 
   @IsJSON()
-  thumbnails: string[];
+  thumbnails: string;
 
   @IsNumber()
   categoryId: number;

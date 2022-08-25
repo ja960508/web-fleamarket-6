@@ -8,8 +8,15 @@ import { useContext } from 'react';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import { Link as ProductDetailLink } from '../../lib/Router';
 import useProductLike from '../../hooks/useProductLike';
+import useManageDropdown from '../../hooks/useManageDropdown';
 
-function ProductItem({ product }: { product: ProductPreviewType }) {
+function ProductItem({
+  product,
+  isAuthor,
+}: {
+  product: ProductPreviewType;
+  isAuthor: boolean;
+}) {
   const {
     id,
     likeCount,
@@ -27,6 +34,9 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
     id,
     userInfo.userId,
   );
+  const { authorOnlyDropDown } = useManageDropdown({
+    productId: Number(id),
+  });
 
   return (
     <ProductDetailLink to={`/post/${id}`}>
@@ -59,13 +69,17 @@ function ProductItem({ product }: { product: ProductPreviewType }) {
           </div>
         </div>
 
-        <button
-          className="like-button"
-          type="button"
-          onClick={handleLikeProduct}
-        >
-          <HeartIcon />
-        </button>
+        {isAuthor ? (
+          <div className="tool-button">{authorOnlyDropDown}</div>
+        ) : (
+          <button
+            className="tool-button like-button"
+            type="button"
+            onClick={handleLikeProduct}
+          >
+            <HeartIcon />
+          </button>
+        )}
       </StyledProductItem>
     </ProductDetailLink>
   );
@@ -103,11 +117,13 @@ const StyledProductItem = styled.li<{ isLiked: boolean }>`
     ${textSmall};
   }
 
-  .like-button {
+  .tool-button {
     position: absolute;
     top: 1rem;
     right: 1rem;
+  }
 
+  .like-button {
     ${({ isLiked }) =>
       isLiked
         ? css`

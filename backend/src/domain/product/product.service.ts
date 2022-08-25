@@ -51,7 +51,6 @@ export class ProductService {
     const { userId, filter, categoryId, page = 1 } = options;
 
     const LIMIT = 10;
-    const CALC_TOTAL_COUNT = `SQL_CALC_FOUND_ROWS`;
     const REGION_SUBQUERY = `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
     const ISLIKED_SUBQUERY = `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
       userId ?? -1
@@ -60,7 +59,7 @@ export class ProductService {
     const ISLIKED_TRUE = `(SELECT 1) AS isLiked`;
     const CHECK_IS_DELETED = `P.deletedAt IS NULL`;
 
-    const SELECT_WITH = `DISTINCT ${CALC_TOTAL_COUNT} ${REGION_SUBQUERY}, ${LIKECOUNT_SUBQUERY},`;
+    const SELECT_WITH = `DISTINCT ${REGION_SUBQUERY}, ${LIKECOUNT_SUBQUERY},`;
     const BASE_TABLE = /*sql*/ `PRODUCT as P LEFT JOIN USER_LIKE_PRODUCT as ULP ON ULP.productId = P.id`;
 
     if (filter && categoryId) {
@@ -99,12 +98,10 @@ export class ProductService {
     }, ${LIMIT}`;
 
     const [result] = await this.pool.query(paginatedQuery);
-    const [[{ totalCount }]] = (await this.pool.query(
-      `SELECT FOUND_ROWS() AS totalCount`,
-    )) as any[][];
+    const [totalData] = (await this.pool.query(beforePaginationQuery)) as any[];
 
     return {
-      totalCount,
+      totalCount: totalData?.length || 0,
       data: result,
     };
   }

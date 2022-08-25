@@ -67,7 +67,7 @@ function userInfoReducer<T>(state: UserInfoContextType, action: ActionType<T>) {
     case SET_USER:
       return { ...state, ...action.payload, isLogin: true };
     case DELETE_USER:
-      return { ...initialUserInfo };
+      return { ...initialUserInfo, isAuthorizing: false };
     case CHANGE_REGION:
       return { ...state, ...action.payload };
     default:

@@ -1,6 +1,11 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { CategoryIcon, MapPinIcon, UserIcon } from '../../assets/icons/icons';
+import {
+  CategoryIcon,
+  MapPinIcon,
+  MenuIcon,
+  UserIcon,
+} from '../../assets/icons/icons';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import { LinkButton } from '../../lib/Router';
 import colors from '../../styles/colors';
@@ -28,8 +33,8 @@ function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
           </LinkButton>
         </h3>
         <div>
-          <LinkButton moveTo={true ? '/auth/sign-in' : '/my'}>
-            <UserIcon />
+          <LinkButton moveTo={userInfo.isLogin ? '/my' : '/auth/sign-in'}>
+            {userInfo.isLogin ? <MenuIcon /> : <UserIcon />}
           </LinkButton>
         </div>
       </StyledNav>
