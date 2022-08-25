@@ -81,7 +81,7 @@ const DropDownTransition = keyframes`
   }
 
   to {
-    transform: translateY(100%);
+    transform: translateY(110%);
     opacity: 1;
   }
 `;
@@ -94,7 +94,6 @@ const DropDownList = styled.ul`
   position: absolute;
   bottom: 0;
   right: 0;
-  transform: translateY(100%);
 
   width: 8rem;
 
@@ -106,7 +105,7 @@ const DropDownList = styled.ul`
   background-color: ${colors.offWhite};
   border-radius: 10px;
 
-  animation: ${DropDownTransition} ease-in-out 0.2s forwards;
+  animation: ${DropDownTransition} ease-in-out 0.1s forwards;
 `;
 
 const DropDownElement = styled.li`
