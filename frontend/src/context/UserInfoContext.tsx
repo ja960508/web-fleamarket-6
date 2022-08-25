@@ -5,6 +5,8 @@ interface UserInfoContextType {
   name: string;
   region: string;
   regionId: number;
+  isLogin: boolean;
+  isAuthorizing: boolean;
 }
 
 interface ActionType<T> {
@@ -33,11 +35,13 @@ export const createAction = <A,>(
 const SET_USER = 'USERINFO/SET_USER';
 const DELETE_USER = 'USERINFO/DELETE_USER';
 const CHANGE_REGION = 'USERINFO/CHANGE_REGION';
+const SET_AUTHORIZING = 'USERINFO/SET_AUTHORIZING';
 
 export const userInfoActions = {
   SET_USER,
   DELETE_USER,
   CHANGE_REGION,
+  SET_AUTHORIZING,
 } as const;
 
 const initialUserInfo: UserInfoContextType = {
@@ -45,6 +49,8 @@ const initialUserInfo: UserInfoContextType = {
   name: '',
   region: '',
   regionId: 0,
+  isLogin: false,
+  isAuthorizing: true,
 };
 
 export const UserInfoContext =
@@ -56,8 +62,10 @@ export const UserInfoDispatch = createContext<
 
 function userInfoReducer<T>(state: UserInfoContextType, action: ActionType<T>) {
   switch (action.type) {
-    case SET_USER:
+    case SET_AUTHORIZING:
       return { ...state, ...action.payload };
+    case SET_USER:
+      return { ...state, ...action.payload, isLogin: true };
     case DELETE_USER:
       return { ...initialUserInfo };
     case CHANGE_REGION:

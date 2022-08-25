@@ -51,3 +51,47 @@ export function isMatchedRoute(parsedPath: string, pathname: string) {
 
   return pathRegExp.test(pathname);
 }
+
+export function getQueryString(search: string): {
+  [key: string]: string;
+} {
+  if (!search) return {};
+
+  return search.split('&').reduce((acc, querystring) => {
+    const [key, val] = querystring.split('=');
+    return { ...acc, [key]: val };
+  }, {});
+}
+
+export function getPathParams({
+  currentPath,
+  pathRegex,
+  paramArray,
+}: {
+  currentPath: string;
+  pathRegex: string;
+  paramArray: string[];
+}) {
+  const paramsRegex = new RegExp(`^${pathRegex}$`);
+
+  const match = currentPath.match(paramsRegex);
+
+  if (!match) {
+    return {};
+  }
+
+  match.shift();
+
+  const result: {
+    [key: string]: string;
+  } = {};
+
+  return match.reduce(
+    (result, curr, idx) => {
+      result[paramArray[idx]] = curr;
+
+      return result;
+    },
+    { ...result },
+  );
+}

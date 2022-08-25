@@ -1,5 +1,8 @@
 import UserInfoProvider from './context/UserInfoContext';
-import { Route, Router, Routes } from './lib/Router';
+import useToken from './hooks/useToken';
+import { Route, Routes } from './lib/Router';
+import LocationProvider from './lib/Router/components/LocationProvider';
+import PathProvider from './lib/Router/components/PathProvider';
 import Transition from './lib/Router/components/Transition';
 import OAuthRedirect from './pages/Auth/OAuthRedirect';
 import SignIn from './pages/Auth/SignIn';
@@ -14,26 +17,33 @@ import RegionInfo from './pages/RegionInfo';
 import GlobalStyles from './styles/GlobalStyles';
 
 function App() {
+  useToken();
+
   return (
     <>
       <UserInfoProvider>
         <GlobalStyles />
-        <Router>
+        <PathProvider>
           <Transition>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/my" element={<My />} />
-              <Route path="/region" element={<RegionInfo />} />
-              <Route path="/category" element={<Category />} />
-              <Route path="/auth/sign-in" element={<SignIn />} />
-              <Route path="/auth/sign-up" element={<SignUp />} />
-              <Route path="/auth/OAuth-redirect" element={<OAuthRedirect />} />
-              <Route path="/post/manage" element={<PostManager />} />
-              <Route path="/post/:id" element={<PostDetail />} />
-              <Route path="/chat" element={<Chat />} />
-            </Routes>
+            <LocationProvider>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/my" element={<My />} />
+                <Route path="/region" element={<RegionInfo />} />
+                <Route path="/category" element={<Category />} />
+                <Route path="/auth/sign-in" element={<SignIn />} />
+                <Route path="/auth/sign-up" element={<SignUp />} />
+                <Route
+                  path="/auth/OAuth-redirect"
+                  element={<OAuthRedirect />}
+                />
+                <Route path="/post/manage" element={<PostManager />} />
+                <Route path="/post/:productId" element={<PostDetail />} />
+                <Route path="/chat" element={<Chat />} />
+              </Routes>
+            </LocationProvider>
           </Transition>
-        </Router>
+        </PathProvider>
       </UserInfoProvider>
     </>
   );

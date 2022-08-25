@@ -5,28 +5,43 @@ import {
   useEffect,
   useRef,
   cloneElement,
-  useContext,
   PropsWithChildren,
   isValidElement,
+  useContext,
 } from 'react';
 import { PathContext } from './PathProvider';
 
-function cloneChildren(children: ReactNode, pathnameProps?: string) {
+export function cloneChildren(
+  children: ReactNode,
+  locationInfo?: {
+    search?: string;
+    pathname?: string;
+  },
+) {
   const cloneTarget = isValidElement(children) ? children : <>{children}</>;
-  return cloneElement(cloneTarget, { pathnameProps });
+  return cloneElement(cloneTarget, {
+    key: locationInfo?.pathname,
+    locationInfo,
+  });
 }
 
 interface RouteInfo {
   element?: JSX.Element;
-  pathnameProps?: string;
+  locationInfo?: {
+    search?: string;
+    pathname?: string;
+  };
 }
 
 function Transition({ children }: PropsWithChildren): JSX.Element {
   const path = useContext(PathContext);
   const mountRef = useRef(false);
   const [currentRoute, setCurrentRoute] = useState<RouteInfo>({
-    element: cloneChildren(children, location.pathname),
-    pathnameProps: location.pathname,
+    element: cloneChildren(children, {
+      pathname: path,
+      search: window.location.search,
+    }),
+    locationInfo: { pathname: path, search: window.location.search },
   });
   const [nextRoute, setNextRoute] = useState<RouteInfo>({});
   const [isAnimationReady, setIsAnimationReady] = useState(false);
@@ -41,21 +56,30 @@ function Transition({ children }: PropsWithChildren): JSX.Element {
       return;
     }
 
+    const locationInfo = {
+      pathname: path,
+      search: window.location.search,
+    };
+
     setNextRoute({
-      element: cloneChildren(children, location.pathname),
-      pathnameProps: location.pathname,
+      element: cloneChildren(children, locationInfo),
+      locationInfo,
     });
 
     setIsAnimationReady(true);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   }, [children, path]);
 
   useEffect(() => {
     const isMount = mountRef.current !== false;
     if (isMount && !isAnimationReady) {
-      const { element, pathnameProps } = nextRoute;
+      const { element, locationInfo } = nextRoute;
       setCurrentRoute({
-        element: cloneChildren(element, pathnameProps),
-        pathnameProps: nextRoute.pathnameProps,
+        element: cloneChildren(element, locationInfo),
+        locationInfo,
       });
     }
   }, [isAnimationReady, nextRoute]);
@@ -102,7 +126,7 @@ const routeKeyframes = {
 
 const StyledAnimatingBox = styled.div`
   display: flex;
-  animation: ${routeKeyframes.right} ease-in-out 0.7s forwards;
+  animation: ${routeKeyframes.right} ease-in-out 0.5s forwards;
 `;
 
 export default Transition;

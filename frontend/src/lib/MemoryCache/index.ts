@@ -6,12 +6,12 @@ interface QueryCache {
   [queryKey: QueryKey]: {
     updateFn: () => Promise<any>;
     cacheData: any;
-    prevQueryOptions?: string;
+    prevRefetchArgs?: string;
   };
 }
 
 interface TimerMap {
-  [queryKey: QueryKey]: number;
+  [queryKey: QueryKey]: NodeJS.Timeout;
 }
 
 class MemoryCache {
@@ -22,26 +22,25 @@ class MemoryCache {
     this.timerMap = {};
   }
 
-  private registerExpire(queryKey: QueryKey) {
+  private registerExpire(queryKey: QueryKey, expireTime?: number) {
     if (this.timerMap[queryKey]) {
       clearTimeout(this.timerMap[queryKey]);
     }
 
     this.timerMap[queryKey] = setTimeout(() => {
       this.removeCacheData(queryKey);
-    }, CACHE_EXPIRE);
+    }, expireTime || CACHE_EXPIRE);
   }
 
   private isStaleCache(queryKey: QueryKey, refetchArgs?: RefetchArgs) {
     if (!refetchArgs) return false;
 
-    const prevQueryOptions = this.queryCache[queryKey]?.prevQueryOptions;
-    if (!prevQueryOptions) return true;
+    const prevRefetchArgs = this.queryCache[queryKey]?.prevRefetchArgs;
 
-    return prevQueryOptions !== JSON.stringify(refetchArgs);
+    return prevRefetchArgs !== this.serializeRefetchArgs(refetchArgs);
   }
 
-  private parseQueryOption(refetchArgs?: RefetchArgs) {
+  private serializeRefetchArgs(refetchArgs?: RefetchArgs) {
     return refetchArgs?.every((arg) => Boolean(arg))
       ? JSON.stringify(refetchArgs)
       : undefined;
@@ -58,18 +57,19 @@ class MemoryCache {
     queryFn: QueryFn<T>,
     dataInfo: {
       fetchedData: T;
-      queryOptions?: RefetchArgs;
+      refetchArgs?: RefetchArgs;
+      expireTime?: number;
     },
   ) {
-    const { fetchedData, queryOptions } = dataInfo;
+    const { fetchedData, refetchArgs, expireTime } = dataInfo;
 
     this.queryCache[queryKey] = {
       updateFn: queryFn,
       cacheData: fetchedData,
-      prevQueryOptions: this.parseQueryOption(queryOptions),
+      prevRefetchArgs: this.serializeRefetchArgs(refetchArgs),
     };
 
-    this.registerExpire(queryKey);
+    this.registerExpire(queryKey, expireTime);
   }
 
   removeCacheData(queryKey: QueryKey) {

@@ -1,32 +1,17 @@
 import { useContext } from 'react';
-import { PathContext, PathDispatch } from './components/PathProvider';
-import location from './location';
+import { LocationContext } from './components/LocationProvider';
+import { PathDispatch } from './components/PathProvider';
+import { getQueryString } from './utils';
+
+export function useLocation() {
+  const location = useContext(LocationContext);
+  return location;
+}
 
 export function usePathParams() {
-  const currentPath = useContext(PathContext);
-  const { path, params } = location.getLocation();
-  const paramsRegex = new RegExp(`^${path}$`);
+  const { params } = useLocation();
 
-  const match = currentPath.match(paramsRegex);
-
-  if (!match) {
-    return {};
-  }
-
-  match.shift();
-
-  const result: {
-    [key: string]: string;
-  } = {};
-
-  return match.reduce(
-    (result, curr, idx) => {
-      result[params[idx]] = curr;
-
-      return result;
-    },
-    { ...result },
-  );
+  return params;
 }
 
 export function useNavigate() {
@@ -36,10 +21,10 @@ export function useNavigate() {
 }
 
 export function useSearchParams() {
-  const location = new URLSearchParams(window.location.search);
-
-  return (query: string) => {
-    return location.get(query);
+  const { search } = useLocation();
+  const queryStringMap = getQueryString(search);
+  return (querystring: string) => {
+    return queryStringMap[querystring];
   };
 }
 

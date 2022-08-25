@@ -1,25 +1,36 @@
-import React, { Children, useContext } from 'react';
+import React, {
+  Children,
+  PropsWithChildren,
+  useContext,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import { PathContext } from './PathProvider';
 import {
+  getPathParams,
   isMatchedRoute,
   isValidChild,
   removeQueryString,
   throwError,
   transformPathVariables,
 } from '../utils';
-import location from '../location';
+import { LocationDispatch, LocationInfo } from './LocationProvider';
 
 function Routes({
   children,
-  pathnameProps,
-}: {
-  pathnameProps?: string;
-  children: React.ReactNode;
-}) {
+  locationInfo,
+}: PropsWithChildren<{
+  locationInfo?: {
+    pathname: string;
+    search: string;
+  };
+}>) {
   const path = useContext(PathContext);
-  const currentPath = pathnameProps || path;
+  const changeLocation = useContext(LocationDispatch);
+  const currentPath = locationInfo?.pathname || path;
 
-  let currentRoute = null;
+  const nextLocation = useRef<LocationInfo>();
+  const currentRoute = useRef(null);
 
   Children.forEach(children, (child: React.ReactNode) => {
     if (!isValidChild(child)) {
@@ -34,15 +45,28 @@ function Routes({
     );
 
     if (isMatchedRoute(parsedPath, removeQueryString(currentPath))) {
-      currentRoute = routeElement;
-      location.setLocation({
-        path: parsedPath,
-        params,
+      currentRoute.current = routeElement;
+
+      const resultParam = getPathParams({
+        currentPath,
+        pathRegex: parsedPath,
+        paramArray: params,
       });
+
+      nextLocation.current = {
+        pathname: currentPath,
+        params: resultParam,
+        search: locationInfo?.search || '',
+      };
     }
   });
+  useLayoutEffect(() => {
+    if (nextLocation.current) {
+      changeLocation(nextLocation.current);
+    }
+  }, []);
 
-  return <>{currentRoute}</>;
+  return <>{currentRoute.current}</>;
 }
 
 export default Routes;

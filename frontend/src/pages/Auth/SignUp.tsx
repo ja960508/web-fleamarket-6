@@ -1,8 +1,11 @@
-import axios from 'axios';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
+import PageHeader from '../../components/PageHeader/PageHeader';
+import { NICKNAME, PASSWORD } from '../../constants/validation';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
+import useTextInputs from '../../hooks/useTextInputs';
+import { credentialRemote, remote } from '../../lib/api';
 import { useHistoryState, useNavigate } from '../../lib/Router/hooks';
 import colors from '../../styles/colors';
 
@@ -12,12 +15,7 @@ interface regionType {
 }
 
 function SignUp() {
-  const [region, setRegion] = useState<regionType[]>([
-    {
-      id: 1,
-      name: '잠실',
-    },
-  ]);
+  const [region, setRegion] = useState<regionType[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<regionType>({
     id: 0,
     name: '',
@@ -25,6 +23,23 @@ function SignUp() {
   const githubUser = useHistoryState();
   const dispatch = useContext(UserInfoDispatch);
   const navigate = useNavigate();
+  const { inputs, handleChange } = useTextInputs<{
+    nickname: string;
+    password: string;
+  }>({
+    initialValue: {
+      nickname: '',
+      password: '',
+    },
+  });
+
+  useEffect(() => {
+    (async function () {
+      const { data } = await remote('region');
+
+      setRegion(data);
+    })();
+  }, []);
 
   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,7 +47,7 @@ function SignUp() {
     if (githubUser) {
       const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-      const { data } = await axios.post('http://localhost:4000/auth/signup', {
+      const { data } = await credentialRemote.post('auth/signup', {
         user: userInfo,
       });
 
@@ -50,16 +65,13 @@ function SignUp() {
       return;
     }
 
-    const { nickname, password } = event.target as HTMLFormElement;
     const userInfo = {
-      nickname: nickname.value,
-      password: password.value,
+      nickname: inputs.nickname,
+      password: inputs.password,
       regionId: selectedRegion.id,
     };
 
-    const { data } = await axios.post('http://localhost:4000/auth/signup', {
-      user: userInfo,
-    });
+    const { data } = await credentialRemote.post('auth/signup', userInfo);
 
     dispatch({
       type: 'USERINFO/SET_USER',
@@ -78,36 +90,48 @@ function SignUp() {
   };
 
   return (
-    <StyledSignupForm onSubmit={handleRegister}>
-      {!githubUser && (
-        <>
-          <CustomInput
-            name="nickname"
-            type="text"
-            placeholder="영문, 숫자 조합 10자 이하"
-          />
-          <CustomInput
-            name="password"
-            type="password"
-            placeholder="영문/특문/숫자 조합 16자 이하"
-          />
-        </>
-      )}
-      <CustomInput
-        type="text"
-        placeholder="시∙구 제외, 동만 입력."
-        value={selectedRegion.name}
-        readOnly={true}
-      />
-      <ul>
-        {region.map((item) => (
-          <li key={item.id} onClick={() => handleSelectRegion(item)}>
-            {item.name}
-          </li>
-        ))}
-      </ul>
-      <button type="submit">회원가입</button>
-    </StyledSignupForm>
+    <>
+      <PageHeader pageName="회원가입" />
+      <StyledSignupForm onSubmit={handleRegister}>
+        {!githubUser && (
+          <>
+            <CustomInput
+              name="nickname"
+              type="text"
+              value={inputs.nickname}
+              onChange={handleChange('nickname')}
+              placeholder="영문, 숫자 조합 10자 이하"
+              validation={NICKNAME.REGEX}
+              error={NICKNAME.ERROR_MESSAGE}
+              autoComplete="off"
+            />
+            <CustomInput
+              name="password"
+              type="password"
+              value={inputs.password}
+              onChange={handleChange('password')}
+              placeholder="영문/특문/숫자 조합 16자 이하"
+              validation={PASSWORD.REGEX}
+              error={PASSWORD.ERROR_MESSAGE}
+            />
+          </>
+        )}
+        <CustomInput
+          type="text"
+          placeholder="시∙구 제외, 동만 입력."
+          value={selectedRegion.name}
+          readOnly={true}
+        />
+        <ul>
+          {region.map((item) => (
+            <li key={item.id} onClick={() => handleSelectRegion(item)}>
+              {item.name}
+            </li>
+          ))}
+        </ul>
+        <button type="submit">회원가입</button>
+      </StyledSignupForm>
+    </>
   );
 }
 

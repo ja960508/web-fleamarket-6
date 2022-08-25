@@ -1,27 +1,44 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, PropsWithChildren, useEffect, useState } from 'react';
 
 export type NextPathType = string | -1;
-type PathDispatchType = (nextPath: NextPathType, state?: any) => void;
+export type PathDispatchOptions = {
+  state?: any;
+  replace?: boolean;
+};
+
+type PathDispatchType = (
+  nextPath: NextPathType,
+  options?: PathDispatchOptions,
+) => void;
 
 export const PathContext = createContext('/');
 export const PathDispatch = createContext<PathDispatchType>(() => undefined);
 
-function PathProvider({ children }: { children: React.ReactNode }) {
+function PathProvider({ children }: PropsWithChildren) {
   const [path, setPath] = useState(location.pathname);
 
-  const handlePathChange = (nextPath: NextPathType, state?: any) => {
+  const handlePathChange = (
+    nextPath: NextPathType,
+    options?: PathDispatchOptions,
+  ) => {
     if (nextPath === -1) {
       window.history.back();
       return;
     }
 
     setPath(nextPath);
-    window.history.pushState(state, '', nextPath);
+
+    if (options?.replace) {
+      window.history.replaceState(options?.state, '', nextPath);
+      return;
+    }
+
+    window.history.pushState(options?.state, '', nextPath);
   };
 
   useEffect(() => {
     const handlePopState = () => {
-      setPath(window.location.pathname);
+      setPath(location.pathname);
     };
 
     window.addEventListener('popstate', handlePopState);

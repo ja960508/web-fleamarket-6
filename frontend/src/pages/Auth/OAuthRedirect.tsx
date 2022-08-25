@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React, { useContext, useEffect } from 'react';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
+import { credentialRemote } from '../../lib/api';
 import { useNavigate, useSearchParams } from '../../lib/Router';
 
 function OAuthRedirect() {
@@ -16,21 +16,18 @@ function OAuthRedirect() {
     }
 
     (async function () {
-      const { data } = await axios.post(
-        'http://localhost:4000/auth/oauth/github',
-        {
-          code,
-        },
-      );
+      const { data } = await credentialRemote.post('auth/oauth/github', {
+        code,
+      });
 
       if (data.isExist) {
         dispatch({
           type: 'USERINFO/SET_USER',
           payload: {
-            userId: data.user.githubUserId,
+            userId: data.user.id,
             name: data.user.nickname,
-            region: '잠실',
-            regionId: 1,
+            region: data.user.regionName,
+            regionId: data.user.regionId,
           },
         });
         navigate('/');
