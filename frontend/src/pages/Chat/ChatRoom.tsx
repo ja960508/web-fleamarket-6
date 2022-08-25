@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import { SendIcon } from '../../assets/icons/icons';
 import ChatList from '../../components/Chat/ChatList';
+import Loading from '../../components/commons/Loading';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import useQuery from '../../hooks/useQuery';
@@ -20,7 +21,7 @@ function Chat() {
     return result.data;
   });
 
-  const { sendMessage, receivedData } = useSocket(data?.roomInfo);
+  const { isLoading, sendMessage, receivedData } = useSocket(data?.roomInfo);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -37,40 +38,46 @@ function Chat() {
 
   return (
     <StyledWrapper>
-      <PageHeader pageName="상대유저" />
-      <StyledProductInfo>
-        <img
-          className="post-image"
-          src={data?.roomInfo.thumbnails[0]}
-          alt="post_images"
-        />
-        <div className="product-info">
-          <div>{data?.roomInfo.name}</div>
-          <div className="product-price">{data?.roomInfo.price}원</div>
-        </div>
-        <div>
-          {
-            <div className="sale-status">
-              {data?.roomInfo.isSold ? '판매완료' : '판매중'}
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <PageHeader pageName="상대유저" />
+          <StyledProductInfo>
+            <img
+              className="post-image"
+              src={data?.roomInfo.thumbnails[0]}
+              alt="post_images"
+            />
+            <div className="product-info">
+              <div>{data?.roomInfo.name}</div>
+              <div className="product-price">{data?.roomInfo.price}원</div>
             </div>
-          }
-        </div>
-      </StyledProductInfo>
-      <ChatList>
-        {receivedData.map((data) => (
-          <li key={data.message + data.timestamp}>{data.message}</li>
-        ))}
-      </ChatList>
-      <StyledChatForm onSubmit={handleSubmit}>
-        <CustomInput
-          type="text"
-          placeholder="메시지를 입력하세요."
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit">
-          <SendIcon />
-        </button>
-      </StyledChatForm>
+            <div>
+              {
+                <div className="sale-status">
+                  {data?.roomInfo.isSold ? '판매완료' : '판매중'}
+                </div>
+              }
+            </div>
+          </StyledProductInfo>
+          <ChatList>
+            {receivedData.map((data) => (
+              <li key={data.message + data.timestamp}>{data.message}</li>
+            ))}
+          </ChatList>
+          <StyledChatForm onSubmit={handleSubmit}>
+            <CustomInput
+              type="text"
+              placeholder="메시지를 입력하세요."
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <button type="submit">
+              <SendIcon />
+            </button>
+          </StyledChatForm>
+        </>
+      )}
     </StyledWrapper>
   );
 }

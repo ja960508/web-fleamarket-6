@@ -10,6 +10,7 @@ interface ReceivedData {
 }
 
 function useSocket(roomInfo?: ChatRoomInfo['roomInfo']) {
+  const [isLoading, setIsLoading] = useState(true);
   const [receivedData, setReceivedData] = useState<ReceivedData[]>([]);
   const socket = useRef<io.Socket>();
 
@@ -44,11 +45,12 @@ function useSocket(roomInfo?: ChatRoomInfo['roomInfo']) {
       buyerId,
       roomId,
     });
+    setIsLoading(false);
 
     receiveMessage(socket.current);
   }, [roomInfo]);
 
-  return { sendMessage, receivedData };
+  return { isLoading, sendMessage, receivedData };
 }
 
 export default useSocket;
