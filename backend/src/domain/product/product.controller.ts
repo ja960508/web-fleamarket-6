@@ -26,7 +26,10 @@ export class ProductController {
 
   @Post('write')
   async writePost(@Body() post: CreateProductDTO) {
-    return this.productService.writePost(post);
+    return this.productService.writePost({
+      ...post,
+      thumbnails: JSON.parse(post.thumbnails),
+    });
   }
 
   @Post(':productId/like')

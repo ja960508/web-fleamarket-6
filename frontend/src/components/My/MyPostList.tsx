@@ -21,7 +21,7 @@ function MyPostList() {
       ) : (
         <ul>
           {products.map((item) => (
-            <ProductItem key={item.id} product={item} />
+            <ProductItem key={item.id} product={item} isAuthor={true} />
           ))}
         </ul>
       )}

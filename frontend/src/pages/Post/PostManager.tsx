@@ -111,7 +111,7 @@ function PostManager() {
       name: title,
       price,
       description,
-      thumbnails,
+      thumbnails: JSON.stringify(thumbnails),
       categoryId: selectedCategory,
       authorId: userInfo.userId,
     };

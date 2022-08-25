@@ -56,7 +56,7 @@ export class CreateProductDTO {
   description: string;
 
   @IsJSON()
-  thumbnails: string[];
+  thumbnails: string;
 
   @IsNumber()
   categoryId: number;

@@ -45,7 +45,13 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
   }, []);
 
   return (
-    <StyledDropDown ref={dropDownRef} onClick={() => toggleDropDown()}>
+    <StyledDropDown
+      ref={dropDownRef}
+      onClick={(event) => {
+        event.stopPropagation();
+        toggleDropDown();
+      }}
+    >
       {initialDisplay}
       {isDropDownOpen && (
         <DropDownList>
