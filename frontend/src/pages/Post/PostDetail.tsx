@@ -176,12 +176,21 @@ const SellerInfo = styled.div`
 `;
 
 const PostFooter = styled.footer<{ isLiked: boolean }>`
+  position: sticky;
+  bottom: 0;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   padding: 1rem;
   border: 1px solid ${colors.gray200};
+  border-left-width: 0;
+  border-right-width: 0;
+
+  ${mixin.shadow.normal};
+
+  background-color: white;
 
   svg {
     ${({ isLiked }) =>

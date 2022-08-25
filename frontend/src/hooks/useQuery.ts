@@ -15,7 +15,10 @@ export type RefetchArgs = any[];
 function useQuery<T>(
   queryKeyWithArgs: [QueryKey, ...RefetchArgs],
   queryFn: QueryFn<T>,
-  expireTime?: number,
+  queryOptions?: {
+    expireTime?: number;
+    skip?: boolean;
+  },
 ) {
   const [queryKey, ...refetchArgs] = queryKeyWithArgs;
   const [data, setData] = useState<T>();
@@ -31,7 +34,7 @@ function useQuery<T>(
         memoryCache.setCacheData(queryKey, queryFn, {
           fetchedData: result,
           refetchArgs,
-          expireTime,
+          expireTime: queryOptions?.expireTime,
         });
 
         setData(result);
@@ -42,6 +45,8 @@ function useQuery<T>(
       }
     }
 
+    if (queryOptions?.skip) return;
+
     const cacheData = memoryCache.getCacheData(queryKey, refetchArgs);
     if (!cacheData) {
       fetchFromRemote();
@@ -50,7 +55,7 @@ function useQuery<T>(
 
     setData(cacheData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryKey, ...refetchArgs]);
+  }, [queryKey, ...refetchArgs, queryOptions?.skip]);
 
   return { data, isLoading };
 }

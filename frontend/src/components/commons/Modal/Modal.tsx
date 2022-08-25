@@ -4,7 +4,7 @@ import ModalPortal from './ModalPortal';
 
 interface ModalPropsType {
   isModalOpen: boolean;
-  children: React.ReactNode;
+  children: React.ReactNode | JSX.Element;
   closeModal: () => void;
 }
 

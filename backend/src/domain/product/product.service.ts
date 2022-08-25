@@ -1,12 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Pool } from 'mysql2/promise';
+import { Pool, ResultSetHeader } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import { S3Service } from 'src/config/s3/s3.service';
 import {
   ProductLikeRequestBody,
   ProductParam,
   ProductsGetOptions,
-  PostType,
+  CreateProductDTO,
+  ModifyProductDTO,
 } from './types/product';
 import formatData from 'src/utils/format';
 
@@ -22,7 +23,7 @@ export class ProductService {
 
   private async isProductExist(productId: number) {
     const [result] = await this.pool.query(/*sql*/ `
-      SELECT 1 FROM PRODUCT WHERE PRODUCT.id = ${productId} LIMIT 1;
+      SELECT 1 FROM PRODUCT WHERE PRODUCT.id = ${productId} AND PRODUCT.deletedAt IS NULL LIMIT 1;
     `);
 
     return Boolean(result[0]);
@@ -51,12 +52,13 @@ export class ProductService {
 
     const LIMIT = 10;
     const CALC_TOTAL_COUNT = `SQL_CALC_FOUND_ROWS`;
-    const REGION_SUBQUERY = /*sql*/ `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
-    const ISLIKED_SUBQUERY = /*sql*/ `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
+    const REGION_SUBQUERY = `(SELECT name from USER JOIN REGION ON USER.regionId = REGION.id where USER.id = authorId) as regionName`;
+    const ISLIKED_SUBQUERY = `EXISTS (SELECT * FROM USER_LIKE_PRODUCT where userId = ${
       userId ?? -1
     } and productId = P.id) as isLiked`;
-    const LIKECOUNT_SUBQUERY = /*sql*/ `(SELECT COUNT(1) FROM USER_LIKE_PRODUCT as ULP WHERE ULP.productId = P.id) as likeCount`;
-    const ISLIKED_TRUE = /*sql*/ `(SELECT 1) AS isLiked`;
+    const LIKECOUNT_SUBQUERY = `(SELECT COUNT(1) FROM USER_LIKE_PRODUCT as ULP WHERE ULP.productId = P.id) as likeCount`;
+    const ISLIKED_TRUE = `(SELECT 1) AS isLiked`;
+    const CHECK_IS_DELETED = `P.deletedAt IS NULL`;
 
     const SELECT_WITH = `DISTINCT ${CALC_TOTAL_COUNT} ${REGION_SUBQUERY}, ${LIKECOUNT_SUBQUERY},`;
     const BASE_TABLE = /*sql*/ `PRODUCT as P LEFT JOIN USER_LIKE_PRODUCT as ULP ON ULP.productId = P.id`;
@@ -72,23 +74,23 @@ export class ProductService {
       throw new HttpException('filter should be provided with userId.', 400);
     }
 
-    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE}`;
+    let beforePaginationQuery = /*sql*/ `SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE ${CHECK_IS_DELETED}`;
 
     if (filter === 'like') {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId}
+        SELECT ${SELECT_WITH} P.*, ${ISLIKED_TRUE} FROM ${BASE_TABLE} WHERE ULP.userId = ${userId} AND ${CHECK_IS_DELETED}
       `;
     }
 
     if (filter === 'sale') {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.authorId = ${userId} AND ${CHECK_IS_DELETED}
       `;
     }
 
     if (categoryId) {
       beforePaginationQuery = /*sql*/ `
-        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId}
+        SELECT ${SELECT_WITH} ${ISLIKED_SUBQUERY}, P.* FROM ${BASE_TABLE} WHERE P.categoryId = ${categoryId} AND ${CHECK_IS_DELETED}
       `;
     }
 
@@ -141,7 +143,7 @@ export class ProductService {
     }
   }
 
-  async writePost(post: PostType) {
+  async writePost(post: CreateProductDTO) {
     try {
       const postData = {
         ...post,
@@ -155,10 +157,53 @@ export class ProductService {
         VALUES (${Object.values(postData).map(formatData).join()})
         `);
 
-      return res;
+      const { insertId } = res as ResultSetHeader;
+      return {
+        productId: insertId,
+      };
     } catch (e) {
       console.error(e);
       throw new HttpException('Failed to upload Post.', 500);
     }
+  }
+
+  async modifyPostById(productId: number, post: Partial<ModifyProductDTO>) {
+    const isExist = await this.isProductExist(productId);
+    if (!isExist) {
+      throw new HttpException(`Cannot found Product.`, 404);
+    }
+
+    const modifyTemplate = Object.entries(post)
+      .map(([key, val]) => `${key}= ${formatData(val)}`)
+      .join(', ');
+
+    const [res] = await this.pool.query(/*sql*/ `
+      UPDATE PRODUCT SET ${modifyTemplate} WHERE id = ${productId};
+    `);
+
+    const modifedResult = res as ResultSetHeader;
+    if (!modifedResult?.changedRows) {
+      throw new HttpException('Nothing changed.', 422);
+    }
+
+    return post;
+  }
+
+  async deletePostById(productId: number) {
+    const deletedAt = new Date().toISOString();
+
+    const [result] = await this.pool.query(/* sql */ `
+      UPDATE PRODUCT SET deletedAt =  "${deletedAt}" WHERE id = ${productId};
+    `);
+
+    const modifedResult = result as ResultSetHeader;
+    if (!modifedResult?.changedRows) {
+      throw new HttpException('Something wrong when delete Product', 422);
+    }
+
+    return {
+      productId,
+      deletedAt,
+    };
   }
 }
