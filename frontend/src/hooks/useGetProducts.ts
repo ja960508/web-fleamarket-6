@@ -27,14 +27,14 @@ function useGetProducts() {
 
   const getProductsByUserId = useCallback(async () => {
     const userQueryString = userId ? `userId=${userId}&` : '';
-    const locationQueryString = `location=my&`;
+    const filterQueryString = `filter=sale&`;
 
     if (!userId) {
       return;
     }
 
     const { data } = await remote.get(
-      '/product?' + userQueryString + locationQueryString,
+      '/product?' + userQueryString + filterQueryString,
     );
 
     setProducts(data.data);
