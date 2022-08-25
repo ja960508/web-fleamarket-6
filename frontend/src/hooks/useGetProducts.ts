@@ -21,7 +21,7 @@ function useGetProducts() {
     (data: dataType) => {
       const lastPage = Math.ceil(data.totalCount / 10);
       setPage((prev) => prev + 1);
-      setIsLastPage(lastPage === page);
+      setIsLastPage(lastPage === 0 || lastPage === page);
     },
     [page],
   );
