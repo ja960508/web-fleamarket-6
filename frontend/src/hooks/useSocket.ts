@@ -1,28 +1,54 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as io from 'socket.io-client';
 import socketEvent from '../constants/socketEvent';
+import { ChatRoomInfo } from '../types/chat';
 
-function useSocket(roomId: string) {
-  const socket = useRef<io.Socket<any, any>>();
-  useEffect(() => {
-    socket.current = io.connect('http://localhost:8080');
+interface ReceivedData {
+  senderId: number;
+  message: string;
+  timestamp: string;
+}
 
-    socket.current.on('connect', () => {
-      socket.current?.emit(socketEvent.ENTER, {
-        seller: 1,
-        buyer: 5,
-        roomId,
-      });
-    });
-  }, []);
+function useSocket(roomInfo?: ChatRoomInfo['roomInfo']) {
+  const [receivedData, setReceivedData] = useState<ReceivedData[]>([]);
+  const socket = useRef<io.Socket>();
 
-  const sendMessage = (message: string) => {
+  const sendMessage = ({
+    message,
+    senderId,
+  }: {
+    message: string;
+    senderId: number;
+  }) => {
     if (!socket.current) return;
 
-    socket.current?.emit(socketEvent.SEND, { message, senderId: 5 });
+    socket.current?.emit(socketEvent.SEND, { message, senderId });
   };
 
-  return { sendMessage };
+  const receiveMessage = (socket: io.Socket) => {
+    socket.on(socketEvent.RECEIVE, (info: ReceivedData) => {
+      setReceivedData((prev) => [...prev, info]);
+    });
+  };
+
+  useEffect(() => {
+    socket.current = io.connect('http://localhost:8080');
+  }, []);
+
+  useEffect(() => {
+    if (!socket?.current || !roomInfo) return;
+
+    const { authorId: sellerId, buyerId, id: roomId } = roomInfo;
+    socket.current.emit(socketEvent.ENTER, {
+      sellerId,
+      buyerId,
+      roomId,
+    });
+
+    receiveMessage(socket.current);
+  }, [roomInfo]);
+
+  return { sendMessage, receivedData };
 }
 
 export default useSocket;

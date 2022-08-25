@@ -1,7 +1,8 @@
+import { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
-function ChatList() {
-  return <StyledChatList>ChatList</StyledChatList>;
+function ChatList({ children }: PropsWithChildren) {
+  return <StyledChatList>{children}</StyledChatList>;
 }
 
 export default ChatList;

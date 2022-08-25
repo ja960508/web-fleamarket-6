@@ -1,4 +1,4 @@
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import { SendIcon } from '../../assets/icons/icons';
 import ChatList from '../../components/Chat/ChatList';
@@ -10,20 +10,29 @@ import { remote } from '../../lib/api';
 import { usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textSmall } from '../../styles/fonts';
+import { ChatRoomInfo } from '../../types/chat';
 
 function Chat() {
+  const [message, setMessage] = useState('');
   const { chatId } = usePathParams();
-  const { data } = useQuery<any>(['chat', chatId], async () => {
+  const { data } = useQuery<ChatRoomInfo>(['chat', chatId], async () => {
     const result = await remote(`/chat/${chatId}`);
     return result.data;
   });
 
-  const { sendMessage } = useSocket(chatId);
+  const { sendMessage, receivedData } = useSocket(data?.roomInfo);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    sendMessage('야이자식아!');
+    if (!data?.roomInfo.buyerId) return;
+
+    sendMessage({
+      message,
+      senderId: data.roomInfo.buyerId,
+    });
+
+    setMessage('');
   };
 
   return (
@@ -47,9 +56,17 @@ function Chat() {
           }
         </div>
       </StyledProductInfo>
-      <ChatList></ChatList>
+      <ChatList>
+        {receivedData.map((data) => (
+          <li key={data.message + data.timestamp}>{data.message}</li>
+        ))}
+      </ChatList>
       <StyledChatForm onSubmit={handleSubmit}>
-        <CustomInput type="text" placeholder="메시지를 입력하세요." />
+        <CustomInput
+          type="text"
+          placeholder="메시지를 입력하세요."
+          onChange={(e) => setMessage(e.target.value)}
+        />
         <button type="submit">
           <SendIcon />
         </button>

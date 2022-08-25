@@ -60,10 +60,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client: Socket,
     { message, senderId }: { message: string; senderId: number },
   ) {
-    // 디비에 저장.
-
     const roomId = client.data.roomId;
-    client.to(roomId).emit('getMessage', {
+    client.to(roomId).emit(socketEvent.RECEIVE, {
       senderId,
       message,
       timestamp: new Date().toLocaleDateString(),
