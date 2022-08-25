@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -36,6 +37,14 @@ export class ProductController {
       productId,
       isLiked,
     });
+  }
+
+  @Delete(':productId')
+  deleteProductById(
+    @Param()
+    { productId }: ProductParam,
+  ) {
+    return this.productService.deletePostById(productId);
   }
 
   @Get(':productId')
