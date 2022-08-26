@@ -38,6 +38,11 @@ function Chat() {
   useEffect(() => {
     (async function () {
       const result = await remote(`/chat/${chatId}`);
+
+      if (!result.data.roomInfo) {
+        navigate('/');
+      }
+
       const { buyerId, sellerId } = result.data.roomInfo;
       const partnerId = buyerId === userInfo.userId ? sellerId : buyerId;
       const partner = await remote(`/auth/${partnerId}`);

@@ -79,7 +79,7 @@ export class ChatService {
     SELECT C.id, C.buyerId, C.sellerId, C.productId, P.isSold, P.thumbnails, 
     C.updatedAt, P.price, P.name FROM CHATROOM as C
     INNER JOIN PRODUCT as P ON P.id = C.productId
-    WHERE C.id = ${roomId}
+    WHERE C.id = ${roomId} AND C.deletedAt IS NULL
   `);
 
     return res[0];
