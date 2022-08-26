@@ -8,5 +8,9 @@ function ChatList({ children }: PropsWithChildren) {
 export default ChatList;
 
 const StyledChatList = styled.ol`
+  padding: 1rem;
   flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
 `;

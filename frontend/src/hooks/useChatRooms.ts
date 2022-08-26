@@ -11,8 +11,6 @@ function useChatRooms() {
   const userId = searchParams('userId');
   const productId = searchParams('productId');
 
-  console.log(userId, productId);
-
   const { data: chatRooms } = useQuery(
     ['chatroom', userId, productId],
     async () => {

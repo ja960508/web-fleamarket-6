@@ -1,10 +1,12 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { SendIcon } from '../../assets/icons/icons';
 import ChatList from '../../components/Chat/ChatList';
+import ChatMessage from '../../components/Chat/ChatMessage';
 import Loading from '../../components/commons/Loading';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
+import { UserInfoContext } from '../../context/UserInfoContext';
 import useQuery from '../../hooks/useQuery';
 import useSocket from '../../hooks/useSocket';
 import { remote } from '../../lib/api';
@@ -16,15 +18,31 @@ import { ChatRoomInfo } from '../../types/chat';
 function Chat() {
   const [message, setMessage] = useState('');
   const { chatId } = usePathParams();
-  const { data: chatRoomInfo } = useQuery<ChatRoomInfo>(
-    ['chat', chatId],
-    async () => {
-      const result = await remote(`/chat/${chatId}`);
+  const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoomInfo>(null!);
+  const userInfo = useContext(UserInfoContext);
+  const [partner, setPartner] = useState<string>('partner');
 
-      console.log(result);
-      return result.data;
-    },
-  );
+  // const { data: chatRoomInfo } = useQuery<ChatRoomInfo>(
+  //   ['chat', chatId],
+  //   async () => {
+  //     const result = await remote(`/chat/${chatId}`);
+
+  //     console.log(result);
+  //     return result.data;
+  //   },
+  // );
+
+  useEffect(() => {
+    (async function () {
+      const result = await remote(`/chat/${chatId}`);
+      const { buyerId, sellerId } = result.data.roomInfo;
+      const partnerId = buyerId === userInfo.userId ? sellerId : buyerId;
+      const partner = await remote(`/auth/${partnerId}`);
+
+      setPartner(partner.data.nickname);
+      setChatRoomInfo(result.data);
+    })();
+  }, [chatId, userInfo]);
 
   const { isLoading, sendMessage, receivedData } = useSocket(chatRoomInfo);
 
@@ -35,7 +53,7 @@ function Chat() {
 
     sendMessage({
       message,
-      senderId: chatRoomInfo.roomInfo.buyerId,
+      senderId: userInfo.userId,
     });
 
     setMessage('');
@@ -47,7 +65,7 @@ function Chat() {
         <Loading />
       ) : (
         <>
-          <PageHeader pageName="상대유저" />
+          <PageHeader pageName={partner} />
           <StyledProductInfo>
             <img
               className="post-image"
@@ -69,16 +87,19 @@ function Chat() {
             </div>
           </StyledProductInfo>
           <ChatList>
-            {receivedData.map((chatRoomInfo) => (
-              <li key={chatRoomInfo.message + chatRoomInfo.createdAt}>
-                {chatRoomInfo.message}
-              </li>
+            {receivedData.map((chatMessage) => (
+              <ChatMessage
+                key={chatMessage.id}
+                chatMessage={chatMessage}
+                isMine={chatMessage.senderId === userInfo.userId}
+              />
             ))}
           </ChatList>
           <StyledChatForm onSubmit={handleSubmit}>
             <CustomInput
               type="text"
               placeholder="메시지를 입력하세요."
+              value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
             <button type="submit">
@@ -129,6 +150,7 @@ const StyledProductInfo = styled.div`
 `;
 
 const StyledChatForm = styled.form`
+  width: 100%;
   display: flex;
   padding: 0.5rem;
   padding-right: 1rem;

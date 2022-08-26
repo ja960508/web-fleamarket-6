@@ -1,24 +1,32 @@
 import styled from 'styled-components';
 import useChatRooms from '../../hooks/useChatRooms';
+import { useNavigate } from '../../lib/Router';
 import { StyledGuideMessage } from '../../pages/My';
 import colors from '../../styles/colors';
+import { textSmall } from '../../styles/fonts';
 
 function ChatRoomList() {
   const { chatRooms } = useChatRooms();
-
+  const navigate = useNavigate();
   const isNotEmpty = chatRooms?.length;
+
+  const openChatRoom = (roomId: number) => {
+    navigate(`/chat/${roomId}`);
+  };
 
   return isNotEmpty ? (
     <ul>
       {chatRooms?.map((item) => (
-        <StyledChatList key={item.id}>
+        <StyledChatList key={item.id} onClick={() => openChatRoom(item.id)}>
           <div className="your-info">
             <div className="your-name">{item.buyerName || item.sellerName}</div>
             <div className="last-message">{item.lastChatMessage}</div>
           </div>
-          <div>
-            <img src={item.thumbnails[0]} alt="product_thumbnail" />
-          </div>
+          <img
+            className="product-thumbnail"
+            src={item.thumbnails[0]}
+            alt="product_thumbnail"
+          />
         </StyledChatList>
       ))}
     </ul>
@@ -36,5 +44,17 @@ const StyledChatList = styled.li`
 
   .your-info {
     flex: 1;
+  }
+
+  .last-message {
+    ${textSmall}
+    color: ${colors.gray100};
+  }
+
+  .product-thumbnail {
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid ${colors.gray300};
+    border-radius: 6px;
   }
 `;

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, Req, Param } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { MAX_COOKIE_AGE, TOKEN_NAME } from 'src/constants/auth';
 import { AuthService } from './auth.service';
@@ -87,5 +87,10 @@ export class AuthController {
     });
 
     return;
+  }
+
+  @Get(':id')
+  getUserInfoById(@Param('id') id: number) {
+    return this.authService.findUserById(id);
   }
 }
