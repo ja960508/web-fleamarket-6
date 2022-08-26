@@ -9,6 +9,7 @@ import {
 import { UserInfoContext } from '../../context/UserInfoContext';
 import { LinkButton } from '../../lib/Router';
 import colors from '../../styles/colors';
+import { textLarge } from '../../styles/fonts';
 
 function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
   const userInfo = useContext(UserInfoContext);
@@ -28,8 +29,8 @@ function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
 
         <h3>
           <LinkButton className="region-button" moveTo="/region">
-            <MapPinIcon />
             <span>{userInfo.region}</span>
+            <MapPinIcon />
           </LinkButton>
         </h3>
         <div>
@@ -52,11 +53,21 @@ const StyledNav = styled.nav`
   color: ${colors.white};
   background-color: ${colors.primary};
 
-  h3 {
-    .region-button {
+  & > h3 {
+    & > .region-button {
       display: flex;
       align-items: center;
       gap: 0.25rem;
+
+      ${textLarge}
+
+      & > svg > path {
+        stroke-width: 2px;
+      }
+
+      & > span {
+        font-family: 'LeferiPoint-WhiteObliqueA';
+      }
     }
   }
 
