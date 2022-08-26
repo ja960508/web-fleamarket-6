@@ -3,21 +3,20 @@ import * as io from 'socket.io-client';
 import socketEvent from '../constants/socketEvent';
 import { ChatRoomInfo, MessageType } from '../types/chat';
 
+interface SendMessage {
+  message: string;
+  senderId: number;
+}
+
 function useSocket(chatRoomInfo: ChatRoomInfo | undefined) {
   const [isLoading, setIsLoading] = useState(true);
   const [receivedData, setReceivedData] = useState<MessageType[]>([]);
   const socket = useRef<io.Socket>();
 
-  const sendMessage = ({
-    message,
-    senderId,
-  }: {
-    message: string;
-    senderId: number;
-  }) => {
+  const sendMessage = ({ message, senderId }: SendMessage) => {
     if (!socket.current || !chatRoomInfo) return;
 
-    socket.current?.emit(socketEvent.SEND, {
+    socket.current.emit(socketEvent.SEND, {
       message,
       senderId,
       roomId: chatRoomInfo.roomInfo.id,
@@ -26,7 +25,6 @@ function useSocket(chatRoomInfo: ChatRoomInfo | undefined) {
 
   const receiveMessage = (socket: io.Socket) => {
     socket.on(socketEvent.RECEIVE, (info: MessageType) => {
-      console.log(info);
       setReceivedData((prev) => [...prev, info]);
     });
   };
@@ -36,7 +34,7 @@ function useSocket(chatRoomInfo: ChatRoomInfo | undefined) {
   }, []);
 
   useEffect(() => {
-    if (!socket?.current || !chatRoomInfo) return;
+    if (!socket.current || !chatRoomInfo) return;
 
     const { sellerId, buyerId, id: roomId } = chatRoomInfo.roomInfo;
 

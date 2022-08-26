@@ -8,7 +8,7 @@ import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, useNavigate, usePathParams } from '../../lib/Router';
+import { useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -65,6 +65,11 @@ function PostDetail() {
     : '문의하기';
 
   const handleRequestChat = async () => {
+    if (isAuthorOfProduct) {
+      navigate(`/my?tab=1&userId=${userId}&productId=${productId}`);
+      return;
+    }
+
     const { data: existRoom } = await remote(
       `chat/check?userId=${userId}&productId=${productId}`,
     );
@@ -125,9 +130,6 @@ function PostDetail() {
         <button type="button" onClick={handleRequestChat}>
           {chatLinkText}
         </button>
-        {/* <Link to="/chat" className="chat-link">
-          {chatLinkText}
-        </Link> */}
       </PostFooter>
     </>
   );

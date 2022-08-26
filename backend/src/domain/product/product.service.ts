@@ -93,7 +93,7 @@ export class ProductService {
       `;
     }
 
-    const paginatedQuery = /*sql*/ `${beforePaginationQuery} LIMIT ${
+    const paginatedQuery = /*sql*/ `${beforePaginationQuery} ORDER BY createdAt DESC LIMIT ${
       (page - 1) * LIMIT
     }, ${LIMIT}`;
 

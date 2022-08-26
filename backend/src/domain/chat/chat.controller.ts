@@ -8,6 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { ChatRoomFilterType } from './dto/chatRoom';
 import { CreateChatDto } from './dto/create-chat.dto';
 
 @Controller('chat')
@@ -23,8 +24,11 @@ export class ChatController {
   // 채팅목록을 처리하는 친구
   // 쿼리를 받음. 내가 참여중인것 or 현재 상품에 대한 것
   @Get()
-  getChatRooms() {
-    return '어떤 채팅방 목록';
+  getChatRooms(
+    @Query()
+    query: ChatRoomFilterType,
+  ) {
+    return this.chatService.getChatRooms(query);
   }
 
   @Get('/check')

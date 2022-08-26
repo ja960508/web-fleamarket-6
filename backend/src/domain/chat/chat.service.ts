@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Pool, ResultSetHeader } from 'mysql2/promise';
 import { MySQLService } from 'src/config/mysql/mysql.service';
 import formatData from 'src/utils/format';
+import { ChatRoomFilterType } from './dto/chatRoom';
 import { CreateChatDto, createMessageDto } from './dto/create-chat.dto';
 
 @Injectable()
@@ -119,5 +120,40 @@ export class ChatService {
     `);
 
     return res[0];
+  }
+
+  //C.id, C.buyerId, C.sellerId, U1.id as youId, U2.id as youId
+  async getChatRooms(query: ChatRoomFilterType) {
+    const { userId, productId } = query;
+    const chatMessageQuery = `SELECT CM.message FROM CHAT_MESSAGE as CM WHERE CM.roomId = C.id ORDER BY createdAt DESC LIMIT 1`;
+
+    const baseQuery = `SELECT C.id, C.buyerId, C.sellerId, C.productId, buyer.nickname as buyerName, 
+    seller.nickname as sellerName, product.thumbnails as thumbnails,
+    (${chatMessageQuery}) as lastChatMessage
+    FROM CHATROOM as C 
+    LEFT JOIN USER as buyer ON (buyer.id = C.buyerId AND C.sellerId = ${userId})
+    LEFT JOIN USER as seller ON (seller.id = C.sellerId AND C.buyerId = ${userId})  
+    LEFT JOIN PRODUCT as product ON (product.id = C.productId) 
+    WHERE C.deletedAt IS NULL `;
+    let conditionalQuery = ``;
+
+    if (userId) {
+      conditionalQuery = ` AND (buyerId = ${userId} OR sellerId = ${userId})`;
+    }
+
+    if (productId) {
+      conditionalQuery += ` AND productId = ${productId}`;
+    }
+
+    try {
+      const [res] = await this.pool.query(baseQuery + conditionalQuery);
+
+      console.log(res);
+
+      return res;
+    } catch (e) {
+      console.error(e);
+      throw new HttpException('Failed to load ChatRooms.', 500);
+    }
   }
 }
