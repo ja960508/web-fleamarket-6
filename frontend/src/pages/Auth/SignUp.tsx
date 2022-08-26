@@ -1,24 +1,19 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
+import RegionSearchContainer from '../../components/RegionSearchContainer';
 import { NICKNAME, PASSWORD } from '../../constants/validation';
 import { UserInfoDispatch } from '../../context/UserInfoContext';
 import useTextInputs from '../../hooks/useTextInputs';
-import { credentialRemote, remote } from '../../lib/api';
+import { credentialRemote } from '../../lib/api';
 import { useHistoryState, useNavigate } from '../../lib/Router/hooks';
 import colors from '../../styles/colors';
-
-interface regionType {
-  id: number;
-  name: string;
-}
+import { initialRegionValue, RegionType } from '../../types/region';
 
 function SignUp() {
-  const [region, setRegion] = useState<regionType[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<regionType>({
-    id: 0,
-    name: '',
+  const [selectedRegion, setSelectedRegion] = useState<RegionType>({
+    ...initialRegionValue,
   });
   const githubUser = useHistoryState();
   const dispatch = useContext(UserInfoDispatch);
@@ -33,38 +28,25 @@ function SignUp() {
     },
   });
 
-  useEffect(() => {
-    (async function () {
-      const { data } = await remote('region');
+  const signupWithGithub = async () => {
+    const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-      setRegion(data);
-    })();
-  }, []);
+    const { data } = await credentialRemote.post('auth/signup', {
+      user: userInfo,
+    });
 
-  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    dispatch({
+      type: 'USERINFO/SET_USER',
+      payload: {
+        userId: data.id,
+        name: data.nickname,
+        region: '잠실',
+        regionId: 1,
+      },
+    });
+  };
 
-    if (githubUser) {
-      const userInfo = { ...githubUser, regionId: selectedRegion.id };
-
-      const { data } = await credentialRemote.post('auth/signup', {
-        user: userInfo,
-      });
-
-      dispatch({
-        type: 'USERINFO/SET_USER',
-        payload: {
-          userId: data.id,
-          name: data.nickname,
-          region: '잠실',
-          regionId: 1,
-        },
-      });
-      navigate('/');
-
-      return;
-    }
-
+  const signup = async () => {
     const userInfo = {
       nickname: inputs.nickname,
       password: inputs.password,
@@ -82,17 +64,25 @@ function SignUp() {
         regionId: 1,
       },
     });
-    navigate('/');
   };
 
-  const handleSelectRegion = (item: regionType) => {
-    setSelectedRegion(item);
+  const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (githubUser) {
+      await signupWithGithub();
+      navigate('/');
+      return;
+    }
+
+    signup();
+    navigate('/');
   };
 
   return (
     <>
       <PageHeader pageName="회원가입" />
-      <StyledSignupForm onSubmit={handleRegister}>
+      <StyledSignupForm onSubmit={handleSignup}>
         {!githubUser && (
           <>
             <CustomInput
@@ -116,19 +106,10 @@ function SignUp() {
             />
           </>
         )}
-        <CustomInput
-          type="text"
-          placeholder="시∙구 제외, 동만 입력."
-          value={selectedRegion.name}
-          readOnly={true}
+        <RegionSearchContainer
+          selectedRegion={selectedRegion}
+          setSelectedRegion={setSelectedRegion}
         />
-        <ul>
-          {region.map((item) => (
-            <li key={item.id} onClick={() => handleSelectRegion(item)}>
-              {item.name}
-            </li>
-          ))}
-        </ul>
         <button type="submit">회원가입</button>
       </StyledSignupForm>
     </>
