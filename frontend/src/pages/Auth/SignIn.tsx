@@ -8,6 +8,7 @@ import useTextInputs from '../../hooks/useTextInputs';
 import { credentialRemote } from '../../lib/api';
 import { Link, useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
+import { textMedium, textSmall, textXSmall } from '../../styles/fonts';
 
 function SignIn() {
   const dispatch = useContext(UserInfoDispatch);
@@ -80,7 +81,9 @@ function SignIn() {
         >
           깃허브로 로그인
         </StyledGithubOAuthLink>
-        <Link to="/auth/sign-up">회원가입</Link>
+        <Link className="signup-link" to="/auth/sign-up">
+          회원가입
+        </Link>
       </StyledSignInForm>
     </>
   );
@@ -105,6 +108,12 @@ const StyledSignInForm = styled.form`
     color: ${colors.white};
     border-radius: 8px;
     margin-bottom: 1rem;
+    ${textMedium};
+  }
+
+  .signup-link {
+    margin-top: 15px;
+    ${textSmall};
   }
 `;
 
@@ -115,4 +124,6 @@ const StyledGithubOAuthLink = styled.a`
   color: ${colors.white};
   border-radius: 8px;
   margin-bottom: 1rem;
+
+  ${textMedium};
 `;

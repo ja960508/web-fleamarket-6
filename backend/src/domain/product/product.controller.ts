@@ -11,6 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { AuthService } from '../auth/auth.service';
 import { ProductService } from './product.service';
 import {
   CreateProductDTO,
@@ -22,7 +23,10 @@ import {
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('write')
   async writePost(@Body() post: CreateProductDTO) {
