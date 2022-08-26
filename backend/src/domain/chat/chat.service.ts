@@ -91,7 +91,6 @@ export class ChatService {
       WHERE roomId = ${roomId}
     `);
 
-    console.log(res);
     return res;
   }
 
@@ -147,8 +146,6 @@ export class ChatService {
 
     try {
       const [res] = await this.pool.query(baseQuery + conditionalQuery);
-
-      console.log(res);
 
       return res;
     } catch (e) {

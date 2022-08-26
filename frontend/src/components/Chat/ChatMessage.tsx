@@ -8,7 +8,6 @@ interface ChatMessageProps {
 }
 
 function ChatMessage({ chatMessage, isMine }: ChatMessageProps) {
-  console.log(isMine);
   return (
     <StyledChatMessage isMine={isMine}>{chatMessage.message}</StyledChatMessage>
   );

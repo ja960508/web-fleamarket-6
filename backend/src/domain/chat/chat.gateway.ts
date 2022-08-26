@@ -70,8 +70,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const id = await this.chatService.createChatMessage(createdChatMessage);
     const newMessage = await this.chatService.getChatMessageById(id);
 
-    console.log(newMessage);
-
     client.to(roomId).emit(socketEvent.RECEIVE, {
       ...newMessage,
     });
