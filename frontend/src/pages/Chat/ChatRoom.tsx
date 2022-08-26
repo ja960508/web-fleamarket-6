@@ -1,18 +1,19 @@
 import { FormEvent, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { SendIcon } from '../../assets/icons/icons';
+import { LogoutIcon, SendIcon } from '../../assets/icons/icons';
 import ChatList from '../../components/Chat/ChatList';
 import ChatMessage from '../../components/Chat/ChatMessage';
 import Loading from '../../components/commons/Loading';
+import Modal from '../../components/commons/Modal/Modal';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoContext } from '../../context/UserInfoContext';
-import useQuery from '../../hooks/useQuery';
+import { useModal } from '../../hooks/useModal';
 import useSocket from '../../hooks/useSocket';
 import { remote } from '../../lib/api';
-import { usePathParams } from '../../lib/Router';
+import { useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
-import { textSmall } from '../../styles/fonts';
+import { textMedium, textSmall } from '../../styles/fonts';
 import { ChatRoomInfo } from '../../types/chat';
 
 function Chat() {
@@ -21,6 +22,8 @@ function Chat() {
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoomInfo>(null!);
   const userInfo = useContext(UserInfoContext);
   const [partner, setPartner] = useState<string>('partner');
+  const { isModalOpen, openModal, closeModal } = useModal();
+  const navigate = useNavigate();
 
   // const { data: chatRoomInfo } = useQuery<ChatRoomInfo>(
   //   ['chat', chatId],
@@ -49,6 +52,7 @@ function Chat() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
+    if (!message) return;
     if (!chatRoomInfo?.roomInfo.buyerId) return;
 
     sendMessage({
@@ -59,13 +63,34 @@ function Chat() {
     setMessage('');
   };
 
+  const handleExitChatRoom = async () => {
+    await remote.delete(`/chat/${chatId}`);
+    navigate('/my');
+  };
+
   return (
     <StyledWrapper>
       {isLoading ? (
         <Loading />
       ) : (
         <>
-          <PageHeader pageName={partner} />
+          <Modal isModalOpen={isModalOpen} closeModal={closeModal}>
+            <DeleteConfirmBox>
+              <strong>정말 나가시겠어요?</strong>
+              <div>
+                <CancelButton onClick={closeModal}>취소하기</CancelButton>
+                <DeleteButton onClick={handleExitChatRoom}>나가기</DeleteButton>
+              </div>
+            </DeleteConfirmBox>
+          </Modal>
+          <PageHeader
+            pageName={partner}
+            extraButton={
+              <button onClick={openModal}>
+                <LogoutIcon />
+              </button>
+            }
+          />
           <StyledProductInfo>
             <img
               className="post-image"
@@ -170,4 +195,40 @@ const StyledChatForm = styled.form`
       stroke: ${colors.gray100};
     }
   }
+`;
+
+const DeleteConfirmBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  width: 80vw;
+  padding: 1rem;
+
+  & > strong {
+    all: unset;
+    ${textMedium};
+    font-weight: 500;
+  }
+
+  & > div {
+    display: flex;
+    gap: 1rem;
+  }
+`;
+
+const BaseButton = styled.button`
+  padding: 0.5rem 1rem;
+  color: white;
+  border-radius: 8px;
+
+  flex: 1;
+`;
+
+const DeleteButton = styled(BaseButton)`
+  background-color: ${colors.red};
+`;
+
+const CancelButton = styled(BaseButton)`
+  background-color: ${colors.gray200};
 `;
