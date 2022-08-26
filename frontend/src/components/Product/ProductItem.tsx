@@ -1,6 +1,6 @@
 import { HeartIcon, MessageSquareIcon } from '../../assets/icons/icons';
 import { ProductPreviewType } from '../../types/product';
-import { parseDateFromNow } from '../../utils/parse';
+import { parseDateFromNow, parseNumberToLocaleString } from '../../utils/parse';
 import styled, { css } from 'styled-components';
 import colors from '../../styles/colors';
 import { textMedium, textSmall } from '../../styles/fonts';
@@ -54,7 +54,9 @@ function ProductItem({
             <span className="delimiter"></span>
             <span>{parseDateFromNow(createdAt)}</span>
           </div>
-          <strong className="product-price">{price}</strong>
+          <strong className="product-price">
+            {parseNumberToLocaleString(price)}
+          </strong>
           <div className="product-count-group">
             {chatCount > 0 && (
               <span>

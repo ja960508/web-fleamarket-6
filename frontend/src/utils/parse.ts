@@ -1,3 +1,5 @@
+import { MAX_PRICE } from '../constants/limit';
+
 export const parseDateFromNow = (date: string) => {
   const today = new Date();
   const timeValue = new Date(date);
@@ -28,10 +30,13 @@ export const parseDateFromNow = (date: string) => {
   return `${Math.floor(betweenTimeDay / 365)}년전`;
 };
 
-export const parseLocaleStringToNumber = (
-  localeString: string,
-  maxPrice: number,
-) => {
+export const parseLocaleStringToNumber = (localeString: string) => {
   const parsedNumber = Number(localeString.replace(/[^0-9]/g, ''));
-  return parsedNumber >= maxPrice ? maxPrice - 1 : parsedNumber;
+  return parsedNumber >= MAX_PRICE ? MAX_PRICE - 1 : parsedNumber;
+};
+
+export const parseNumberToLocaleString = (priceNumber: number) => {
+  if (priceNumber >= MAX_PRICE) return (MAX_PRICE - 1).toLocaleString();
+
+  return priceNumber.toLocaleString();
 };
