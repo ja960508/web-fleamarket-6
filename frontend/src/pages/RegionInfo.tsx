@@ -1,34 +1,22 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import Modal from '../components/commons/Modal/Modal';
-import CustomInput from '../components/CustomInput';
 import withCheckLogin from '../components/HOC/withCheckLogin';
 import PageHeader from '../components/PageHeader/PageHeader';
+import RegionSearchContainer from '../components/RegionSearchContainer';
 import { UserInfoContext, UserInfoDispatch } from '../context/UserInfoContext';
-import { useModal } from '../hooks/useModal';
-import useQuery from '../hooks/useQuery';
 import { remote } from '../lib/api';
 import { useNavigate } from '../lib/Router';
 import colors from '../styles/colors';
-import { RegionType } from '../types/region';
-import debounce from '../utils/debounce';
+import { initialRegionValue } from '../types/region';
 
 function RegionInfo() {
   const userInfo = useContext(UserInfoContext);
   const userInfoDispatch = useContext(UserInfoDispatch);
-  const { data } = useQuery(['region'], async () => {
-    const result = await remote('/region');
-    return result.data;
-  });
-  const [selectedRegion, setSelectedRegion] = useState({ id: 0, name: '' });
-  const [query, setQuery] = useState('');
-  const navigate = useNavigate();
-  const { isModalOpen, openModal, closeModal } = useModal();
 
-  const handleSelectRegion = (item: RegionType) => {
-    setSelectedRegion(item);
-    closeModal();
-  };
+  const [selectedRegion, setSelectedRegion] = useState({
+    ...initialRegionValue,
+  });
+  const navigate = useNavigate();
 
   const handleChangeRegion = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -48,12 +36,6 @@ function RegionInfo() {
     navigate('/');
   };
 
-  const handleSearchRegion = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) =>
-      setQuery(event.target.value),
-    300,
-  );
-
   return (
     <>
       <PageHeader pageName="현재 지역 변경하기" />
@@ -65,37 +47,10 @@ function RegionInfo() {
         <label className="region-label" htmlFor="region">
           변경할 동네를 입력하세요
         </label>
-        <CustomInput
-          placeholder="시∙구 제외, 동만 입력"
-          type="text"
-          id="region"
-          value={selectedRegion.name}
-          readOnly
-          onClick={openModal}
+        <RegionSearchContainer
+          selectedRegion={selectedRegion}
+          setSelectedRegion={setSelectedRegion}
         />
-        <Modal isModalOpen={isModalOpen} closeModal={closeModal}>
-          <StyledModalContent>
-            <CustomInput
-              type="text"
-              placeholder="검색할 지역을 입력하세요."
-              onChange={handleSearchRegion}
-            />
-            <ul className="region-list">
-              {data
-                ?.filter((item: RegionType) => item.name.includes(query))
-                .map((item: RegionType) => (
-                  <li
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => handleSelectRegion(item)}
-                    className="region-item"
-                    key={item.id}
-                  >
-                    {item.name}
-                  </li>
-                ))}
-            </ul>
-          </StyledModalContent>
-        </Modal>
         <button disabled={!selectedRegion.id} type="submit">
           변경하기
         </button>
@@ -148,26 +103,5 @@ const StyledForm = styled.form`
     padding: 0.5rem;
     background-color: ${colors.gray200};
     border-bottom: 1px solid ${colors.white};
-  }
-`;
-
-const StyledModalContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  width: 80vw;
-
-  input {
-    margin-bottom: 1rem;
-  }
-
-  .region-list {
-    height: 30vh;
-    overflow-y: scroll;
-
-    .region-item {
-      padding: 0.5rem 0;
-      border-bottom: 1px solid ${colors.gray300};
-    }
   }
 `;
