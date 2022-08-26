@@ -216,10 +216,7 @@ const PostFooter = styled.footer<{ isLiked: boolean }>`
 
     .product-price {
       ${textSmall};
-
-      &::after {
-        content: '원';
-      }
+      ${mixin.concatWonUnit};
     }
   }
 

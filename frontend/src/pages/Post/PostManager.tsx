@@ -6,7 +6,6 @@ import PageHeader from '../../components/PageHeader/PageHeader';
 import ImagePreviewList from '../../components/Post/ImagePreviewList';
 import {
   MAX_DESCRIPTION_LENGTH,
-  MAX_PRICE,
   MAX_TITLE_LENGTH,
 } from '../../constants/limit';
 import { UserInfoContext } from '../../context/UserInfoContext';

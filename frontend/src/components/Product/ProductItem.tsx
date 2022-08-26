@@ -9,6 +9,7 @@ import { UserInfoContext } from '../../context/UserInfoContext';
 import { Link as ProductDetailLink } from '../../lib/Router';
 import useProductLike from '../../hooks/useProductLike';
 import useManageDropdown from '../../hooks/useManageDropdown';
+import mixin from '../../styles/mixin';
 
 function ProductItem({
   product,
@@ -117,6 +118,7 @@ const StyledProductItem = styled.li<{ isLiked: boolean }>`
   .product-price {
     font-weight: 500;
     ${textSmall};
+    ${mixin.concatWonUnit};
   }
 
   .tool-button {
