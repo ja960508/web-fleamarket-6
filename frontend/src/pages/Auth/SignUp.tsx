@@ -40,8 +40,8 @@ function SignUp() {
       payload: {
         userId: data.id,
         name: data.nickname,
-        region: '잠실',
-        regionId: 1,
+        region: selectedRegion.name,
+        regionId: selectedRegion.id,
       },
     });
   };
@@ -60,8 +60,8 @@ function SignUp() {
       payload: {
         userId: data.id,
         name: data.nickname,
-        region: '잠실',
-        regionId: 1,
+        region: selectedRegion.name,
+        regionId: selectedRegion.id,
       },
     });
   };
