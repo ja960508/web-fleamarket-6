@@ -20,19 +20,14 @@ export class MySQLService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.pool.execute(`
+    await this.pool.execute(/*sql*/ `
     CREATE TABLE IF NOT EXISTS REGION (
       id INT PRIMARY KEY AUTO_INCREMENT,
       name VARCHAR(20) NOT NULL
     )
   `);
 
-    await this.pool.execute(`
-    INSERT INTO REGION (name)
-    SELECT '잠실'
-    WHERE NOT EXISTS (SELECT * FROM REGION)`);
-
-    await this.pool.execute(`
+    await this.pool.execute(/*sql*/ `
     CREATE TABLE IF NOT EXISTS USER (
       id INT PRIMARY KEY AUTO_INCREMENT,
       githubUserId INT,
@@ -43,7 +38,7 @@ export class MySQLService implements OnModuleInit {
     )
     `);
 
-    await this.pool.execute(`
+    await this.pool.execute(/*sql*/ `
     CREATE TABLE IF NOT EXISTS CATEGORY (
       id INT PRIMARY KEY AUTO_INCREMENT,
       name VARCHAR(20) NOT NULL,
@@ -51,7 +46,7 @@ export class MySQLService implements OnModuleInit {
     )
     `);
 
-    await this.pool.execute(`
+    await this.pool.execute(/*sql*/ `
     CREATE TABLE IF NOT EXISTS PRODUCT (
       id INT PRIMARY KEY AUTO_INCREMENT,
       name VARCHAR(20) NOT NULL,
@@ -68,7 +63,7 @@ export class MySQLService implements OnModuleInit {
     )
     `);
 
-    await this.pool.execute(`
+    await this.pool.execute(/*sql*/ `
     CREATE TABLE IF NOT EXISTS USER_LIKE_PRODUCT (
       id INT PRIMARY KEY AUTO_INCREMENT,
       userId int NOT NULL,
@@ -78,7 +73,7 @@ export class MySQLService implements OnModuleInit {
     )
     `);
 
-    await this.pool.execute(`
+    await this.pool.execute(/*sql*/ `
     CREATE TABLE IF NOT EXISTS USER_VIEW_PRODUCT (
       id INT PRIMARY KEY AUTO_INCREMENT,
       userId int NOT NULL,
@@ -86,6 +81,33 @@ export class MySQLService implements OnModuleInit {
       FOREIGN KEY (userId) REFERENCES USER(id),
       FOREIGN KEY (productId) REFERENCES PRODUCT(id)
     )
+    `);
+
+    await this.pool.execute(/*sql*/ `
+      CREATE TABLE IF NOT EXISTS CHATROOM (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        buyerId INT NOT NULL,
+        sellerId INT NOT NULL,
+        productId INT NOT NULL,
+        updatedAt TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        deletedAt TIMESTAMP,
+        FOREIGN KEY (buyerId) REFERENCES USER(id),
+        FOREIGN KEY (sellerId) REFERENCES USER(id),
+        FOREIGN KEY (productId) REFERENCES PRODUCT(id)
+      )
+    `);
+
+    await this.pool.execute(/*sql*/ `
+      CREATE TABLE IF NOT EXISTS CHAT_MESSAGE (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        senderId INT NOT NULL,
+        roomId INT NOT NULL,
+        message VARCHAR(255) NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        isRead TINYINT(1) NOT NULL,
+        FOREIGN KEY (roomId) REFERENCES CHATROOM(id),
+        FOREIGN KEY (senderId) REFERENCES USER(id)
+      )
     `);
   }
 }

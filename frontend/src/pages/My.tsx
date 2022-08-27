@@ -13,7 +13,7 @@ import mixin from '../styles/mixin';
 function My() {
   const dispatch = useContext(UserInfoDispatch);
   const navigate = useNavigate();
-  const { tab, selectedTab, getTabContents } = useMyPage();
+  const { tab, selectTab, getTabContents } = useMyPage();
 
   const handleLogout = async () => {
     await credentialRemote.get('auth/logout');
@@ -34,7 +34,7 @@ function My() {
           <li
             key={item}
             className={tab === item ? 'selected' : ''}
-            onClick={() => selectedTab(item)}
+            onClick={() => selectTab(item)}
           >
             {item}
           </li>

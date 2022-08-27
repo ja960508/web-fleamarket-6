@@ -3,9 +3,12 @@ import ChatRoomList from '../components/My/ChatRoomList';
 import MyLikePostList from '../components/My/MyLikePostList';
 import MyPostList from '../components/My/MyPostList';
 import TABS from '../constants/tabs';
+import { useSearchParams } from '../lib/Router';
 
 function useMyPage() {
-  const [tab, selectedTab] = useState(TABS[0]);
+  const searchParams = useSearchParams();
+  const tabId = Number(searchParams('tab')) || 0;
+  const [tab, selectTab] = useState(TABS[tabId]);
 
   const getTabContents = () => {
     switch (tab) {
@@ -22,7 +25,7 @@ function useMyPage() {
 
   return {
     tab,
-    selectedTab,
+    selectTab,
     getTabContents,
   };
 }
