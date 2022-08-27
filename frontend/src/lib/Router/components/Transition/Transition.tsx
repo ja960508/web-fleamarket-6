@@ -1,12 +1,14 @@
 import styled, { css, keyframes } from 'styled-components';
 import { PropsWithChildren } from 'react';
 import useTransitionHelper, { RouteInfo } from './useTransitionHelper';
+import useHistoryStack from './useHistoryStack';
 
 function Transition({ children }: PropsWithChildren): JSX.Element {
   const { isAnimationReady, currentRoute, nextRoute, handleAnimationEnd } =
     useTransitionHelper({
       currentChildren: children,
     });
+  const { shouldMoveToBack } = useHistoryStack();
 
   const renderRouteElement = (route: RouteInfo) => {
     return route?.element ?? null;
@@ -14,9 +16,13 @@ function Transition({ children }: PropsWithChildren): JSX.Element {
 
   return (
     <StyledAnimatingBox
+      shouldMoveToBack={shouldMoveToBack}
       isAnimating={isAnimationReady}
       onAnimationEnd={handleAnimationEnd}
     >
+      {isAnimationReady && shouldMoveToBack && (
+        <Wrapper>{renderRouteElement(nextRoute)}</Wrapper>
+      )}
       <Wrapper key={currentRoute.locationInfo?.pathname}>
         {renderRouteElement(currentRoute)}
       </Wrapper>
@@ -49,12 +55,18 @@ const routeKeyframes = {
     }`,
 };
 
-const StyledAnimatingBox = styled.div<{ isAnimating?: boolean }>`
-  ${({ isAnimating }) =>
+const StyledAnimatingBox = styled.div<{
+  shouldMoveToBack: boolean;
+  isAnimating?: boolean;
+}>`
+  ${({ isAnimating, shouldMoveToBack }) =>
     isAnimating &&
     css`
       display: flex;
-      animation: ${routeKeyframes.right} ease-in-out 0.5s forwards;
+      animation: ${shouldMoveToBack
+          ? routeKeyframes.left
+          : routeKeyframes.right}
+        ease-in-out 0.5s forwards;
     `};
 `;
 

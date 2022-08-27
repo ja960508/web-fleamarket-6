@@ -1,4 +1,5 @@
 import { createContext, PropsWithChildren, useEffect, useState } from 'react';
+import historyStack from '../historyStack';
 
 export type NextPathType = string | -1;
 export type PathDispatchOptions = {
@@ -23,6 +24,7 @@ function PathProvider({ children }: PropsWithChildren) {
   ) => {
     if (nextPath === -1) {
       window.history.back();
+      historyStack.pop();
       return;
     }
 
@@ -30,15 +32,18 @@ function PathProvider({ children }: PropsWithChildren) {
 
     if (options?.replace) {
       window.history.replaceState(options?.state, '', nextPath);
+      historyStack.update(nextPath);
       return;
     }
 
     window.history.pushState(options?.state, '', nextPath);
+    historyStack.push(nextPath);
   };
 
   useEffect(() => {
     const handlePopState = () => {
       setPath(location.pathname);
+      historyStack.pop();
     };
 
     window.addEventListener('popstate', handlePopState);
