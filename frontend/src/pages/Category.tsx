@@ -16,7 +16,9 @@ function Category() {
       const result = await remote('/category');
       return result.data;
     },
-    CATEGORY_EXPIRE_TIME,
+    {
+      expireTime: CATEGORY_EXPIRE_TIME,
+    },
   );
 
   return (

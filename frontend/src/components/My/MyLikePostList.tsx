@@ -22,7 +22,7 @@ function MyLikePostList() {
       ) : (
         <ul>
           {products.map((item) => (
-            <ProductItem key={item.id} product={item} />
+            <ProductItem isAuthor={false} key={item.id} product={item} />
           ))}
         </ul>
       )}

@@ -23,7 +23,7 @@ interface ProductInputsType {
   thumbnails: string[];
 }
 
-const MAX_PRICE = 1000000000;
+const MAX_PRICE = 1_000_000_000;
 
 function PostManager() {
   const userInfo = useContext(UserInfoContext);
