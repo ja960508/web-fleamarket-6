@@ -1,14 +1,16 @@
-import { FormEvent, useContext, useEffect, useState } from 'react';
+import { FormEvent, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { LogoutIcon, SendIcon } from '../../assets/icons/icons';
 import ChatList from '../../components/Chat/ChatList';
 import ChatMessage from '../../components/Chat/ChatMessage';
 import Loading from '../../components/commons/Loading';
 import Modal from '../../components/commons/Modal/Modal';
+import ThumbnailImage from '../../components/commons/ThumbnailImage';
 import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import { useModal } from '../../hooks/useModal';
+import useQuery from '../../hooks/useQuery';
 import useSocket from '../../hooks/useSocket';
 import { remote } from '../../lib/api';
 import { useNavigate, usePathParams } from '../../lib/Router';
@@ -19,14 +21,15 @@ import { ChatRoomInfo } from '../../types/chat';
 function Chat() {
   const [message, setMessage] = useState('');
   const { chatId } = usePathParams();
-  const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoomInfo>(null!);
+  const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoomInfo>();
   const userInfo = useContext(UserInfoContext);
   const [partner, setPartner] = useState<string>('partner');
+  const chatListRef = useRef<HTMLOListElement>(null);
   const { isModalOpen, openModal, closeModal } = useModal();
   const navigate = useNavigate();
 
   // const { data: chatRoomInfo } = useQuery<ChatRoomInfo>(
-  //   ['chat', chatId],
+  //   ['chat' + chatId, chatId],
   //   async () => {
   //     const result = await remote(`/chat/${chatId}`);
 
@@ -50,7 +53,7 @@ function Chat() {
       setPartner(partner.data.nickname);
       setChatRoomInfo(result.data);
     })();
-  }, [chatId, userInfo]);
+  }, [chatId, userInfo, navigate]);
 
   const { isLoading, sendMessage, receivedData } = useSocket(chatRoomInfo);
 
@@ -72,11 +75,13 @@ function Chat() {
     await remote.delete(`/chat/${chatId}`);
     navigate('/my');
   };
+
   useEffect(() => {
     if (chatListRef.current) {
       chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
     }
   }, [receivedData]);
+
   return (
     <StyledWrapper>
       {isLoading ? (
@@ -101,10 +106,9 @@ function Chat() {
             }
           />
           <StyledProductInfo>
-            <img
+            <ThumbnailImage
+              url={chatRoomInfo?.roomInfo.thumbnails[0]}
               className="post-image"
-              src={chatRoomInfo?.roomInfo.thumbnails[0]}
-              alt="post_images"
             />
             <div className="product-info">
               <div>{chatRoomInfo?.roomInfo.name}</div>
@@ -120,7 +124,7 @@ function Chat() {
               }
             </div>
           </StyledProductInfo>
-          <ChatList>
+          <ChatList ref={chatListRef}>
             {receivedData.map((chatMessage) => (
               <ChatMessage
                 key={chatMessage.id}

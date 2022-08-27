@@ -1,9 +1,13 @@
-import { PropsWithChildren } from 'react';
+import { forwardRef } from 'react';
 import styled from 'styled-components';
 
-function ChatList({ children }: PropsWithChildren) {
-  return <StyledChatList>{children}</StyledChatList>;
-}
+type Props = { children: React.ReactNode };
+
+const ChatList = forwardRef<HTMLOListElement, Props>((props, ref) => (
+  <StyledChatList ref={ref}>{props.children}</StyledChatList>
+));
+
+ChatList.displayName = 'ChatList';
 
 export default ChatList;
 

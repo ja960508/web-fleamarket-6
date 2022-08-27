@@ -4,6 +4,7 @@ import { useNavigate } from '../../lib/Router';
 import { StyledGuideMessage } from '../../pages/My';
 import colors from '../../styles/colors';
 import { textSmall } from '../../styles/fonts';
+import ThumbnailImage from '../commons/ThumbnailImage';
 
 function ChatRoomList() {
   const { chatRooms } = useChatRooms();
@@ -22,10 +23,9 @@ function ChatRoomList() {
             <div className="your-name">{item.buyerName || item.sellerName}</div>
             <div className="last-message">{item.lastChatMessage}</div>
           </div>
-          <img
+          <ThumbnailImage
             className="product-thumbnail"
-            src={item.thumbnails[0]}
-            alt="product_thumbnail"
+            url={item.thumbnails[0]}
           />
         </StyledChatList>
       ))}
