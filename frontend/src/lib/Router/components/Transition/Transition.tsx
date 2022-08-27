@@ -1,6 +1,6 @@
 import styled, { css, keyframes } from 'styled-components';
 import { PropsWithChildren } from 'react';
-import useTransitionHelper from './useTransitionHelper';
+import useTransitionHelper, { RouteInfo } from './useTransitionHelper';
 
 function Transition({ children }: PropsWithChildren): JSX.Element {
   const { isAnimationReady, currentRoute, nextRoute, handleAnimationEnd } =
@@ -8,15 +8,9 @@ function Transition({ children }: PropsWithChildren): JSX.Element {
       currentChildren: children,
     });
 
-  if (!isAnimationReady) {
-    return (
-      <StyledAnimatingBox>
-        <Wrapper key={currentRoute.locationInfo?.pathname}>
-          {currentRoute?.element ?? null}
-        </Wrapper>
-      </StyledAnimatingBox>
-    );
-  }
+  const renderRouteElement = (route: RouteInfo) => {
+    return route?.element ?? null;
+  };
 
   return (
     <StyledAnimatingBox
@@ -24,9 +18,9 @@ function Transition({ children }: PropsWithChildren): JSX.Element {
       onAnimationEnd={handleAnimationEnd}
     >
       <Wrapper key={currentRoute.locationInfo?.pathname}>
-        {currentRoute?.element ?? null}
+        {renderRouteElement(currentRoute)}
       </Wrapper>
-      <Wrapper>{nextRoute?.element ?? null}</Wrapper>
+      {isAnimationReady && <Wrapper>{renderRouteElement(nextRoute)}</Wrapper>}
     </StyledAnimatingBox>
   );
 }
