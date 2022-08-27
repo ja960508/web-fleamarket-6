@@ -13,12 +13,18 @@ function Home() {
   const { products, isLastPage, getProducts } = useGetProducts();
   useInfiniteScroll({ loader, asyncCallback: getProducts });
   const categoryIconURL = useHistoryState();
-  const { notice } = useToast();
+  const { notice, error, warn } = useToast();
+
+  const random = [notice, error, warn];
 
   return (
     <main>
       <HomeNavbar currentCategoryIcon={categoryIconURL} />
-      <button onClick={() => notice('아이 반가워')}>토스트 띄우기</button>
+      <button
+        onClick={() => random[Math.floor(Math.random() * 3)]('랜덤 노티스')}
+      >
+        토스트 띄우기
+      </button>
       <ul>
         {products?.map((product) => (
           <ProductItem key={product.id} product={product} isAuthor={false} />

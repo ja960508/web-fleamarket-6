@@ -3,30 +3,40 @@ import type { Dispatch } from 'react';
 
 export type ToastContentType = JSX.Element | string;
 export type ToastCssType = 'notice' | 'warn' | 'error';
-type ToastActionType = 'add' | 'clear';
 
 export interface ToastContextInfo {
   toastCssType: ToastCssType;
   toastContent: ToastContentType;
+  id: string;
 }
 
-interface ToastAction {
-  type: ToastActionType;
-  payload?: ToastContextInfo;
-}
+type ToastActionType =
+  | {
+      type: 'add';
+      payload: ToastContextInfo;
+    }
+  | {
+      type: 'remove';
+      payload: Partial<ToastContextInfo>;
+    }
+  | {
+      type: 'clear';
+    };
 
 const initialToastList: ToastContextInfo[] = [];
 
 export const ToastContext = {
   data: createContext<ToastContextInfo[]>(initialToastList),
-  dispatch: createContext<Dispatch<ToastAction>>(() => undefined),
+  dispatch: createContext<Dispatch<ToastActionType>>(() => undefined),
 };
 
-function toastReducer(state: ToastContextInfo[], action: ToastAction) {
+function toastReducer(state: ToastContextInfo[], action: ToastActionType) {
   switch (action.type) {
     case 'add':
       if (!action.payload) return state;
       return [...state, action.payload];
+    case 'remove':
+      return state.filter(({ id }) => id !== action.payload?.id);
     case 'clear':
     default:
       return [...initialToastList];

@@ -1,9 +1,8 @@
 import { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
-import styled, { css } from 'styled-components';
-import { ToastCssType } from '../../../context/ToastContext';
+import styled from 'styled-components';
 import useToast from '../../../hooks/useToast';
-import colors from '../../../styles/colors';
+import ToastContent from './ToastContent';
 
 function ToastPortal({ children }: PropsWithChildren) {
   const toastElement = document.getElementById('toast');
@@ -17,43 +16,36 @@ function ToastContainer() {
   return (
     <ToastPortal>
       <ToastBox>
-        {toastList.map(({ toastContent, toastCssType }) => (
-          <ToastContent type={toastCssType} key={toastContent + toastCssType}>
-            {toastContent}
-          </ToastContent>
-        ))}
+        <ToastSection>
+          {toastList.map(({ id, toastContent, toastCssType }) => (
+            <ToastContent key={id} toastId={id} toastCssType={toastCssType}>
+              {toastContent}
+            </ToastContent>
+          ))}
+        </ToastSection>
       </ToastBox>
     </ToastPortal>
   );
 }
 
-const ToastCss = {
-  notice: css`
-    background-color: ${colors.primary};
-    color: ${colors.white};
-  `,
-  warn: css`
-    background-color: ${colors.gray200};
-    color: ${colors.white};
-  `,
-  error: css`
-    background-color: ${colors.red};
-    color: ${colors.white};
-  `,
-};
-
-const ToastContent = styled.div<{ type: ToastCssType }>`
-  ${({ type }) => ToastCss[type]};
-`;
-
 const ToastBox = styled.div`
   position: fixed;
   bottom: 1rem;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 100%);
 
-  width: 5rem;
-  height: 2rem;
+  width: 80%;
+`;
+
+const ToastSection = styled.ol`
+  height: 25vh;
+  overflow-y: hidden;
+  transform: translateY(-100%);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
 `;
 
 export default ToastContainer;
