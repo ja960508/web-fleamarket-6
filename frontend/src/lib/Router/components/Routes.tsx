@@ -8,11 +8,12 @@ import {
   transformPathVariables,
 } from '../utils';
 import location from '../location';
+import NotFound from '../../../pages/NotFound';
 
 function Routes({ children }: { children: React.ReactNode }) {
   const path = useContext(PathContext);
 
-  let currentRoute = null;
+  let currentRoute = <NotFound />;
 
   Children.forEach(children, (child: React.ReactNode) => {
     if (!isValidChild(child)) {

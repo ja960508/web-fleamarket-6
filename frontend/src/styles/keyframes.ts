@@ -14,7 +14,7 @@ export const disappearWithOpacity = keyframes`
   }
 `;
 
-export const BannerAnimation = keyframes`
+export const bannerAnimation = keyframes`
   0% {
     opacity: 0.5;
   }
@@ -32,7 +32,7 @@ export const BannerAnimation = keyframes`
   }
 `;
 
-export const AppearFromBottom = keyframes`
+export const appearFromBottom = keyframes`
   from {
     transform: translateY(15px);
     opacity: 0.5;
@@ -43,7 +43,7 @@ export const AppearFromBottom = keyframes`
   }
 `;
 
-export const AppearFromTop = keyframes`
+export const appearFromTop = keyframes`
   from {
     transform: translateY(95%);
     opacity: 0.1;

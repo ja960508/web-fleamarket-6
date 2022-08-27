@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { HeartIcon } from '../../assets/icons/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
@@ -8,7 +8,7 @@ import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { useNavigate, usePathParams } from '../../lib/Router';
+import { Link, useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -27,7 +27,7 @@ function PostDetail() {
   const { authorOnlyDropDown } = useManageDropdown({
     productId: Number(productId),
   });
-  const { data: postDetail } = useQuery<ProductDetail>(
+  const { data: postDetail, isLoading } = useQuery<ProductDetail>(
     ['postDetail' + productId, productId],
     async () => {
       const { data } = await remote(`/product/${productId}`);
@@ -39,6 +39,10 @@ function PostDetail() {
     +productId,
     userId,
   );
+
+  useEffect(() => {
+    if (!postDetail && !isLoading) navigate('/404', { replace: true });
+  }, [postDetail, isLoading, navigate]);
 
   if (!postDetail) {
     return <PageHeader pageName="상품 상세" />;

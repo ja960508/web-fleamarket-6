@@ -9,6 +9,7 @@ import ChatList from './pages/Chat/ChatList';
 import ChatRoom from './pages/Chat/ChatRoom';
 import Home from './pages/Home';
 import My from './pages/My';
+import NotFound from './pages/NotFound';
 import PostDetail from './pages/Post/PostDetail';
 import PostManager from './pages/Post/PostManager';
 import RegionInfo from './pages/RegionInfo';
@@ -34,6 +35,7 @@ function App() {
           <Route path="/post/manage" element={<PostManager />} />
           <Route path="/chat" element={<ChatList />} />
           <Route path="/chat/:chatId" element={<ChatRoom />} />
+          <Route path="/404" element={<NotFound />} />
         </Routes>
       </Router>
     </>
