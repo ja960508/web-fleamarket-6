@@ -1,29 +1,39 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { AuthService } from '../auth/auth.service';
 import { ProductService } from './product.service';
 import {
+  CreateProductDTO,
+  ModifyProductDTO,
   ProductLikeRequestBody,
   ProductParam,
   ProductsGetOptions,
-  PostType,
 } from './types/product';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('write')
-  async writePost(@Body() post: PostType) {
-    return this.productService.writePost(post);
+  async writePost(@Body() post: CreateProductDTO) {
+    return this.productService.writePost({
+      ...post,
+      thumbnails: JSON.parse(post.thumbnails),
+    });
   }
 
   @Post(':productId/like')
@@ -36,6 +46,27 @@ export class ProductController {
       productId,
       isLiked,
     });
+  }
+
+  @Patch(':productId')
+  modifyProductById(
+    @Param()
+    { productId }: ProductParam,
+    @Body()
+    modifyProductDto: Partial<ModifyProductDTO>,
+  ) {
+    return this.productService.modifyPostById(productId, {
+      ...modifyProductDto,
+      thumbnails: JSON.parse(modifyProductDto.thumbnails),
+    });
+  }
+
+  @Delete(':productId')
+  deleteProductById(
+    @Param()
+    { productId }: ProductParam,
+  ) {
+    return this.productService.deletePostById(productId);
   }
 
   @Get(':productId')

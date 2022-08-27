@@ -1,5 +1,6 @@
 import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { remote } from '../lib/api';
+import memoryCache from '../lib/MemoryCache';
 import debounce from '../utils/debounce';
 
 interface LikeInfo {
@@ -22,6 +23,7 @@ function useProductLike(
           userId,
           isLiked: !currentIsLiked,
         });
+        memoryCache.removeCacheData('products');
       } catch (e) {
         alert('좋아요 누르기에 실패했어요.');
         console.error(e);

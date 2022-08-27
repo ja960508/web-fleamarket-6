@@ -15,6 +15,7 @@ import {
   transformPathVariables,
 } from '../utils';
 import { LocationDispatch, LocationInfo } from '../providers/LocationProvider';
+import NotFound from '../../../pages/NotFound';
 
 function Routes({
   children,
@@ -30,7 +31,7 @@ function Routes({
   const currentPath = locationInfo?.pathname || path;
 
   const nextLocation = useRef<LocationInfo>();
-  const currentRoute = useRef(null);
+  const currentRoute = useRef(<NotFound />);
 
   Children.forEach(children, (child: React.ReactNode) => {
     if (!isValidChild(child)) {

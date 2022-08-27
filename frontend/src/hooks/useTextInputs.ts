@@ -10,7 +10,7 @@ function useTextInputs<T>({ initialValue }: useTextInputsProps<T>) {
   const handleChange =
     (key: keyof T, regex = /[\s]/) =>
     ({ target }: React.ChangeEvent<HTMLInputElement & HTMLSelectElement>) => {
-      let value = target.value.replace(regex, '');
+      const value = target.value.replace(regex, '');
 
       setInputs({
         ...inputs,

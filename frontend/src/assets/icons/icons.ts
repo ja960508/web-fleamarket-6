@@ -14,3 +14,4 @@ export { ReactComponent as MessageSquareIcon } from './messageSquareIcon.svg';
 export { ReactComponent as MoreVerticalIcon } from './moreVerticalIcon.svg';
 export { ReactComponent as SendIcon } from './sendIcon.svg';
 export { ReactComponent as UserIcon } from './userIcon.svg';
+export { ReactComponent as Arrow } from './arrow.svg';

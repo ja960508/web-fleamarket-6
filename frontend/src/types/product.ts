@@ -3,6 +3,7 @@ export interface ProductPreviewType {
   thumbnail: string;
   likeCount: number;
   createdAt: string;
+  deletedAt: string;
   isSold: boolean;
   authorId: number;
   name: string;
@@ -17,5 +18,6 @@ export interface ProductDetail extends ProductPreviewType {
   categoryName: string;
   authorName: string;
   description: string;
+  thumbnails: string[];
   viewCount: number;
 }

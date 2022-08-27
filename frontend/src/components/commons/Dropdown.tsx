@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import type { CSSProperties } from 'styled-components';
 import colors from '../../styles/colors';
 import { textSmall } from '../../styles/fonts';
 import mixin from '../../styles/mixin';
+import { appearFromTop } from '../../styles/keyframes';
 
 interface DropDownElementInfo {
   content: {
@@ -32,7 +33,8 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
     const handleClickOutsideDropdown = ({ target }: Event) => {
       if (!(target instanceof HTMLElement) || !dropDownRef.current) return;
 
-      if (dropDownRef.current.contains(target)) return;
+      if (dropDownRef.current.contains(target) || target.closest('#modal'))
+        return;
 
       toggleDropDown(false);
     };
@@ -44,12 +46,26 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
   }, []);
 
   return (
-    <StyledDropDown ref={dropDownRef} onClick={() => toggleDropDown()}>
+    <StyledDropDown
+      ref={dropDownRef}
+      onClick={(event) => {
+        event.stopPropagation();
+        toggleDropDown();
+      }}
+    >
       {initialDisplay}
       {isDropDownOpen && (
         <DropDownList>
           {dropDownElements.map(({ content: { text, style }, onClick }) => (
-            <DropDownElement key={text} onClick={onClick} style={style}>
+            <DropDownElement
+              key={text}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+                toggleDropDown(false);
+              }}
+              style={style}
+            >
               {text}
             </DropDownElement>
           ))}
@@ -59,18 +75,6 @@ function DropDown({ initialDisplay, dropDownElements }: DropDownProps) {
   );
 }
 
-const DropDownTransition = keyframes`
-  from {
-    transform: translateY(95%);
-    opacity: 0.1;
-  }
-
-  to {
-    transform: translateY(100%);
-    opacity: 1;
-  }
-`;
-
 const StyledDropDown = styled.button`
   position: relative;
 `;
@@ -79,7 +83,6 @@ const DropDownList = styled.ul`
   position: absolute;
   bottom: 0;
   right: 0;
-  transform: translateY(100%);
 
   width: 8rem;
 
@@ -91,7 +94,7 @@ const DropDownList = styled.ul`
   background-color: ${colors.offWhite};
   border-radius: 10px;
 
-  animation: ${DropDownTransition} ease-in-out 0.2s forwards;
+  animation: ${appearFromTop} ease-in-out 0.1s forwards;
 `;
 
 const DropDownElement = styled.li`

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { HeartIcon } from '../../assets/icons/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
@@ -8,7 +8,7 @@ import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, usePathParams } from '../../lib/Router';
+import { useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -21,22 +21,33 @@ import { ProductDetail } from '../../types/product';
 import { parseDateFromNow } from '../../utils/parse';
 
 function PostDetail() {
+  const navigate = useNavigate();
   const { userId } = useContext(UserInfoContext);
   const { productId } = usePathParams();
   const { authorOnlyDropDown } = useManageDropdown(productId);
-  const { data: postDetail } = useQuery<ProductDetail>(
+  const {
+    data: postDetail,
+    isLoading,
+    errorCode,
+  } = useQuery<ProductDetail>(
     ['postDetail' + productId, productId],
     async () => {
       const { data } = await remote(`/product/${productId}`);
+
       return data;
     },
     { skip: !productId },
   );
+
   const { optimisticLikeInfo, handleLikeProduct } = useProductLike(
     { isLiked: Boolean(postDetail?.isLiked), likeCount: 0 },
     +productId,
     userId,
   );
+
+  useEffect(() => {
+    if (!postDetail && errorCode === 404) navigate('/404', { replace: true });
+  }, [postDetail, errorCode, navigate]);
 
   if (!postDetail) {
     return <PageHeader pageName="상품 상세" />;
@@ -55,6 +66,7 @@ function PostDetail() {
     chatCount,
     likeCount,
     regionName,
+    thumbnails,
   } = postDetail;
 
   const isAuthorOfProduct = userId === authorId;
@@ -62,13 +74,46 @@ function PostDetail() {
     ? `채팅 목록 보기 ${chatCount > 0 ? `(${chatCount})` : ''}`
     : '문의하기';
 
+  const handleRequestChat = async () => {
+    if (isAuthorOfProduct) {
+      navigate(`/my?tab=1&userId=${userId}&productId=${productId}`);
+      return;
+    }
+
+    const { data: existRoom } = await remote(
+      `chat/check?userId=${userId}&productId=${productId}`,
+    );
+
+    if (existRoom) {
+      navigate(`/chat/${existRoom.roomId}`);
+
+      return;
+    }
+
+    const {
+      data: { roomId },
+    } = await remote.post(`chat`, {
+      buyerId: userId,
+      sellerId: authorId,
+      productId,
+    });
+
+    navigate(`/chat/${roomId}`);
+  };
+
   return (
     <>
       <PageHeader
         pageName="상품 상세보기"
         extraButton={isAuthorOfProduct && authorOnlyDropDown}
       />
-      <ImageSlider />
+      <ImageSlider>
+        {thumbnails.map((item) => (
+          <li key={item}>
+            <img src={item} alt="product_images" />
+          </li>
+        ))}
+      </ImageSlider>
       <StyledPostDetail>
         <div className="sale-status">{isSold ? '판매완료' : '판매중'}</div>
         <h1>{name}</h1>
@@ -85,7 +130,6 @@ function PostDetail() {
         </BoxWithDelimiter>
         <SellerInfo>
           <span>판매자 정보</span>
-
           <span className="product-author">{authorName}</span>
           <span className="product-region">{regionName}</span>
         </SellerInfo>
@@ -98,9 +142,9 @@ function PostDetail() {
           <span className="delimiter-vertical" />
           <span className="product-price">{price.toLocaleString()}</span>
         </div>
-        <Link to="/chat" className="chat-link">
+        <button type="button" onClick={handleRequestChat}>
           {chatLinkText}
-        </Link>
+        </button>
       </PostFooter>
     </>
   );
@@ -175,12 +219,21 @@ const SellerInfo = styled.div`
 `;
 
 const PostFooter = styled.footer<{ isLiked: boolean }>`
+  position: sticky;
+  bottom: 0;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   padding: 1rem;
   border: 1px solid ${colors.gray200};
+  border-left-width: 0;
+  border-right-width: 0;
+
+  ${mixin.shadow.normal};
+
+  background-color: white;
 
   svg {
     ${({ isLiked }) =>
@@ -206,10 +259,7 @@ const PostFooter = styled.footer<{ isLiked: boolean }>`
 
     .product-price {
       ${textSmall};
-
-      &::after {
-        content: '원';
-      }
+      ${mixin.concatWonUnit};
     }
   }
 

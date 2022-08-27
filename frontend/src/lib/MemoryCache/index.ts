@@ -11,7 +11,7 @@ interface QueryCache {
 }
 
 interface TimerMap {
-  [queryKey: QueryKey]: NodeJS.Timeout;
+  [queryKey: QueryKey]: number;
 }
 
 class MemoryCache {
