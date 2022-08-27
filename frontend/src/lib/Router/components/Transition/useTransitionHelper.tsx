@@ -73,8 +73,8 @@ function useTransitionHelper({
     if (isMount.current && !isAnimationReady) {
       const { element, locationInfo } = nextRoute;
 
-      const changeNextRouteInfo = changeRoute('current');
-      changeNextRouteInfo({
+      const changeCurrentRouteInfo = changeRoute('current');
+      changeCurrentRouteInfo({
         children: element,
         locationInfo,
       });

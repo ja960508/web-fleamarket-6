@@ -1,10 +1,4 @@
-import React, {
-  cloneElement,
-  ComponentProps,
-  isValidElement,
-  PropsWithoutRef,
-  ReactNode,
-} from 'react';
+import React, { cloneElement, isValidElement, ReactNode } from 'react';
 
 const ROUTE_PARAMETER_REGEX = /:(\w+)/g;
 const QUERY_STRING_REGEXP = /\?[\w=&]+/g;
@@ -102,8 +96,14 @@ export function getPathParams({
   );
 }
 
-export function cloneChildren(children: ReactNode, props: any) {
+export function cloneChildren(
+  children: ReactNode,
+  locationInfo?: { pathname?: string; search?: string },
+) {
   const cloneTarget = isValidElement(children) ? children : <>{children}</>;
 
-  return cloneElement(cloneTarget, props);
+  return cloneElement(cloneTarget, {
+    key: locationInfo?.pathname,
+    locationInfo,
+  });
 }

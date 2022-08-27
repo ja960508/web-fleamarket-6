@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { PropsWithChildren } from 'react';
 import useTransitionHelper from './useTransitionHelper';
 
@@ -9,12 +9,23 @@ function Transition({ children }: PropsWithChildren): JSX.Element {
     });
 
   if (!isAnimationReady) {
-    return <>{currentRoute?.element ?? null}</>;
+    return (
+      <StyledAnimatingBox>
+        <Wrapper key={currentRoute.locationInfo?.pathname}>
+          {currentRoute?.element ?? null}
+        </Wrapper>
+      </StyledAnimatingBox>
+    );
   }
 
   return (
-    <StyledAnimatingBox onAnimationEnd={handleAnimationEnd}>
-      <Wrapper>{currentRoute?.element ?? null}</Wrapper>
+    <StyledAnimatingBox
+      isAnimating={isAnimationReady}
+      onAnimationEnd={handleAnimationEnd}
+    >
+      <Wrapper key={currentRoute.locationInfo?.pathname}>
+        {currentRoute?.element ?? null}
+      </Wrapper>
       <Wrapper>{nextRoute?.element ?? null}</Wrapper>
     </StyledAnimatingBox>
   );
@@ -44,9 +55,13 @@ const routeKeyframes = {
     }`,
 };
 
-const StyledAnimatingBox = styled.div`
-  display: flex;
-  animation: ${routeKeyframes.right} ease-in-out 0.5s forwards;
+const StyledAnimatingBox = styled.div<{ isAnimating?: boolean }>`
+  ${({ isAnimating }) =>
+    isAnimating &&
+    css`
+      display: flex;
+      animation: ${routeKeyframes.right} ease-in-out 0.5s forwards;
+    `};
 `;
 
 export default Transition;
