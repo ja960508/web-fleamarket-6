@@ -62,7 +62,7 @@ function useQuery<T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryKey, ...refetchArgs, queryOptions?.skip]);
 
-  return { data, isLoading };
+  return { data, isLoading, errorCode };
 }
 
 export default useQuery;

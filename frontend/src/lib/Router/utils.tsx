@@ -57,10 +57,13 @@ export function getQueryString(search: string): {
 } {
   if (!search) return {};
 
-  return search.split('&').reduce((acc, querystring) => {
-    const [key, val] = querystring.split('=');
-    return { ...acc, [key]: val };
-  }, {});
+  return search
+    .replace('?', '')
+    .split('&')
+    .reduce((acc, querystring) => {
+      const [key, val] = querystring.split('=');
+      return { ...acc, [key]: val };
+    }, {});
 }
 
 export function getPathParams({

@@ -25,11 +25,7 @@ function PostDetail() {
   const { userId } = useContext(UserInfoContext);
   const { productId } = usePathParams();
   const { authorOnlyDropDown } = useManageDropdown(productId);
-  const {
-    data: postDetail,
-    isLoading,
-    errorCode,
-  } = useQuery<ProductDetail>(
+  const { data: postDetail, errorCode } = useQuery<ProductDetail>(
     ['postDetail' + productId, productId],
     async () => {
       const { data } = await remote(`/product/${productId}`);

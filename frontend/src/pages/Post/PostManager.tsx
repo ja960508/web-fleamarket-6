@@ -47,7 +47,7 @@ function PostManager() {
       const { data } = await remote(`/product/${productId}`);
       return data;
     },
-    { skip: productId === null },
+    { skip: !productId },
   );
 
   const [productInputs, setProductInputs] = useState<ProductInputsType>({

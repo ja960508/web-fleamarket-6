@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext } from 'react';
 import { LocationContext } from './providers/LocationProvider';
 import { PathDispatch } from './components/../providers/PathProvider';
 import { getQueryString } from './utils';
