@@ -1,3 +1,4 @@
+import ToastContainer from './components/commons/Toast/ToastContainer';
 import useToken from './hooks/useToken';
 import { Route, Router, Routes } from './lib/Router';
 import OAuthRedirect from './pages/Auth/OAuthRedirect';
@@ -19,6 +20,7 @@ function App() {
   return (
     <>
       <GlobalStyles />
+      <ToastContainer />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />

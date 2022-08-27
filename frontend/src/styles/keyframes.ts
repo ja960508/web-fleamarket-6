@@ -1,5 +1,19 @@
 import { keyframes } from 'styled-components';
 
+export const disappearWithOpacity = keyframes`
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+  }
+`;
+
 export const BannerAnimation = keyframes`
   0% {
     opacity: 0.5;
@@ -38,6 +52,19 @@ export const AppearFromTop = keyframes`
   to {
     transform: translateY(110%);
     opacity: 1;
+  }
+`;
+
+export const appearFromLeft = keyframes`
+  0% {
+    transform: translateX(-100%);
+  }
+  90% {
+    transform: translateX(5%);
+  }
+
+  100% {
+    transform: translate(0);
   }
 `;
 

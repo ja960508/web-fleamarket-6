@@ -5,6 +5,7 @@ import PostAddButton from '../components/Post/PostAddButton';
 import ProductItem from '../components/Product/ProductItem';
 import useGetProducts from '../hooks/useGetProducts';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
+import useToast from '../hooks/useToast';
 import { useHistoryState } from '../lib/Router/hooks';
 
 function Home() {
@@ -18,7 +19,7 @@ function Home() {
       <HomeNavbar currentCategoryIcon={categoryIconURL} />
       <ul>
         {products?.map((product) => (
-          <ProductItem key={product.id} product={product} />
+          <ProductItem key={product.id} product={product} isAuthor={false} />
         ))}
       </ul>
       {!isLastPage && <Loading ref={loader} />}
