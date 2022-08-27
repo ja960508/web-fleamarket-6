@@ -86,6 +86,11 @@ function PostManager() {
       return;
     }
 
+    if (files.length + productInputs.thumbnails.length > 10) {
+      alert('사진을 10개 넘게 올릴 수 없습니다.');
+      return;
+    }
+
     const formData = new FormData();
     [...files].forEach((file) => formData.append('thumbnails', file));
 

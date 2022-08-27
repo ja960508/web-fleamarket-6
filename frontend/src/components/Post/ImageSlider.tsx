@@ -1,11 +1,8 @@
-function ImageSlider() {
-  return (
-    <img
-      src="http://source.unsplash.com/random"
-      className="image-slider"
-      style={{ width: '100%', height: '15rem', objectFit: 'cover' }}
-    />
-  );
+import React from 'react';
+import Slider from '../commons/Slider';
+
+function ImageSlider({ children }: { children: React.ReactNode }) {
+  return <Slider>{children}</Slider>;
 }
 
 export default ImageSlider;

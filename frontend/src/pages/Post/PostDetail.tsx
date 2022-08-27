@@ -31,6 +31,7 @@ function PostDetail() {
     ['postDetail' + productId, productId],
     async () => {
       const { data } = await remote(`/product/${productId}`);
+
       return data;
     },
   );
@@ -61,6 +62,7 @@ function PostDetail() {
     chatCount,
     likeCount,
     regionName,
+    thumbnails,
   } = postDetail;
 
   const isAuthorOfProduct = userId === authorId;
@@ -101,7 +103,13 @@ function PostDetail() {
         pageName="상품 상세보기"
         extraButton={isAuthorOfProduct && authorOnlyDropDown}
       />
-      <ImageSlider />
+      <ImageSlider>
+        {thumbnails.map((item) => (
+          <li key={item}>
+            <img src={item} alt="product_images" />
+          </li>
+        ))}
+      </ImageSlider>
       <StyledPostDetail>
         <div className="sale-status">{isSold ? '판매완료' : '판매중'}</div>
         <h1>{name}</h1>
@@ -118,7 +126,6 @@ function PostDetail() {
         </BoxWithDelimiter>
         <SellerInfo>
           <span>판매자 정보</span>
-
           <span className="product-author">{authorName}</span>
           <span className="product-region">{regionName}</span>
         </SellerInfo>

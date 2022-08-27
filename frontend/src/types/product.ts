@@ -18,5 +18,6 @@ export interface ProductDetail extends ProductPreviewType {
   categoryName: string;
   authorName: string;
   description: string;
+  thumbnails: string[];
   viewCount: number;
 }
