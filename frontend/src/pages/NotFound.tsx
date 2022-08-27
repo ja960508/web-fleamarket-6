@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from '../lib/Router';
 import colors from '../styles/colors';
 import PageHeader from '../components/PageHeader/PageHeader';
-import { BannerAnimation } from '../styles/keyframes';
+import { bannerAnimation } from '../styles/keyframes';
 
 function NotFound() {
   return (
@@ -39,7 +39,7 @@ const StyledNotFound = styled.main`
 
     margin-bottom: 2rem;
 
-    animation: ${BannerAnimation} 4s ease-in-out infinite;
+    animation: ${bannerAnimation} 4s ease-in-out infinite;
   }
 `;
 
