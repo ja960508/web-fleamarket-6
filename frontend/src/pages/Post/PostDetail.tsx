@@ -68,6 +68,33 @@ function PostDetail() {
     ? `채팅 목록 보기 ${chatCount > 0 ? `(${chatCount})` : ''}`
     : '문의하기';
 
+  const handleRequestChat = async () => {
+    if (isAuthorOfProduct) {
+      navigate(`/my?tab=1&userId=${userId}&productId=${productId}`);
+      return;
+    }
+
+    const { data: existRoom } = await remote(
+      `chat/check?userId=${userId}&productId=${productId}`,
+    );
+
+    if (existRoom) {
+      navigate(`/chat/${existRoom.roomId}`);
+
+      return;
+    }
+
+    const {
+      data: { roomId },
+    } = await remote.post(`chat`, {
+      buyerId: userId,
+      sellerId: authorId,
+      productId,
+    });
+
+    navigate(`/chat/${roomId}`);
+  };
+
   return (
     <>
       <PageHeader
@@ -104,9 +131,9 @@ function PostDetail() {
           <span className="delimiter-vertical" />
           <span className="product-price">{price.toLocaleString()}</span>
         </div>
-        <Link to="/chat" className="chat-link">
+        <button type="button" onClick={handleRequestChat}>
           {chatLinkText}
-        </Link>
+        </button>
       </PostFooter>
     </>
   );
@@ -221,10 +248,7 @@ const PostFooter = styled.footer<{ isLiked: boolean }>`
 
     .product-price {
       ${textSmall};
-
-      &::after {
-        content: '원';
-      }
+      ${mixin.concatWonUnit};
     }
   }
 
