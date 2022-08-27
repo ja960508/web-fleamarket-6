@@ -10,7 +10,7 @@ import { Link, useNavigate } from '../../lib/Router';
 import colors from '../../styles/colors';
 import { textMedium, textSmall } from '../../styles/fonts';
 import loginBanner from '../../assets/login-banner.png';
-import { AppearFromBottom, BannerAnimation } from '../../styles/keyframes';
+import { appearFromBottom, bannerAnimation } from '../../styles/keyframes';
 
 function SignIn() {
   const dispatch = useContext(UserInfoDispatch);
@@ -160,7 +160,7 @@ const StyledLoginBanner = styled.img`
   border-radius: 4px;
   opacity: 0.5;
 
-  animation: ${BannerAnimation} infinite 1.5s ease;
+  animation: ${bannerAnimation} infinite 1.5s ease;
 `;
 
 const InputHideBox = styled.div`
@@ -170,5 +170,5 @@ const InputHideBox = styled.div`
     width: 100%;
   }
 
-  animation: ${AppearFromBottom} forwards 0.5s ease-in-out;
+  animation: ${appearFromBottom} forwards 0.5s ease-in-out;
 `;

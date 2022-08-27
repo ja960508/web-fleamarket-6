@@ -4,7 +4,7 @@ import type { CSSProperties } from 'styled-components';
 import colors from '../../styles/colors';
 import { textSmall } from '../../styles/fonts';
 import mixin from '../../styles/mixin';
-import { AppearFromTop } from '../../styles/keyframes';
+import { appearFromTop } from '../../styles/keyframes';
 
 interface DropDownElementInfo {
   content: {
@@ -94,7 +94,7 @@ const DropDownList = styled.ul`
   background-color: ${colors.offWhite};
   border-radius: 10px;
 
-  animation: ${AppearFromTop} ease-in-out 0.1s forwards;
+  animation: ${appearFromTop} ease-in-out 0.1s forwards;
 `;
 
 const DropDownElement = styled.li`
