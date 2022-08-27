@@ -10,7 +10,6 @@ import CustomInput from '../../components/CustomInput';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import { useModal } from '../../hooks/useModal';
-import useQuery from '../../hooks/useQuery';
 import useSocket from '../../hooks/useSocket';
 import { remote } from '../../lib/api';
 import { useNavigate, usePathParams } from '../../lib/Router';
@@ -27,16 +26,6 @@ function Chat() {
   const chatListRef = useRef<HTMLOListElement>(null);
   const { isModalOpen, openModal, closeModal } = useModal();
   const navigate = useNavigate();
-
-  // const { data: chatRoomInfo } = useQuery<ChatRoomInfo>(
-  //   ['chat' + chatId, chatId],
-  //   async () => {
-  //     const result = await remote(`/chat/${chatId}`);
-
-  //     console.log(result);
-  //     return result.data;
-  //   },
-  // );
 
   useEffect(() => {
     (async function () {

@@ -9,7 +9,6 @@ interface ChatMessageProps {
 }
 
 function ChatMessage({ chatMessage, isMine }: ChatMessageProps) {
-  console.log(chatMessage);
   return (
     <StyledChatMessageContainer isMine={isMine}>
       {isMine && (
