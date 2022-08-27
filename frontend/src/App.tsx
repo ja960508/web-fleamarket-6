@@ -5,7 +5,8 @@ import OAuthRedirect from './pages/Auth/OAuthRedirect';
 import SignIn from './pages/Auth/SignIn';
 import SignUp from './pages/Auth/SignUp';
 import Category from './pages/Category';
-import Chat from './pages/Chat';
+import ChatList from './pages/Chat/ChatList';
+import ChatRoom from './pages/Chat/ChatRoom';
 import Home from './pages/Home';
 import My from './pages/My';
 import PostDetail from './pages/Post/PostDetail';
@@ -31,7 +32,8 @@ function App() {
           <Route path="/auth/OAuth-redirect" element={<OAuthRedirect />} />
           <Route path="/post/:productId" element={<PostDetail />} />
           <Route path="/post/manage" element={<PostManager />} />
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat" element={<ChatList />} />
+          <Route path="/chat/:chatId" element={<ChatRoom />} />
         </Routes>
       </Router>
     </>

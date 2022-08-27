@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import colors from '../../styles/colors';
+import { spinAnimation } from '../../styles/keyframes';
 
 const Loading = forwardRef<HTMLDivElement>((_props, ref) => {
   return <LoadingSpinner ref={ref} />;
@@ -9,14 +10,6 @@ const Loading = forwardRef<HTMLDivElement>((_props, ref) => {
 Loading.displayName = 'loading';
 
 export default Loading;
-
-const spinAnimation = keyframes`
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
-		transform: rotate(1turn);
-}`;
 
 export const LoadingSpinner = styled.div`
   padding: 1rem;

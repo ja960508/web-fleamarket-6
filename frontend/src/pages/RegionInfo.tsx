@@ -75,7 +75,7 @@ const StyledForm = styled.form`
 
     .current-region {
       padding: 0.5rem;
-      background-color: #ff5c00;
+      background-color: ${colors.orange};
       border-radius: 8px;
       text-align: center;
       color: ${colors.white};
