@@ -96,7 +96,11 @@ const StyledProductItem = styled.li<{ isLiked: boolean }>`
   border-bottom: 1px solid ${colors.gray300};
 
   .product-name {
+    width: 80%;
     ${textMedium};
+    ${mixin.textEllipsis(2)};
+
+    word-break: keep-all;
     font-weight: 500;
   }
 
