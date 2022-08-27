@@ -1,6 +1,6 @@
 import { HeartIcon, MessageSquareIcon } from '../../assets/icons/icons';
 import { ProductPreviewType } from '../../types/product';
-import { parseDateFromNow } from '../../utils/parse';
+import { parseDateFromNow, parseNumberToLocaleString } from '../../utils/parse';
 import styled, { css } from 'styled-components';
 import colors from '../../styles/colors';
 import { textMedium, textSmall } from '../../styles/fonts';
@@ -9,6 +9,7 @@ import { UserInfoContext } from '../../context/UserInfoContext';
 import { Link as ProductDetailLink } from '../../lib/Router';
 import useProductLike from '../../hooks/useProductLike';
 import useManageDropdown from '../../hooks/useManageDropdown';
+import mixin from '../../styles/mixin';
 
 function ProductItem({
   product,
@@ -54,7 +55,9 @@ function ProductItem({
             <span className="delimiter"></span>
             <span>{parseDateFromNow(createdAt)}</span>
           </div>
-          <strong className="product-price">{price}</strong>
+          <strong className="product-price">
+            {parseNumberToLocaleString(price)}
+          </strong>
           <div className="product-count-group">
             {chatCount > 0 && (
               <span>
@@ -93,7 +96,11 @@ const StyledProductItem = styled.li<{ isLiked: boolean }>`
   border-bottom: 1px solid ${colors.gray300};
 
   .product-name {
+    width: 80%;
     ${textMedium};
+    ${mixin.textEllipsis(2)};
+
+    word-break: keep-all;
     font-weight: 500;
   }
 
@@ -115,6 +122,7 @@ const StyledProductItem = styled.li<{ isLiked: boolean }>`
   .product-price {
     font-weight: 500;
     ${textSmall};
+    ${mixin.concatWonUnit};
   }
 
   .tool-button {

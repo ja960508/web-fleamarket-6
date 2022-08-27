@@ -4,6 +4,10 @@ import { CheckIcon, ImageIcon, MapPinIcon } from '../../assets/icons/icons';
 import withCheckLogin from '../../components/HOC/withCheckLogin';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import ImagePreviewList from '../../components/Post/ImagePreviewList';
+import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH,
+} from '../../constants/limit';
 import { UserInfoContext } from '../../context/UserInfoContext';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
@@ -22,8 +26,6 @@ interface ProductInputsType {
   price: number;
   thumbnails: string[];
 }
-
-const MAX_PRICE = 1_000_000_000;
 
 function PostManager() {
   const userInfo = useContext(UserInfoContext);
@@ -63,8 +65,7 @@ function PostManager() {
     title.trim() !== '' &&
     description.trim() !== '' &&
     selectedCategory > 0 &&
-    price > 0 &&
-    price < MAX_PRICE;
+    price > 0;
 
   const isEditMode = prevProductDetail !== undefined;
 
@@ -202,6 +203,7 @@ function PostManager() {
               type="text"
               placeholder="글 제목"
               value={title}
+              maxLength={MAX_TITLE_LENGTH}
               onChange={({ target: { value } }) => handleChange('title', value)}
             />
             <div className="category-guide">
@@ -229,10 +231,7 @@ function PostManager() {
               placeholder="가격(선택사항)"
               value={price.toLocaleString()}
               onChange={({ target: { value } }) =>
-                handleChange(
-                  'price',
-                  parseLocaleStringToNumber(value, MAX_PRICE),
-                )
+                handleChange('price', parseLocaleStringToNumber(value))
               }
             />
           </div>
@@ -242,6 +241,7 @@ function PostManager() {
             className="description"
             placeholder="게시글 내용을 작성해주세요"
             value={description}
+            maxLength={MAX_DESCRIPTION_LENGTH}
             onChange={({ target: { value } }) =>
               handleChange('description', value)
             }
@@ -343,7 +343,7 @@ const StyledPostForm = styled.form`
     .category-guide {
       margin-bottom: 0.5rem;
       ${textSmall}
-      color: #828282;
+      color: ${colors.gray100};
     }
 
     .categories {
