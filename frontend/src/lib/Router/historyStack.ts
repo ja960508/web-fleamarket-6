@@ -6,12 +6,24 @@ class HistoryStack {
     this.observers = [];
   }
 
+  notify() {
+    this.observers.forEach((observer) => {
+      observer(this.historyStack.length);
+    });
+  }
+
+  observe(callbackFn: CallableFunction) {
+    this.observers.push(callbackFn);
+  }
+
   push(nextHistory: string) {
     this.historyStack.push(nextHistory);
+    this.notify();
   }
 
   pop() {
     this.historyStack.pop();
+    this.notify();
   }
 
   update(updateHistory: string) {
