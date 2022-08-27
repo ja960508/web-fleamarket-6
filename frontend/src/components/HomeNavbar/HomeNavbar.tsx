@@ -15,7 +15,7 @@ function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
   const userInfo = useContext(UserInfoContext);
 
   return (
-    <header>
+    <StyledHomeNavbar>
       <StyledNav>
         <LinkButton moveTo="/category">
           {currentCategoryIcon ? (
@@ -39,11 +39,17 @@ function HomeNavbar({ currentCategoryIcon }: { currentCategoryIcon: string }) {
           </LinkButton>
         </div>
       </StyledNav>
-    </header>
+    </StyledHomeNavbar>
   );
 }
 
 export default HomeNavbar;
+
+const StyledHomeNavbar = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 1;
+`;
 
 const StyledNav = styled.nav`
   display: flex;

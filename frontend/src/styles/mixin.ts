@@ -1,4 +1,5 @@
 import { css } from 'styled-components';
+import colors from './colors';
 
 export default {
   textEllipsis: (line: number) => css`
@@ -15,6 +16,9 @@ export default {
     `,
     normal: css`
       box-shadow: 0px 4px 4px rgb(0 0 0 / 10%), 0px 4px 20px rgb(0 0 0 / 10%);
+    `,
+    bottom: css`
+      box-shadow: 0px 2px 2px -2px ${colors.gray100};
     `,
   },
   concatWonUnit: css`

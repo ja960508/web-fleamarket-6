@@ -21,7 +21,12 @@ function PageHeader({ pageName, extraButton }: PageHeaderProps) {
 }
 
 const StyledHeader = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
   width: 100%;
+  height: 3.5rem;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;

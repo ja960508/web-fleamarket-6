@@ -7,7 +7,8 @@ import useMyPage from '../hooks/useMyPage';
 import { credentialRemote } from '../lib/api';
 import { useNavigate } from '../lib/Router';
 import colors from '../styles/colors';
-import { textSmall } from '../styles/fonts';
+import { textSmall, textXSmall } from '../styles/fonts';
+import mixin from '../styles/mixin';
 
 function My() {
   const dispatch = useContext(UserInfoDispatch);
@@ -24,7 +25,9 @@ function My() {
     <>
       <PageHeader
         pageName="마이페이지"
-        extraButton={<button onClick={handleLogout}>로그아웃</button>}
+        extraButton={
+          <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
+        }
       />
       <StyledMyPageTabs>
         {TABS.map((item) => (
@@ -45,13 +48,19 @@ function My() {
 export default My;
 
 const StyledMyPageTabs = styled.ul`
+  position: sticky;
+  top: 3.5rem;
+  z-index: 1;
+
   display: flex;
   justify-content: space-around;
   padding-top: 1rem;
   background-color: ${colors.offWhite};
+  ${mixin.shadow.bottom};
 
   li {
-    padding: 0 0.5rem 1rem 0.5rem;
+    padding: 0 0.5rem 0.75rem 0.5rem;
+    ${textXSmall};
   }
 
   .selected {
@@ -67,4 +76,10 @@ export const StyledGuideMessage = styled.div`
   padding: 1rem;
   ${textSmall};
   color: ${colors.gray200};
+`;
+
+const LogoutButton = styled.button`
+  ${textXSmall};
+  letter-spacing: -0.1em;
+  color: ${colors.gray100};
 `;
