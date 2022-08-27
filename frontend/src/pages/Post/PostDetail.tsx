@@ -42,7 +42,8 @@ function PostDetail() {
   );
 
   useEffect(() => {
-    if (!postDetail && errorCode === 404) navigate('/404', { replace: true });
+    if (!postDetail && (errorCode === 404 || errorCode === 400))
+      navigate('/404', { replace: true });
   }, [postDetail, errorCode, navigate]);
 
   if (!postDetail) {
