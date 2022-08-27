@@ -55,7 +55,10 @@ export class ProductController {
     @Body()
     modifyProductDto: Partial<ModifyProductDTO>,
   ) {
-    return this.productService.modifyPostById(productId, modifyProductDto);
+    return this.productService.modifyPostById(productId, {
+      ...modifyProductDto,
+      thumbnails: JSON.parse(modifyProductDto.thumbnails),
+    });
   }
 
   @Delete(':productId')
