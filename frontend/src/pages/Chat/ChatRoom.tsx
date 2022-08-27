@@ -72,7 +72,11 @@ function Chat() {
     await remote.delete(`/chat/${chatId}`);
     navigate('/my');
   };
-
+  useEffect(() => {
+    if (chatListRef.current) {
+      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+    }
+  }, [receivedData]);
   return (
     <StyledWrapper>
       {isLoading ? (
