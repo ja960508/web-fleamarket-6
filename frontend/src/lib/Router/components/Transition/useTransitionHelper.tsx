@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { PathContext } from '../../providers/PathProvider';
 import { cloneChildren } from '../../utils';
 
-interface RouteInfo {
+export interface RouteInfo {
   element?: JSX.Element;
   locationInfo?: {
     search?: string;
