@@ -1,16 +1,12 @@
 import {
   Children,
-  cloneElement,
   createContext,
-  isValidElement,
   PropsWithChildren,
-  ReactNode,
   useCallback,
   useEffect,
   useState,
 } from 'react';
-import { getQueryString } from '../utils';
-import { cloneChildren } from './Transition';
+import { cloneChildren } from '../utils';
 
 type ParamsType = {
   [pathParam: string]: string;
@@ -49,20 +45,6 @@ function LocationProvider({
     search: '',
     params: {},
   });
-
-  const cloneChildren = (
-    children: ReactNode,
-    locationInfo?: {
-      search?: string;
-      pathname?: string;
-    },
-  ) => {
-    const cloneTarget = isValidElement(children) ? children : <>{children}</>;
-    return cloneElement(cloneTarget, {
-      locationInfo,
-      key: locationInfo?.pathname,
-    });
-  };
 
   const changeLocation = useCallback(
     (partialLocation: Partial<LocationInfo>) => {

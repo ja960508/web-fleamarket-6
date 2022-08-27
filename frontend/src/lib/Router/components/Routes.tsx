@@ -2,10 +2,10 @@ import React, {
   Children,
   PropsWithChildren,
   useContext,
-  useLayoutEffect,
+  useEffect,
   useRef,
 } from 'react';
-import { PathContext } from './PathProvider';
+import { PathContext } from '../providers/PathProvider';
 import {
   getPathParams,
   isMatchedRoute,
@@ -14,7 +14,7 @@ import {
   throwError,
   transformPathVariables,
 } from '../utils';
-import { LocationDispatch, LocationInfo } from './LocationProvider';
+import { LocationDispatch, LocationInfo } from '../providers/LocationProvider';
 
 function Routes({
   children,
@@ -47,20 +47,18 @@ function Routes({
     if (isMatchedRoute(parsedPath, removeQueryString(currentPath))) {
       currentRoute.current = routeElement;
 
-      const resultParam = getPathParams({
-        currentPath,
-        pathRegex: parsedPath,
-        paramArray: params,
-      });
-
       nextLocation.current = {
         pathname: currentPath,
-        params: resultParam,
+        params: getPathParams({
+          currentPath,
+          pathRegex: parsedPath,
+          paramArray: params,
+        }),
         search: locationInfo?.search || '',
       };
     }
   });
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (nextLocation.current) {
       changeLocation(nextLocation.current);
     }

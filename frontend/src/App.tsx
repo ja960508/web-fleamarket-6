@@ -1,9 +1,9 @@
 import UserInfoProvider from './context/UserInfoContext';
 import useToken from './hooks/useToken';
 import { Route, Routes } from './lib/Router';
-import LocationProvider from './lib/Router/components/LocationProvider';
-import PathProvider from './lib/Router/components/PathProvider';
-import Transition from './lib/Router/components/Transition';
+import LocationProvider from './lib/Router/providers/LocationProvider';
+import PathProvider from './lib/Router/components/../providers/PathProvider';
+import Transition from './lib/Router/components/Transition/Transition';
 import OAuthRedirect from './pages/Auth/OAuthRedirect';
 import SignIn from './pages/Auth/SignIn';
 import SignUp from './pages/Auth/SignUp';

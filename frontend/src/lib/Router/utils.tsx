@@ -1,4 +1,10 @@
-import React, { isValidElement } from 'react';
+import React, {
+  cloneElement,
+  ComponentProps,
+  isValidElement,
+  PropsWithoutRef,
+  ReactNode,
+} from 'react';
 
 const ROUTE_PARAMETER_REGEX = /:(\w+)/g;
 const QUERY_STRING_REGEXP = /\?[\w=&]+/g;
@@ -94,4 +100,10 @@ export function getPathParams({
     },
     { ...result },
   );
+}
+
+export function cloneChildren(children: ReactNode, props: any) {
+  const cloneTarget = isValidElement(children) ? children : <>{children}</>;
+
+  return cloneElement(cloneTarget, props);
 }

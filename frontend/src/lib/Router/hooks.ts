@@ -1,6 +1,6 @@
-import { useContext } from 'react';
-import { LocationContext } from './components/LocationProvider';
-import { PathDispatch } from './components/PathProvider';
+import { useContext, useEffect, useRef } from 'react';
+import { LocationContext } from './providers/LocationProvider';
+import { PathDispatch } from './components/../providers/PathProvider';
 import { getQueryString } from './utils';
 
 export function useLocation() {
