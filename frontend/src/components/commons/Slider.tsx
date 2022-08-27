@@ -86,5 +86,13 @@ export const Container = styled.div<{ totalSlideLength: number }>`
       1fr
     );
     transition: transform 0.5s ease-in-out;
+
+    img {
+      margin: 0 auto;
+      height: 40vh;
+      width: 100vw;
+      display: block;
+      object-fit: contain;
+    }
   }
 `;
