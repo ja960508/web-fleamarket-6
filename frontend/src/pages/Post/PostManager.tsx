@@ -153,8 +153,6 @@ function PostManager() {
       navigate(fallbackUrl, { replace: true });
     };
 
-    console.log(prevProductDetailErrorCode);
-
     if (prevProductDetailErrorCode === 404) {
       fallback();
       return;
