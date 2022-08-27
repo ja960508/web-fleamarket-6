@@ -343,7 +343,7 @@ const StyledPostForm = styled.form`
     .category-guide {
       margin-bottom: 0.5rem;
       ${textSmall}
-      color: #828282;
+      color: ${colors.gray100};
     }
 
     .categories {

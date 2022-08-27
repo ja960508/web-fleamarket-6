@@ -144,7 +144,7 @@ const LoginCss = css`
 const StyledGithubOAuthLink = styled.a`
   ${LoginCss};
 
-  background-color: #666666;
+  background-color: ${colors.gray0};
 `;
 
 const StyledBasicLoginButton = styled.button`
