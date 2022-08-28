@@ -136,7 +136,8 @@ export class AuthService {
     return res[0];
   }
 
-  async getUserInfo(token: string) {
+  async getUserInfo(token?: string) {
+    if (!token) return null;
     try {
       const decoded = await new Promise((resolve, reject) => {
         jwt.verify(
