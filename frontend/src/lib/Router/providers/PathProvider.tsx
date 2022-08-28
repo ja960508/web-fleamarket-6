@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, PropsWithChildren, useEffect, useState } from 'react';
+import historyStack from '../historyStack';
 
 export type NextPathType = string | -1;
 export type PathDispatchOptions = {
@@ -14,7 +15,7 @@ type PathDispatchType = (
 export const PathContext = createContext('/');
 export const PathDispatch = createContext<PathDispatchType>(() => undefined);
 
-function PathProvider({ children }: { children: React.ReactNode }) {
+function PathProvider({ children }: PropsWithChildren) {
   const [path, setPath] = useState(location.pathname);
 
   const handlePathChange = (
@@ -23,6 +24,7 @@ function PathProvider({ children }: { children: React.ReactNode }) {
   ) => {
     if (nextPath === -1) {
       window.history.back();
+      historyStack.pop();
       return;
     }
 
@@ -30,15 +32,18 @@ function PathProvider({ children }: { children: React.ReactNode }) {
 
     if (options?.replace) {
       window.history.replaceState(options?.state, '', nextPath);
+      historyStack.update(nextPath);
       return;
     }
 
     window.history.pushState(options?.state, '', nextPath);
+    historyStack.push(nextPath);
   };
 
   useEffect(() => {
     const handlePopState = () => {
-      setPath(window.location.pathname);
+      setPath(location.pathname);
+      historyStack.pop();
     };
 
     window.addEventListener('popstate', handlePopState);

@@ -8,7 +8,7 @@ import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, useNavigate, usePathParams } from '../../lib/Router';
+import { useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -24,17 +24,17 @@ function PostDetail() {
   const navigate = useNavigate();
   const { userId } = useContext(UserInfoContext);
   const { productId } = usePathParams();
-  const { authorOnlyDropDown } = useManageDropdown({
-    productId: Number(productId),
-  });
-  const { data: postDetail, isLoading } = useQuery<ProductDetail>(
+  const { authorOnlyDropDown } = useManageDropdown(productId);
+  const { data: postDetail, errorCode } = useQuery<ProductDetail>(
     ['postDetail' + productId, productId],
     async () => {
       const { data } = await remote(`/product/${productId}`);
 
       return data;
     },
+    { skip: !productId },
   );
+
   const { optimisticLikeInfo, handleLikeProduct } = useProductLike(
     { isLiked: Boolean(postDetail?.isLiked), likeCount: 0 },
     +productId,
@@ -42,8 +42,9 @@ function PostDetail() {
   );
 
   useEffect(() => {
-    if (!postDetail && !isLoading) navigate('/404', { replace: true });
-  }, [postDetail, isLoading, navigate]);
+    if (!postDetail && (errorCode === 404 || errorCode === 400))
+      navigate('/404', { replace: true });
+  }, [postDetail, errorCode, navigate]);
 
   if (!postDetail) {
     return <PageHeader pageName="상품 상세" />;

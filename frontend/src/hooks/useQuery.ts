@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import memoryCache from '../lib/MemoryCache';
 
@@ -23,6 +24,7 @@ function useQuery<T>(
   const [queryKey, ...refetchArgs] = queryKeyWithArgs;
   const [data, setData] = useState<T>();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorCode, setErrorCode] = useState(0);
 
   useEffect(() => {
     async function fetchFromRemote() {
@@ -39,6 +41,9 @@ function useQuery<T>(
 
         setData(result);
       } catch (e) {
+        if (axios.isAxiosError(e)) {
+          setErrorCode(e.response?.status ?? 0);
+        }
         console.error(e);
       } finally {
         setIsLoading(false);
@@ -57,7 +62,7 @@ function useQuery<T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryKey, ...refetchArgs, queryOptions?.skip]);
 
-  return { data, isLoading };
+  return { data, isLoading, errorCode };
 }
 
 export default useQuery;
