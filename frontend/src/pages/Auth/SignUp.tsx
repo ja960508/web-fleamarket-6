@@ -31,8 +31,8 @@ function SignUp() {
   const signupWithGithub = async () => {
     const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-    const { data } = await credentialRemote.post('auth/signup', {
-      user: userInfo,
+    const { data } = await credentialRemote.post('/auth/signup', {
+      ...userInfo,
     });
 
     dispatch({
