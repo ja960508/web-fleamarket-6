@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Arrow } from '../../assets/icons/icons';
 import { useSlide } from '../../hooks/useSlide';
 import colors from '../../styles/colors';
+import ThumbnailImage from './ThumbnailImage';
 
 interface SliderType {
   children: React.ReactNode | React.ReactNode[];
@@ -32,15 +33,25 @@ function Slider({ children }: SliderType) {
     <OuterContainer>
       <Container totalSlideLength={totalSlideLength}>
         <ul className="slider" ref={ulRef}>
-          {children}
+          {totalSlideLength ? (
+            children
+          ) : (
+            <li>
+              <ThumbnailImage url={''} />
+            </li>
+          )}
         </ul>
       </Container>
-      <button className="arrow prev" onClick={prevSlide}>
-        <Arrow />
-      </button>
-      <button className="arrow next" onClick={nextSlide}>
-        <Arrow />
-      </button>
+      {totalSlideLength > 1 && (
+        <>
+          <button className="arrow prev" onClick={prevSlide}>
+            <Arrow />
+          </button>
+          <button className="arrow next" onClick={nextSlide}>
+            <Arrow />
+          </button>
+        </>
+      )}
     </OuterContainer>
   );
 }
