@@ -19,7 +19,7 @@ function useProductLike(
     useState<LikeInfo>(initialLikeInfo);
 
   const debouncedLikeHandler = useRef(
-    debounce(async (currentIsLiked: boolean) => {
+    debounce(async (currentIsLiked: boolean, productId: number) => {
       try {
         await remote.post(`/product/${productId}/like`, {
           userId,
@@ -42,6 +42,10 @@ function useProductLike(
 
   const handleLikeProduct = (e: MouseEvent) => {
     e.stopPropagation();
+    if (!productId) {
+      error('상품 정보를 가져오는데 실패했어요.');
+      return;
+    }
     if (!userId) {
       warn('로그인이 필요해요');
       return;
@@ -50,7 +54,7 @@ function useProductLike(
     const likeOrDislikeProduct = debouncedLikeHandler.current;
 
     togglLikeInfo();
-    likeOrDislikeProduct(optimisticLikeInfo.isLiked);
+    likeOrDislikeProduct(optimisticLikeInfo.isLiked, productId);
   };
 
   useEffect(() => {

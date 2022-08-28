@@ -39,7 +39,7 @@ function PostDetail() {
 
   const { optimisticLikeInfo, handleLikeProduct } = useProductLike(
     { isLiked: Boolean(postDetail?.isLiked), likeCount: 0 },
-    +productId,
+    productId ? +productId : 0,
     userId,
   );
 
