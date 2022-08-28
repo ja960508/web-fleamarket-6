@@ -167,13 +167,8 @@ function PostManager() {
       return;
     }
 
-    const { name, description, categoryId, thumbnail, price } =
+    const { name, description, categoryId, thumbnails, price } =
       prevProductDetail;
-
-    const thumbnails =
-      typeof thumbnail !== 'string'
-        ? ['http://source.unsplash.com/random']
-        : [thumbnail];
 
     setProductInputs({
       title: name,
@@ -202,7 +197,7 @@ function PostManager() {
         <div className="image-section">
           <label htmlFor="post_image" className="image-upload">
             <ImageIcon />
-            <span>{`${thumbnails.length}/10`}</span>
+            <span>{`${thumbnails?.length}/10`}</span>
           </label>
           <input
             id="post_image"
