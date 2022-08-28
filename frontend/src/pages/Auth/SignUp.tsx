@@ -31,8 +31,8 @@ function SignUp() {
   const signupWithGithub = async () => {
     const userInfo = { ...githubUser, regionId: selectedRegion.id };
 
-    const { data } = await credentialRemote.post('auth/signup', {
-      user: userInfo,
+    const { data } = await credentialRemote.post('/auth/signup', {
+      ...userInfo,
     });
 
     dispatch({
@@ -122,10 +122,6 @@ const StyledSignupForm = styled.form`
   display: flex;
   flex-direction: column;
   padding: 1rem;
-
-  input {
-    margin-bottom: 1rem;
-  }
 
   button[type='submit'] {
     padding: 0.625rem 0;

@@ -120,10 +120,6 @@ const StyledSignInForm = styled.form`
   padding-top: 3rem;
   text-align: center;
 
-  input {
-    margin-bottom: 1rem;
-  }
-
   .signup-link {
     margin-top: 15px;
     ${textSmall};
