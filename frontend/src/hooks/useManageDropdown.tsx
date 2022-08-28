@@ -9,11 +9,7 @@ import colors from '../styles/colors';
 import { textMedium } from '../styles/fonts';
 import { useModal } from './useModal';
 
-interface useManageDropdownProps {
-  productId: number;
-}
-
-function useManageDropdown({ productId }: useManageDropdownProps) {
+function useManageDropdown(productId: number) {
   const navigate = useNavigate();
   const { isModalOpen, closeModal, openModal } = useModal();
 

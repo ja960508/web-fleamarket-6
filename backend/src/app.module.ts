@@ -8,11 +8,12 @@ import { CategoryModule } from './domain/category/category.module';
 import { RegionModule } from './domain/region/region.module';
 import { ChatModule } from './domain/chat/chat.module';
 
+const isDevelopment = process.env.NODE_ENV === 'development';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: isDevelopment ? '.env.development' : '.env.production',
     }),
     MySQLModule,
     AuthModule,

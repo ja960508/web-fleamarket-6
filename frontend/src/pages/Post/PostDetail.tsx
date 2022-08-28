@@ -24,9 +24,7 @@ function PostDetail() {
   const navigate = useNavigate();
   const { userId } = useContext(UserInfoContext);
   const { productId } = usePathParams();
-  const { authorOnlyDropDown } = useManageDropdown({
-    productId: Number(productId),
-  });
+  const { authorOnlyDropDown } = useManageDropdown(Number(productId));
   const { data: postDetail, errorCode } = useQuery<ProductDetail>(
     ['postDetail' + productId, productId],
     async () => {

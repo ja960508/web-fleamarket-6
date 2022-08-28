@@ -35,9 +35,7 @@ function ProductItem({
     id,
     userInfo.userId,
   );
-  const { authorOnlyDropDown } = useManageDropdown({
-    productId: Number(id),
-  });
+  const { authorOnlyDropDown } = useManageDropdown(Number(id));
 
   return (
     <ProductDetailLink to={`/post/${id}`}>
