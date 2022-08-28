@@ -29,6 +29,10 @@ function Chat() {
 
   useEffect(() => {
     (async function () {
+      if (!chatId) {
+        return;
+      }
+
       const result = await remote(`/chat/${chatId}`);
 
       if (!result.data.roomInfo) {
