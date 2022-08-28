@@ -123,10 +123,6 @@ const StyledSignupForm = styled.form`
   flex-direction: column;
   padding: 1rem;
 
-  input {
-    margin-bottom: 1rem;
-  }
-
   button[type='submit'] {
     padding: 0.625rem 0;
     background-color: ${colors.primary};
