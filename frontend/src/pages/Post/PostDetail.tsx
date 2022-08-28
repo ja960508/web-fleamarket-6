@@ -8,7 +8,7 @@ import useManageDropdown from '../../hooks/useManageDropdown';
 import useProductLike from '../../hooks/useProductLike';
 import useQuery from '../../hooks/useQuery';
 import { remote } from '../../lib/api';
-import { Link, useNavigate, usePathParams } from '../../lib/Router';
+import { useNavigate, usePathParams } from '../../lib/Router';
 import colors from '../../styles/colors';
 import {
   textLarge,
@@ -32,7 +32,9 @@ function PostDetail() {
 
       return data;
     },
+    { skip: !productId },
   );
+
   const { optimisticLikeInfo, handleLikeProduct } = useProductLike(
     { isLiked: Boolean(postDetail?.isLiked), likeCount: 0 },
     +productId,

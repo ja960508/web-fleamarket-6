@@ -10,6 +10,7 @@ import { Link as ProductDetailLink } from '../../lib/Router';
 import useProductLike from '../../hooks/useProductLike';
 import useManageDropdown from '../../hooks/useManageDropdown';
 import mixin from '../../styles/mixin';
+import ThumbnailImage from '../commons/ThumbnailImage';
 
 function ProductItem({
   product,
@@ -27,6 +28,7 @@ function ProductItem({
     price,
     chatCount,
     isLiked,
+    thumbnails,
   } = product;
 
   const userInfo = useContext(UserInfoContext);
@@ -35,16 +37,13 @@ function ProductItem({
     id,
     userInfo.userId,
   );
-  const { authorOnlyDropDown } = useManageDropdown(Number(id));
+  const { authorOnlyDropDown } = useManageDropdown(id);
 
   return (
     <ProductDetailLink to={`/post/${id}`}>
       <StyledProductItem isLiked={optimisticLikeInfo.isLiked}>
         <div>
-          <img
-            src="http://source.unsplash.com/random"
-            alt="product_thumbnail"
-          />
+          <ThumbnailImage url={thumbnails[0]} />
         </div>
         <div className="product-meta">
           <h4 className="product-name">{name}</h4>

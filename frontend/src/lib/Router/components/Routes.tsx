@@ -1,19 +1,37 @@
-import React, { Children, useContext } from 'react';
-import { PathContext } from './PathProvider';
+import React, {
+  Children,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
+import { PathContext } from '../providers/PathProvider';
 import {
+  getPathParams,
   isMatchedRoute,
   isValidChild,
   removeQueryString,
   throwError,
   transformPathVariables,
 } from '../utils';
-import location from '../location';
+import { LocationDispatch, LocationInfo } from '../providers/LocationProvider';
 import NotFound from '../../../pages/NotFound';
 
-function Routes({ children }: { children: React.ReactNode }) {
+function Routes({
+  children,
+  locationInfo,
+}: PropsWithChildren<{
+  locationInfo?: {
+    pathname: string;
+    search: string;
+  };
+}>) {
   const path = useContext(PathContext);
+  const changeLocation = useContext(LocationDispatch);
+  const currentPath = locationInfo?.pathname || path;
 
-  let currentRoute = <NotFound />;
+  const nextLocation = useRef<LocationInfo>();
+  const currentRoute = useRef(<NotFound />);
 
   Children.forEach(children, (child: React.ReactNode) => {
     if (!isValidChild(child)) {
@@ -27,16 +45,27 @@ function Routes({ children }: { children: React.ReactNode }) {
       removeQueryString(routePath),
     );
 
-    if (isMatchedRoute(parsedPath, removeQueryString(path))) {
-      currentRoute = routeElement;
-      location.setLocation({
-        path: parsedPath,
-        params,
-      });
+    if (isMatchedRoute(parsedPath, removeQueryString(currentPath))) {
+      currentRoute.current = routeElement;
+
+      nextLocation.current = {
+        pathname: currentPath,
+        params: getPathParams({
+          currentPath,
+          pathRegex: parsedPath,
+          paramArray: params,
+        }),
+        search: locationInfo?.search || '',
+      };
     }
   });
+  useEffect(() => {
+    if (nextLocation.current) {
+      changeLocation(nextLocation.current);
+    }
+  }, []);
 
-  return currentRoute;
+  return <>{currentRoute.current}</>;
 }
 
 export default Routes;

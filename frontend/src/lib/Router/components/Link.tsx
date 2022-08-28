@@ -1,6 +1,6 @@
 import { MouseEvent } from 'react';
 import { useNavigate } from '../hooks';
-import { NextPathType } from './PathProvider';
+import { NextPathType } from '../providers/PathProvider';
 
 interface LinkProps {
   className?: string;

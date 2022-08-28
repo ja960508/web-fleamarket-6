@@ -27,6 +27,11 @@ function useManageDropdown(productId: number) {
     navigate(`/post/manage?productId=${productId}`);
   };
 
+  const handleCancle = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    closeModal();
+  };
+
   const productManageOptions = [
     {
       content: {
@@ -48,7 +53,7 @@ function useManageDropdown(productId: number) {
       <DeleteConfirmBox>
         <strong>정말 삭제하시겠어요?</strong>
         <div>
-          <CancelButton onClick={closeModal}>취소하기</CancelButton>
+          <CancelButton onClick={handleCancle}>취소하기</CancelButton>
           <DeleteButton onClick={handleDelete}>삭제하기</DeleteButton>
         </div>
       </DeleteConfirmBox>

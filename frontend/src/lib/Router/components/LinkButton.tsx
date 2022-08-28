@@ -1,5 +1,5 @@
 import { useNavigate } from '../hooks';
-import { NextPathType, PathDispatchOptions } from './PathProvider';
+import { NextPathType, PathDispatchOptions } from '../providers/PathProvider';
 
 interface LinkButtonProps {
   className?: string;
