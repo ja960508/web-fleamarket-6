@@ -81,7 +81,7 @@ function SignUp() {
 
   return (
     <>
-      <PageHeader pageName="회원가입" />
+      <PageHeader pageName="회원가입" prevUrl="/auth/sign-in" />
       <StyledSignupForm onSubmit={handleSignup}>
         {!githubUser && (
           <>
