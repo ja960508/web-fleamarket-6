@@ -30,6 +30,7 @@ function ToastContainer() {
 
 const ToastBox = styled.div`
   position: fixed;
+  z-index: -1;
   bottom: 1rem;
   left: 50%;
   transform: translate(-50%, 100%);

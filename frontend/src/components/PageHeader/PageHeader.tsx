@@ -6,12 +6,13 @@ import { textMedium } from '../../styles/fonts';
 interface PageHeaderProps {
   pageName: string;
   extraButton?: React.ReactNode;
+  prevUrl?: string;
 }
 
-function PageHeader({ pageName, extraButton }: PageHeaderProps) {
+function PageHeader({ pageName, extraButton, prevUrl }: PageHeaderProps) {
   return (
     <StyledHeader>
-      <LinkButton className="go-back-button" moveTo={-1}>
+      <LinkButton className="go-back-button" moveTo={prevUrl || -1}>
         <ChevronLeftIcon />
       </LinkButton>
       <h1>{pageName}</h1>
