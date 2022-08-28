@@ -9,7 +9,7 @@ import colors from '../styles/colors';
 import { textMedium } from '../styles/fonts';
 import { useModal } from './useModal';
 
-function useManageDropdown(productId: string) {
+function useManageDropdown(productId: number) {
   const navigate = useNavigate();
   const { isModalOpen, closeModal, openModal } = useModal();
 
@@ -25,6 +25,11 @@ function useManageDropdown(productId: string) {
 
   const handleModify = () => {
     navigate(`/post/manage?productId=${productId}`);
+  };
+
+  const handleCancle = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    closeModal();
   };
 
   const productManageOptions = [
@@ -48,7 +53,7 @@ function useManageDropdown(productId: string) {
       <DeleteConfirmBox>
         <strong>정말 삭제하시겠어요?</strong>
         <div>
-          <CancelButton onClick={closeModal}>취소하기</CancelButton>
+          <CancelButton onClick={handleCancle}>취소하기</CancelButton>
           <DeleteButton onClick={handleDelete}>삭제하기</DeleteButton>
         </div>
       </DeleteConfirmBox>

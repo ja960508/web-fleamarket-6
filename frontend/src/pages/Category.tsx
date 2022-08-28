@@ -6,6 +6,7 @@ import colors from '../styles/colors';
 import { textXSmall } from '../styles/fonts';
 import { LinkButton } from '../lib/Router';
 import useQuery from '../hooks/useQuery';
+import { CategoryIcon } from '../assets/icons/icons';
 
 const CATEGORY_EXPIRE_TIME = 1000 * 60 * 60 * 5;
 
@@ -25,6 +26,10 @@ function Category() {
     <main>
       <PageHeader pageName="카테고리" />
       <CategoryIconList>
+        <LinkButton moveTo={`/`} className="icon-button">
+          <CategoryIcon />
+          <span>전체보기</span>
+        </LinkButton>
         {data?.map(({ id, name, thumbnail }) => (
           <LinkButton
             options={{ state: thumbnail }}
@@ -55,7 +60,8 @@ const CategoryIconList = styled.div`
     align-items: center;
     gap: 1rem;
 
-    & > img {
+    & > img,
+    & > svg {
       width: 2.5rem;
       height: 2.5rem;
     }

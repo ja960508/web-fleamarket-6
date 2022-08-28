@@ -1,6 +1,6 @@
 export interface ProductPreviewType {
   id: number;
-  thumbnail: string;
+  thumbnails: string[];
   likeCount: number;
   createdAt: string;
   deletedAt: string;
