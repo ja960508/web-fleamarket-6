@@ -1,5 +1,5 @@
 function debounce(cb: CallableFunction, delay: number) {
-  let debounceTimer: NodeJS.Timer | null = null;
+  let debounceTimer: number | null = null;
 
   return function (...args: unknown[]) {
     if (debounceTimer) clearTimeout(debounceTimer);
