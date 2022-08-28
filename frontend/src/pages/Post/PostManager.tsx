@@ -41,14 +41,15 @@ function PostManager() {
     },
   );
 
-  const { data: prevProductDetail } = useQuery<ProductDetail>(
-    ['postDetail' + productId, productId],
-    async () => {
-      const { data } = await remote(`/product/${productId}`);
-      return data;
-    },
-    { skip: productId === null },
-  );
+  const { data: prevProductDetail, errorCode: prevProductDetailErrorCode } =
+    useQuery<ProductDetail>(
+      ['postDetail' + productId, productId],
+      async () => {
+        const { data } = await remote(`/product/${productId}`);
+        return data;
+      },
+      { skip: !productId },
+    );
 
   const [productInputs, setProductInputs] = useState<ProductInputsType>({
     title: '',
@@ -145,29 +146,43 @@ function PostManager() {
   };
 
   useEffect(() => {
-    if (prevProductDetail) {
-      if (prevProductDetail.authorId !== userInfo.userId) {
-        navigate(`/post/${prevProductDetail.id}`, { replace: true });
-        return;
-      }
+    const fallback = () => {
+      const fallbackUrl = prevProductDetail
+        ? `/post/${prevProductDetail.id}`
+        : '/';
+      navigate(fallbackUrl, { replace: true });
+    };
 
-      const { name, description, categoryId, thumbnail, price } =
-        prevProductDetail;
-
-      const thumbnails =
-        typeof thumbnail !== 'string'
-          ? ['http://source.unsplash.com/random']
-          : [thumbnail];
-
-      setProductInputs({
-        title: name,
-        description,
-        selectedCategory: categoryId,
-        thumbnails,
-        price,
-      });
+    if (prevProductDetailErrorCode === 404) {
+      fallback();
+      return;
     }
-  }, [prevProductDetail, userInfo, navigate]);
+
+    if (!prevProductDetail) {
+      return;
+    }
+
+    if (prevProductDetail.authorId !== userInfo.userId) {
+      fallback();
+      return;
+    }
+
+    const { name, description, categoryId, thumbnail, price } =
+      prevProductDetail;
+
+    const thumbnails =
+      typeof thumbnail !== 'string'
+        ? ['http://source.unsplash.com/random']
+        : [thumbnail];
+
+    setProductInputs({
+      title: name,
+      description,
+      selectedCategory: categoryId,
+      thumbnails,
+      price,
+    });
+  }, [prevProductDetail, prevProductDetailErrorCode, userInfo, navigate]);
 
   return (
     <StyledWrapper>

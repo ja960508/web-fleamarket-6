@@ -27,7 +27,7 @@ function PostDetail() {
   const { authorOnlyDropDown } = useManageDropdown({
     productId: Number(productId),
   });
-  const { data: postDetail, isLoading } = useQuery<ProductDetail>(
+  const { data: postDetail, errorCode } = useQuery<ProductDetail>(
     ['postDetail' + productId, productId],
     async () => {
       const { data } = await remote(`/product/${productId}`);
@@ -42,8 +42,9 @@ function PostDetail() {
   );
 
   useEffect(() => {
-    if (!postDetail && !isLoading) navigate('/404', { replace: true });
-  }, [postDetail, isLoading, navigate]);
+    if (!postDetail && (errorCode === 404 || errorCode === 400))
+      navigate('/404', { replace: true });
+  }, [postDetail, errorCode, navigate]);
 
   if (!postDetail) {
     return <PageHeader pageName="상품 상세" />;
