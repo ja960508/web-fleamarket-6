@@ -19,7 +19,7 @@
   </p>
 
   <span>⭐️ </span>
-  <a href="http://3.38.100.23/">데모 보러가기 (준비중)</a>
+  <a href="http://3.36.111.66/">데모 보러가기 (준비중)</a>
   <br />
   <span>:pen: </span>
   <a href="https://github.com/woowa-techcamp-2022/web-fleamarket-6/wiki">위키 보러가기 (준비중)</a>
